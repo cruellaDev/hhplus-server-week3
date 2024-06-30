@@ -4,6 +4,7 @@
 ### 시나리오 : - 콘서트 예약 서비스
 ---
 ## 프로젝트 milestone
+- [milestone](https://github.com/cruellaDev/hhplus-server-week3/issues)
 ---
 ## 요구사항분석
 ---
