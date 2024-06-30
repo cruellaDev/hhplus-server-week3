@@ -11,7 +11,7 @@
 ## 프로젝트 설계
 ### 시퀀스다이어그램
 ### ERD
-![ERD](/images/Concert ERD.png)
+![ERD](./images/ConcertERD.png)
 ### API 명세
 ---
 ## 작업과정
