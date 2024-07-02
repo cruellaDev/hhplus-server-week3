@@ -4,11 +4,11 @@
 ### 시나리오 : - 콘서트 예약 서비스
 ---
 ## 프로젝트 milestone
-- [milestone](https://github.com/cruellaDev/hhplus-server-week3/issues)
+- [milestone in github](https://github.com/cruellaDev/hhplus-server-week3/issues)
 ---
 ## 요구사항분석
 
-1. 유저 토큰 발급 API
+1. 유저 토큰 발급 / 조회 API
 - 유저를 식별할 토큰 발급
 - 폴링으로 본인 대기열 정보 확인 (대기열 순번 혹은 잔여 시간)
 
@@ -40,6 +40,19 @@
 ---
 ## 프로젝트 설계
 ### 시퀀스다이어그램
+1. 유저토큰 발급 조회 API
+![createUserToken](./images/createUserToken.png)
+![checkUserToken](./images/checkToken.png)
+2. 예약 가능 날짜 / 좌석 API
+![getAvailableConcert](./images/getConcertOptions.png)
+![getAvailableConcertSeat](./images/getConcertOptionsSeat.png)
+3. 좌석 예약 요청 API
+![reservation](./images/reservation.png)
+4. 포인트 잔액 충전 / 조회 API
+![chargePoint](./images/chargePoint.png)
+![getPoint](./images/getPoint.png)
+5. 결제 API
+![payment](./images/payment.png)
 ### ERD
 ![ERD](./images/ConcertERD.png)
 ### API 명세
@@ -48,7 +61,9 @@
 3주차
 - ~ 2024.06.30
   - 요구사항 분석
-  - 프로젝트 명세 문서 작성
   - ERD 설계
+- ~ 2024.07.02
+  - 프로젝트 명세 문서 작성
   - 프로젝트 세팅
+  - 시퀀스 다이어그램 작성
 
