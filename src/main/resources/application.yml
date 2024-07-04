@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: concert
+  profiles:
+    active: dev
+    group:
+      test: test
+      dev: dev
+
+logging:
+  level:
+    org.springframework: debug
+    org.hibernate.SQL: DEBUG

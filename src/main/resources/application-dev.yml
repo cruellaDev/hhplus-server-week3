@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  security:
+    user:
+      name: user
+      password: 1111
+
+  datasource:
+    url: "jdbc:mysql://localhost:13306/hhplusdev"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 500
