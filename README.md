@@ -36,7 +36,8 @@
 
 ---
 ## 프로젝트 milestone
-- [milestone in github](https://github.com/cruellaDev/hhplus-server-week3/milestone/1)
+- [milestone #1 in github](https://github.com/cruellaDev/hhplus-server-week3/milestone/1)
+- [milestone #2 in github](https://github.com/users/cruellaDev/projects/2/views/4)
 
 ---
 ## 요구사항분석
