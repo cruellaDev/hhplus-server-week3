@@ -21,7 +21,7 @@ public class CustomerController {
      * @param requestBody 요청 정보
      * @return 응답 정보
      */
-    @PostMapping("/point/balance")
+    @PostMapping("/point")
     public ResponseEntity<PostCustomerPointResponseBody> balanceCustomerPoint(@RequestBody PostBalanceRequestBody requestBody) {
         return ResponseEntity.ok().body(new PostCustomerPointResponseBody(requestBody.customerId(), BigDecimal.TEN));
     }

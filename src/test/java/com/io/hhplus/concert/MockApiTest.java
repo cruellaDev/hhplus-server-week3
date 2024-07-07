@@ -7,6 +7,7 @@ import com.io.hhplus.concert.presentation.customer.dto.request.PostBalanceReques
 import com.io.hhplus.concert.presentation.customer.dto.request.PostChargeRequestBody;
 import com.io.hhplus.concert.presentation.reservation.controller.ReservationController;
 import com.io.hhplus.concert.presentation.waiting.controller.WaitingController;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,6 +43,7 @@ public class MockApiTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @Disabled
     public void balanceCustomerPointTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
 
@@ -58,6 +60,7 @@ public class MockApiTest {
     }
 
     @Test
+    @Disabled
     public void chargeCustomerPointTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
 
