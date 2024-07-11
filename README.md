@@ -117,7 +117,10 @@
 
 
 ### ERD
-![ERD](images/ConcertERD.png)
+![ERD](images/performedAt.png)
+
+### API 명세 - Swagger UI
+![SWAGGER](images/swagger_ui.png)
 
 ### API 명세
 
@@ -251,4 +254,19 @@
     - Mock API 작성
     - 프로젝트 구동 테스트
     - Mock API 테스트
-
+- ~ 2024.07.07
+    - 패키지 구조 변경
+    - 프로젝트 세팅 사항 추가
+- ~ 2024.07.08
+    - 예약 가능 콘서트 공연 목록 조회 API 기능 구현
+    - 예약 가능 콘서트 공연 좌석 목록 조회 API 기능 구현
+- ~ 2024.07.09
+    - 포인트 잔액 조회 API 기능 구현
+    - 포인트 충전 API 기능 구현
+- ~ 2024.07.10
+    - 대기열 진입 API 기능 구현
+    - 대기열 정보 조회 API 기능 구현
+- ~ 2024.07.12
+    - 예약 요청 API 기능 구현
+    - 결제 요청 API 기능 구현
+    - Swagger UI 적용
