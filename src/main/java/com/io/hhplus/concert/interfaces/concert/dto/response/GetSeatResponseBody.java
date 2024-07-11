@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.concert.dto.response;
+package com.io.hhplus.concert.interfaces.concert.dto.response;
 
 public record GetSeatResponseBody(
         Long seatId,

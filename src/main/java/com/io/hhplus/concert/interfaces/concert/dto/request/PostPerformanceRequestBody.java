@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.concert.dto.request;
+package com.io.hhplus.concert.interfaces.concert.dto.request;
 
 import java.math.BigDecimal;
 
