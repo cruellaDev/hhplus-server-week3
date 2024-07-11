@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.reservation.dto.request;
+package com.io.hhplus.concert.interfaces.reservation.dto.request;
 
 public record PostReserverRequestBody(
         Long customerId,

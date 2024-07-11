@@ -1,10 +1,9 @@
-package com.io.hhplus.concert.presentation.reservation.dto.response;
+package com.io.hhplus.concert.interfaces.reservation.dto.response;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public record PostPayedTicketsResponseBody(
-        String reserverName,
+public record PostTicketResponseBody(
         Long concertId,
         String concertName,
         Long performanceId,
@@ -12,7 +11,6 @@ public record PostPayedTicketsResponseBody(
         BigDecimal price,
         String status,
         Long seatId,
-        String seatNo,
-        Date reservedAt
+        String seatNo
 ) {
 }

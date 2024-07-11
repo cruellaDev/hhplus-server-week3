@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.reservation.dto.response;
+package com.io.hhplus.concert.interfaces.reservation.dto.response;
 
 public record PostReservationResponseBody(
         Long customerId,

@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.reservation.dto;
+package com.io.hhplus.concert.interfaces.reservation.dto;
 
 import java.math.BigDecimal;
 

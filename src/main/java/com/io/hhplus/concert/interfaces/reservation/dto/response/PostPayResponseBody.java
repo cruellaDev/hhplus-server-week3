@@ -1,6 +1,6 @@
-package com.io.hhplus.concert.presentation.reservation.dto.response;
+package com.io.hhplus.concert.interfaces.reservation.dto.response;
 
-import com.io.hhplus.concert.presentation.reservation.dto.PayDto;
+import com.io.hhplus.concert.interfaces.reservation.dto.PayDto;
 import lombok.Getter;
 import lombok.Setter;
 

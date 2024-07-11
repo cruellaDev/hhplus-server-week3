@@ -1,6 +1,6 @@
-package com.io.hhplus.concert.presentation.reservation.dto.request;
+package com.io.hhplus.concert.interfaces.reservation.dto.request;
 
-import com.io.hhplus.concert.presentation.concert.dto.request.PostPerformanceRequestBody;
+import com.io.hhplus.concert.interfaces.concert.dto.request.PostPerformanceRequestBody;
 import lombok.Getter;
 import lombok.Setter;
 
