@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.presentation.waiting.dto.response;
+package com.io.hhplus.concert.interfaces.waiting.dto.response;
 
 public record PostWaitingQueueResponseBody(
         Long customerId,
