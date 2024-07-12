@@ -1,0 +1,62 @@
+-- 콘서트
+INSERT INTO hhplusdev.concert VALUES(1, 1, 1, 1, NOW(), NULL, NULL, NOW(), NOW(), STR_TO_DATE('2099-12-31 23:59:59', '%Y-%m-%d %H:%i:%s'), '김항해', '항해콘서트');
+INSERT INTO hhplusdev.concert VALUES(1, 1, 1, 1, NOW(), NULL, NULL, NOW(), NOW(), STR_TO_DATE('2099-12-31 23:59:59', '%Y-%m-%d %H:%i:%s'), '항플플', '항해콘서트 시즌2');
+INSERT INTO hhplusdev.concert VALUES(1, 1, 1, 1, NOW(), NULL, NULL, NOW(), NOW(), STR_TO_DATE('2099-12-31 23:59:59', '%Y-%m-%d %H:%i:%s'), '홍플플', '항해콘서트 시즌3');
+-- 공연
+INSERT INTO hhplusdev.performance VALUES(50, 10000, 1, NOW(), NULL, NULL, NOW(), STR_TO_DATE('2024-08-12 23:00:00', '%Y-%m-%d %H:%i:%s'));
+INSERT INTO hhplusdev.performance VALUES(50, 100000, 3, NOW(), NULL, NULL, NOW(), STR_TO_DATE('2024-08-12 23:00:00', '%Y-%m-%d %H:%i:%s'));
+-- 좌석
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '01');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '02');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '03');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '04');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '05');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '06');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '07');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '08');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '09');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '10');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '11');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '12');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '13');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '14');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '15');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '16');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '17');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '18');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '19');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '20');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '21');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '22');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '23');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '24');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '25');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '26');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '27');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '28');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '29');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '30');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '31');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '32');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '33');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '34');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '35');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '36');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '37');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '38');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '39');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '40');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '41');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '42');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '43');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '44');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '45');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '46');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '47');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '48');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '49');
+INSERT INTO hhplusdev.seat VALUES(1, 1, NOW(), NULL, NULL, NOW(), 1, '50');
+-- 고객
+INSERT INTO hhplusdev.customer VALUES(NOW(), NULL, NULL, NULL, NOW(), NULL, "이고객");
+-- 고객 포인트
+INSERT INTO hhplusdev.customer_point_history VALUES(999999999999999, 1, NOW(), 1, NULL, NULL, NOW());
