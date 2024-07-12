@@ -258,7 +258,7 @@ class WaitingServiceTest {
         long waitingNumber = 157;
         long lastEnterId = 160;
         long currentEnterIdByWaitingId = 3;
-        given(waitingRepository.findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdDesc()).willReturn(Optional.of(lastEnterId));
+        given(waitingRepository.findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdAsc()).willReturn(Optional.of(lastEnterId));
         given(waitingRepository.findOneWaitingEnterHistoryIdByWaitingIdOrderByWaitingEnterHistoryIdDesc(anyLong())).willReturn(Optional.of(currentEnterIdByWaitingId));
 
         // when
