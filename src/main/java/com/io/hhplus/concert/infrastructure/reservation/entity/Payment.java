@@ -27,6 +27,7 @@ public class Payment {
     @Column(name = "RESERVATION_ID", nullable = false, updatable = false)
     private Long reservationId;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "PAY_METHOD", nullable = false, updatable = false)
     private PayMethod payMethod;
 

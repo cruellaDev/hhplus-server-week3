@@ -30,6 +30,7 @@ public class Reservation {
     @Column(name = "RESERVER_NAME", nullable = false, updatable = false, length = 100)
     private String reserverName;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "STATUS", nullable = false, length = 50)
     private ReservationStatus reservationStatus;
 

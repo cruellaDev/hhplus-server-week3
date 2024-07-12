@@ -27,9 +27,10 @@ public class CustomerPointHistory {
     @Column(name = "CUSTOMER_ID", nullable = false)
     private Long customerId;
 
-    @Column(name = "AMOUNT", nullable = false)
+    @Column(name = "AMOUNT", nullable = false, precision = 18, scale = 3)
     private BigDecimal pointAmount;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "TYPE", nullable = false, length = 50)
     private PointType pointType;
 

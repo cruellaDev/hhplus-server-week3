@@ -34,6 +34,7 @@ public class Concert {
     @Column(name = "SALE_END_AT", nullable = false)
     private Date saleEndAt;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "STATUS", nullable = false, length = 50)
     private ConcertStatus concertStatus;
 

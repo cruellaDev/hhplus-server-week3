@@ -29,6 +29,7 @@ public class WaitingQueue {
     @Column(name = "TOKEN", nullable = false, length = 300)
     private String token;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "STATUS", nullable = false, length = 50)
     private WaitingStatus waitingStatus;
 

@@ -60,6 +60,7 @@ public class Ticket {
     @Column(name = "SEAT_NO", nullable = false, updatable = false, length = 100)
     private String seatNo;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "STATUS", nullable = false, length = 50)
     private TicketStatus ticketStatus;
 
