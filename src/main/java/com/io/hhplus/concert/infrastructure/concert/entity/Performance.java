@@ -2,6 +2,7 @@ package com.io.hhplus.concert.infrastructure.concert.entity;
 
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
+import com.io.hhplus.concert.infrastructure.audit.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.util.Date;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "PERFORMANCE")
-public class Performance {
+public class Performance  implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)

@@ -63,7 +63,7 @@ public class CustomerFacade {
         if (!Customer.isAvailableCustomerId(customerPointRequest.getCustomerId())) {
             throw new IllegalArgumentCustomException("고객 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
         }
-        if (!CustomerPointHistory.isInSufficientPointAmount(customerPointRequest.getPointAmount())) {
+        if (CustomerPointHistory.isInSufficientPointAmount(customerPointRequest.getPointAmount())) {
             throw new IllegalArgumentCustomException("금액은 0보다 큰 값이어야 합니다.", ResponseMessage.INVALID);
         }
 
