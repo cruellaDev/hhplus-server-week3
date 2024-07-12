@@ -154,8 +154,7 @@ public class ReservationFacade {
         // 좌석 조회
         for (ReservationRequest.Seat requestedSeat : requestedSeats) {
             Seat seat = seatService.getAvailableSeat(requestedPerformance.getPerformanceId(), requestedSeat.getSeatId());
-            boolean isTaken = Seat.isTaken(seat.seatStatus());
-            if (isTaken) {
+            if (Seat.isTaken(seat.seatStatus()) || Seat.isOccupied(seat.seatStatus())) {
                 throw new IllegalStateCustomException("이미 선점된 좌석입니다.", ResponseMessage.NOT_AVAILABLE);
             }
             isAvailable = seatService.meetsIfSeatToBeReserved(seat);
