@@ -6,6 +6,7 @@ import com.io.hhplus.concert.domain.concert.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,11 +57,17 @@ public class SeatService {
      */
     public boolean assignSeatTemporarily(Long seatId) {
         boolean isAssigned = true;
-        if (seatId == null) return !isAssigned;
+        if (seatId == null) {
+            return !isAssigned;
+        }
         Optional<Seat> optionalSeat = seatRepository.findById(seatId);
-        if (optionalSeat.isEmpty()) return !isAssigned;
+        if (optionalSeat.isEmpty()) {
+            return !isAssigned;
+        }
         Seat asisSeat = optionalSeat.get();
-        if (!Seat.isAvailableSeatStatus(asisSeat.seatStatus())) return !isAssigned;
+        if (!Seat.isAvailableSeatStatus(asisSeat.seatStatus())) {
+            return !isAssigned;
+        }
         Seat tobeSeat = Seat.create(asisSeat.seatId(), asisSeat.performanceId(), asisSeat.concertId(), asisSeat.seatNo(), SeatStatus.WAITING_FOR_RESERVATION);
         try {
             seatRepository.save(tobeSeat);
@@ -75,11 +82,13 @@ public class SeatService {
      * @param reservationId 예약_ID
      * @param seatStatus 좌석_상태
      */
-    public void cancelAssignedSeatsByReservationIdAndReservationStatus(Long reservationId, SeatStatus seatStatus) {
+    public List<Seat> cancelAssignedSeatsByReservationIdAndReservationStatus(Long reservationId, SeatStatus seatStatus) {
         List<Seat> seats = seatRepository.findAllByReservationIdAndSeatStatus(reservationId, seatStatus);
+        List<Seat> savedSeats = new ArrayList<>();
         for (Seat asisSeat : seats) {
             Seat tobeSeat = Seat.create(asisSeat.seatId(), asisSeat.performanceId(), asisSeat.concertId(), asisSeat.seatNo(), SeatStatus.AVAILABLE);
-            seatRepository.save(tobeSeat);
+            savedSeats.add(seatRepository.save(tobeSeat));
         }
+        return savedSeats;
     }
 }

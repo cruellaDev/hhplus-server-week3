@@ -37,6 +37,10 @@ public record Seat(
         return seatStatus != null && seatStatus.equals(SeatStatus.AVAILABLE);
     }
 
+    public static boolean isOccupied(SeatStatus seatStatus) {
+        return seatStatus != null && seatStatus.equals(SeatStatus.WAITING_FOR_RESERVATION);
+    }
+
     public static boolean isTaken(SeatStatus seatStatus) {
         return seatStatus != null && seatStatus.equals(SeatStatus.TAKEN);
     }
