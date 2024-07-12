@@ -1,6 +1,7 @@
 package com.io.hhplus.concert.domain.waiting.service;
 
 import com.io.hhplus.concert.common.enums.WaitingStatus;
+import com.io.hhplus.concert.common.utils.DateUtils;
 import com.io.hhplus.concert.domain.waiting.model.WaitingEnterHistory;
 import com.io.hhplus.concert.domain.waiting.model.WaitingQueue;
 import com.io.hhplus.concert.domain.waiting.repository.WaitingRepository;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -84,7 +86,7 @@ public class WaitingService {
     }
 
     /**
-     * 대기열 토큰 만료 처리채ㅜ
+     * 대기열 토큰 만료 처리
      * @param waitingQueue 대기열 정보
      * @return 토큰 만료 처리 여부
      */
@@ -99,17 +101,20 @@ public class WaitingService {
     }
 
     /**
-     * 만료된 토큰 모두 조회
+     * 시간이 지나 만료됐거나 만료된 토큰 모두 제거
      */
-    public void removeAllExpiredWaitingQueueToken() {
+    public List<WaitingQueue> removeAllExpiredWaitingQueueToken() {
         List<WaitingQueue> waitingQueues = waitingRepository.findAllExpiredWaitingQueue();
-        Date now = new Date();
+        Date now = DateUtils.getSysDate();
+        List<WaitingQueue> savedWaitingQueues = new ArrayList<>();
         for (WaitingQueue waitingQueue : waitingQueues) {
             Date createdAt = waitingQueue.createdAt();
             long duration = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - createdAt.getTime());
             if (duration > 300) {
-                waitingRepository.saveWaitingQueue(WaitingQueue.create(waitingQueue.waitingId(), waitingQueue.customerId(), waitingQueue.token(), WaitingStatus.EXPIRED, waitingQueue.createdAt(), now));
+                WaitingQueue savedWaitingQueue = waitingRepository.saveWaitingQueue(WaitingQueue.create(waitingQueue.waitingId(), waitingQueue.customerId(), waitingQueue.token(), WaitingStatus.EXPIRED, waitingQueue.createdAt(), now));
+                savedWaitingQueues.add(savedWaitingQueue);
             }
         }
+        return savedWaitingQueues;
     }
 }
