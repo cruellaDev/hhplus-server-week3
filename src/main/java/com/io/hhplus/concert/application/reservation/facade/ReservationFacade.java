@@ -260,9 +260,10 @@ public class ReservationFacade {
         isValidDuration = reservationService.meetsIfAbleToPayInTimeLimits(300L, reservation.reservationStatusChangedAt());
         if (!isValidDuration) {
             // 예약 및 티켓 취소 처리, 좌석 상태 변경
-            // TODO 좌석 상태 변경
             reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.CANCELLED);
             reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
+            seatService.cancelAssignedSeatsByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.AVAILABLE);
+
             throw new TimeOutCustomException("결제 가능 시간을 초과하였습니다.", ResponseMessage.OUT_OF_TIME);
         }
 
@@ -288,9 +289,10 @@ public class ReservationFacade {
 
         if (!isEqualAmount || !isPointAffordable) {
             // 예약 및 티켓 취소 처리, 좌석 상태 변경
-            // TODO 좌석 상태 변경
             reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.CANCELLED);
             reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
+            seatService.cancelAssignedSeatsByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.AVAILABLE);
+
             if (!isEqualAmount) throw new InsufficientResourcesCustomException("결제금액이 맞지 않습니다.", ResponseMessage.INVALID);
             throw new InsufficientResourcesCustomException("포인트 잔액이 부족합니다.", ResponseMessage.OUT_OF_BUDGET);
         }
@@ -308,9 +310,9 @@ public class ReservationFacade {
         Payment payment = paymentService.savePayment(Payment.create(null, reservation.reservationId(), PayMethod.POINT, pointUseAmount, pointUseAmount, BigDecimal.ZERO));
 
         // 예약 및 티켓 상태 변경, 좌석 상태 변경
-        // TODO 좌석 상태 변경
         Reservation changedReservation = reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.COMPLETED);
         List<Ticket> changedTickets = reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.PAYED);
+        seatService.cancelAssignedSeatsByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.TAKEN);
 
         return new PaymentResponse(changedReservation, changedTickets, List.of(payment));
     }
@@ -333,7 +335,7 @@ public class ReservationFacade {
                 // 티켓 취소
                 reservationService.updateTicketsStatus(reservation.reservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
                 // 좌석 배정 취소
-                seatService.cancelAssignedSeatsByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.WAITING_FOR_RESERVATION);
+                seatService.cancelAssignedSeatsByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.AVAILABLE);
             }
         }
     }
