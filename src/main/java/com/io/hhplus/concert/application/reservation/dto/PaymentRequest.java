@@ -17,7 +17,7 @@ public class PaymentRequest {
 
     @Getter
     @AllArgsConstructor
-    public class PayInfo {
+    public static class PayInfo {
         private final PayMethod payMethod;
         private BigDecimal payAmount;
     }

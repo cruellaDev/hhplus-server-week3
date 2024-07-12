@@ -26,6 +26,10 @@ public class TicketRepositoryImpl implements TicketRepository {
         return ticketStatus != null && ticketStatus.equals(targetTicketStatus);
     }
 
+    private boolean convertIntegerToBoolean(Integer integer) {
+        return integer != null && integer.compareTo(1) == 0;
+    }
+
     private Ticket mapEntityToDto(com.io.hhplus.concert.infrastructure.reservation.entity.Ticket entity) {
         return Ticket.create(
                 entity.getId(),
@@ -35,9 +39,9 @@ public class TicketRepositoryImpl implements TicketRepository {
                 entity.getSeatId(),
                 entity.getConcertName(),
                 entity.getArtistName(),
-                entity.getIsReceiveOnline().compareTo(1) == 0,
-                entity.getIsReceiveOnSite().compareTo(1) == 0,
-                entity.getIsReceiveByPost().compareTo(1) == 0,
+                convertIntegerToBoolean(entity.getIsReceiveOnline()),
+                convertIntegerToBoolean(entity.getIsReceiveOnline()),
+                convertIntegerToBoolean(entity.getIsReceiveOnline()),
                 entity.getPrice(),
                 entity.getPerformedAt(),
                 entity.getSeatNo(),

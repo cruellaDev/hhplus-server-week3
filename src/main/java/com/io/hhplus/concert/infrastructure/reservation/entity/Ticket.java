@@ -43,13 +43,13 @@ public class Ticket  implements Auditable {
     @Column(name = "ARTIST_NAME", nullable = false, updatable = false, length = 100)
     private String artistName;
 
-    @Column(name = "IS_RECEIVE_ONLINE", nullable = false, updatable = false, precision = 1)
+    @Column(name = "IS_RECEIVE_ONLINE", nullable = true, precision = 1)
     private Integer isReceiveOnline;
 
-    @Column(name = "IS_RECEIVE_ON_SITE", nullable = false, updatable = false, precision = 1)
+    @Column(name = "IS_RECEIVE_ON_SITE", nullable = true, precision = 1)
     private Integer isReceiveOnSite;
 
-    @Column(name = "IS_RECEIVE_BY_POST", nullable = false, updatable = false, precision = 1)
+    @Column(name = "IS_RECEIVE_BY_POST", nullable = true, precision = 1)
     private Integer isReceiveByPost;
 
     @Column(name = "price", nullable = false, updatable = false, precision = 18, scale = 3)

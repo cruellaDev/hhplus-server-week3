@@ -78,15 +78,16 @@ public class SeatService {
     }
 
     /**
-     * 좌석 임시 배정 취소
+     * 좌석 임시 배정 상태 변경
      * @param reservationId 예약_ID
-     * @param seatStatus 좌석_상태
+     * @param asisSeatStatus 기존 좌석_상태
+     * @param tobeSeatStatus 이후 좌석_상태
      */
-    public List<Seat> cancelAssignedSeatsByReservationIdAndReservationStatus(Long reservationId, SeatStatus seatStatus) {
-        List<Seat> seats = seatRepository.findAllByReservationIdAndSeatStatus(reservationId, seatStatus);
+    public List<Seat> updateSeatStatusByReservationIdAndReservationStatus(Long reservationId, SeatStatus asisSeatStatus, SeatStatus tobeSeatStatus) {
+        List<Seat> seats = seatRepository.findAllByReservationIdAndSeatStatus(reservationId, asisSeatStatus);
         List<Seat> savedSeats = new ArrayList<>();
         for (Seat asisSeat : seats) {
-            Seat tobeSeat = Seat.create(asisSeat.seatId(), asisSeat.performanceId(), asisSeat.concertId(), asisSeat.seatNo(), SeatStatus.AVAILABLE);
+            Seat tobeSeat = Seat.create(asisSeat.seatId(), asisSeat.performanceId(), asisSeat.concertId(), asisSeat.seatNo(), tobeSeatStatus);
             savedSeats.add(seatRepository.save(tobeSeat));
         }
         return savedSeats;
