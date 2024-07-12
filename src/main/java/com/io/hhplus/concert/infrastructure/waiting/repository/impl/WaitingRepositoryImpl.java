@@ -64,15 +64,15 @@ public class WaitingRepositoryImpl implements WaitingRepository {
 
     @Override
     public long countWaitingQueueByWaitingStatus(WaitingStatus waitingStatus) {
-        return waitingQueueJpaRepository.findCreatedAtByWaitingStatus(waitingStatus)
+        return waitingQueueJpaRepository.findAllByWaitingStatus(waitingStatus)
                 .stream()
                 .filter(entity -> TimeUnit.MILLISECONDS.toSeconds((new Date()).getTime() - entity.getAuditSection().getCreatedAt().getTime()) <=300)
                 .count();
     }
 
     @Override
-    public Optional<Long> findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdDesc() {
-        return waitingEnterHistoryJpaRepository.findOneIdOrderByIdDesc();
+    public Optional<Long> findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdAsc() {
+        return waitingEnterHistoryJpaRepository.findOneIdOrderByIdAsc();
     }
 
     @Override
@@ -84,10 +84,20 @@ public class WaitingRepositoryImpl implements WaitingRepository {
     public List<WaitingQueue> findAllExpiredWaitingQueue() {
         return waitingQueueJpaRepository.findAllByDeleatedAtIsNull()
                 .stream()
-                .filter(entity -> (entity.getWaitingStatus().equals(WaitingStatus.ACTIVE)
+                .filter(entity -> (entity.getWaitingStatus().equals(WaitingStatus.ACTIVE) // TODO 날짜 조건 추가 필요
                         || entity.getWaitingStatus().equals(WaitingStatus.EXPIRED))
                 )
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAllWaitingQueue() {
+        waitingQueueJpaRepository.deleteAll();
+    }
+
+    @Override
+    public void deleteAllWaitingEnterHistory() {
+        waitingEnterHistoryJpaRepository.deleteAll();
     }
 }

@@ -17,9 +17,12 @@ public interface WaitingRepository {
     // 대기 인원 조회
     long countWaitingQueueByWaitingStatus(WaitingStatus waitingStatus);
     // 대기진입이력 마지막 pk 번호 조회
-    Optional<Long> findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdDesc();
+    Optional<Long> findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdAsc();
     // 대기진입이력 대기열 별 마지막 pk 번호 조회
     Optional<Long> findOneWaitingEnterHistoryIdByWaitingIdOrderByWaitingEnterHistoryIdDesc(Long waitingId);
     // 만료된 토큰 모두 조회
     List<WaitingQueue> findAllExpiredWaitingQueue();
+    // 대기열 모든 기록 삭제
+    void deleteAllWaitingQueue();
+    void deleteAllWaitingEnterHistory();
 }

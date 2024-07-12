@@ -49,6 +49,9 @@ public class WaitingService {
      * @return 토큰 활성 시간 이내 존재 여부
      */
     public boolean meetsIfActiveWaitingQueueInTimeLimits(Long seconds, Date tokenActiveAt) {
+        if (seconds == null || tokenActiveAt == null) {
+            return false;
+        }
         Date currentDate = new Date();
         long targetSeconds = TimeUnit.MILLISECONDS.toSeconds(currentDate.getTime() - tokenActiveAt.getTime());
         return WaitingQueue.isInActiveDuration(seconds, targetSeconds);
@@ -80,9 +83,9 @@ public class WaitingService {
      * @return 대기 순번
      */
     public Long getWaitingNumberByWaitingId(Long waitingId) {
-        long lastEnterId = waitingRepository.findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdDesc().orElse(0L);
+        long firstEnterId = waitingRepository.findOneWaitingEnterHistoryIdOrderByWaitingEnterHistoryIdAsc().orElse(0L);
         long currentEnterIdByWaitingId = waitingRepository.findOneWaitingEnterHistoryIdByWaitingIdOrderByWaitingEnterHistoryIdDesc(waitingId).orElse(0L);
-        return Math.max(0L, lastEnterId - currentEnterIdByWaitingId);
+        return Math.max(0L, currentEnterIdByWaitingId - firstEnterId + 1);
     }
 
     /**

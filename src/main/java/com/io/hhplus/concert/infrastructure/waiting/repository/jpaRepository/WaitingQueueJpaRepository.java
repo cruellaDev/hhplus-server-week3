@@ -14,8 +14,8 @@ public interface WaitingQueueJpaRepository extends JpaRepository<WaitingQueue, L
     @Query("SELECT T FROM WaitingQueue T WHERE T.customerId = :customerId AND T.waitingStatus = :waitingStatus AND T.deleatedAt IS NULL ORDER BY T.id DESC LIMIT 1")
     Optional<WaitingQueue> findByCustomerIdAndWaitingStatus(@Param("customerId") Long customerId, @Param("waitingStatus") WaitingStatus waitingStatus);
 
-    @Query("SELECT T.auditSection FROM WaitingQueue T WHERE T.waitingStatus = :waitingStatus AND T.deleatedAt IS NULL")
-    List<WaitingQueue> findCreatedAtByWaitingStatus(@Param("waitingStatus") WaitingStatus waitingStatus);
+    @Query("SELECT T FROM WaitingQueue T WHERE T.waitingStatus = :waitingStatus AND T.deleatedAt IS NULL")
+    List<WaitingQueue> findAllByWaitingStatus(@Param("waitingStatus") WaitingStatus waitingStatus);
 
     @Query("SELECT T FROM WaitingQueue T WHERE T.deleatedAt IS NULL")
     List<WaitingQueue> findAllByDeleatedAtIsNull();
