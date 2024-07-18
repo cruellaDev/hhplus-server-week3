@@ -1,12 +1,12 @@
-package com.io.hhplus.concert.infrastructure.concert.entity;
+package com.io.hhplus.concert.domain.concert.entity;
 
+import com.io.hhplus.concert.common.enums.SeatStatus;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
 import com.io.hhplus.concert.infrastructure.audit.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -14,27 +14,30 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PERFORMANCE")
-public class Performance  implements Auditable {
+@Table(name = "SEAT")
+public class SeatEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)
     private Long id;
 
+    @Column(name = "PERFORMANCE_ID", nullable = false, updatable = false)
+    private Long performanceId;
+
     @Column(name = "CONCERT_ID", nullable = false, updatable = false)
     private Long concertId;
 
-    @Column(name = "PRICE", nullable = false, precision = 18, scale = 3)
-    private BigDecimal concertPrice;
+    @Column(name = "SEAT_NO", nullable = false, length = 100)
+    private String seatNo;
 
-    @Column(name = "CAPACITY_LIMIT", nullable = false)
-    private Integer capacityLimit;
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name="STATUS", nullable = false, length = 50)
+    private SeatStatus seatStatus;
 
-    @Column(name = "PERFORMED_AT", nullable = false)
-    private Date performedAt;
-
+    @Builder.Default
     @Embedded
     private AuditSection auditSection = new AuditSection();
 

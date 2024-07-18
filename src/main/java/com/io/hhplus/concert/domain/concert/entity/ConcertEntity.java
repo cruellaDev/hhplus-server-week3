@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.infrastructure.concert.entity;
+package com.io.hhplus.concert.domain.concert.entity;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
@@ -17,7 +17,7 @@ import java.util.Date;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "CONCERT")
-public class Concert  implements Auditable {
+public class ConcertEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)
