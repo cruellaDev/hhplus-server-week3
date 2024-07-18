@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.interfaces.common.dto;
+package com.io.hhplus.concert.common.dto;
 
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 
@@ -8,7 +8,7 @@ public record CommonResponse<T> (
         T data)
 {
     public static <T> CommonResponse<T> success(T data) {
-        return new CommonResponse<>(ResponseMessage.OK, null, data);
+        return new CommonResponse<>(ResponseMessage.OK, ResponseMessage.OK.name(), data);
     }
 
     public static <T> CommonResponse<T> success(T data, String message) {
