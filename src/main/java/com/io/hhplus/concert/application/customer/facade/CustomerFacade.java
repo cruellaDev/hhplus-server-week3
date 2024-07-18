@@ -1,16 +1,14 @@
 package com.io.hhplus.concert.application.customer.facade;
 
-import com.io.hhplus.concert.application.customer.dto.CustomerPointHistoryResponse;
-import com.io.hhplus.concert.application.customer.dto.CustomerPointRequest;
-import com.io.hhplus.concert.application.customer.dto.CustomerResponse;
-import com.io.hhplus.concert.common.enums.PointType;
-import com.io.hhplus.concert.domain.customer.model.Customer;
-import com.io.hhplus.concert.domain.customer.model.CustomerPointHistory;
-import com.io.hhplus.concert.domain.customer.service.CustomerService;
-import com.io.hhplus.concert.common.exceptions.IllegalArgumentCustomException;
-import com.io.hhplus.concert.common.exceptions.IllegalStateCustomException;
-import com.io.hhplus.concert.common.exceptions.ResourceNotFoundCustomException;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
+import com.io.hhplus.concert.domain.customer.service.CustomerValidator;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfoWithCustomerPointHistory;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfo;
+import com.io.hhplus.concert.common.enums.PointType;
+import com.io.hhplus.concert.domain.customer.service.model.CustomerModel;
+import com.io.hhplus.concert.domain.customer.service.model.CustomerPointHistoryModel;
+import com.io.hhplus.concert.domain.customer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,81 +19,64 @@ import java.math.BigDecimal;
 public class CustomerFacade {
 
     private final CustomerService customerService;
+    private final CustomerValidator customerValidator;
 
     /**
      * 고객 포인트 조회
      * @param customerId 고객_ID
      * @return 응답 정보
      */
-    public CustomerResponse getCustomerPoint(Long customerId) {
-        if (!Customer.isAvailableCustomerId(customerId)) {
-            throw new IllegalArgumentCustomException("고객 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
+    public CustomerInfo getCustomerPoint(Long customerId) {
+        if (customerId == null) throw new CustomException(ResponseMessage.INVALID, "고객_ID가 존재하지 않습니다.");
 
-        Customer customer;
-        boolean isAvailable;
-
+        // 고객 확인
+        CustomerModel customerModel;
         // 고객 조회
-        customer = customerService.getAvailableCustomer(customerId);
+        customerModel = customerService.getAvailableCustomer(customerId);
         // 고객 검증
-        isAvailable = customerService.meetsIfCustomerValid(customer);
-        if (!isAvailable) {
-            throw new ResourceNotFoundCustomException("존재하지 않는 고객입니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        customerValidator.checkIfCustomerValid(customerModel);
 
         // 고객 포인트 잔액 조회
         BigDecimal customerPointBalance = customerService.getCustomerPointBalance(customerId);
 
         // 응답 정보 반환
-        customer = Customer.create(customer.customerId(), customer.customerName(), customerPointBalance);
-        return new CustomerResponse(customer);
+        customerModel = CustomerModel.create(customerModel.customerId(), customerModel.customerName(), customerPointBalance);
+        return new CustomerInfo(customerModel);
     }
 
     /**
      * 고객 포인트 충전
-     * @param customerPointRequest 요청 정보
-     * @return 응답 정보
+     * @param customerId 고객_ID
+     * @param pointAmount 포인트 금액
+     * @return 고객 포인트 충전 내역
      */
-    public CustomerPointHistoryResponse chargeCustomerPoint(CustomerPointRequest customerPointRequest) {
-        if (customerPointRequest == null) {
-            throw new IllegalArgumentCustomException("고객 포인트 충전 요청정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        if (!Customer.isAvailableCustomerId(customerPointRequest.getCustomerId())) {
-            throw new IllegalArgumentCustomException("고객 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
-        if (CustomerPointHistory.isInSufficientPointAmount(customerPointRequest.getPointAmount())) {
-            throw new IllegalArgumentCustomException("금액은 0보다 큰 값이어야 합니다.", ResponseMessage.INVALID);
-        }
+    public CustomerInfoWithCustomerPointHistory chargeCustomerPoint(Long customerId, BigDecimal pointAmount) {
+        if (customerId == null) throw new CustomException(ResponseMessage.INVALID, "고객 ID가 존재하지 않습니다.");
+        if (pointAmount == null) throw new CustomException(ResponseMessage.INVALID, "충전 금액이 존재하지 않습니다.");
 
-        Customer customer;
-        CustomerPointHistory customerPointHistory;
-        boolean isAvailable;
-        CustomerPointHistory savedCustomerPointHistory;
-        BigDecimal customerPointBalance;
-
+        // 고객 확인
+        CustomerModel customerModel;
         // 고객 조회
-        customer = customerService.getAvailableCustomer(customerPointRequest.getCustomerId());
+        customerModel = customerService.getAvailableCustomer(customerId);
         // 고객 검증
-        isAvailable = customerService.meetsIfCustomerValid(customer);
-        if (!isAvailable) {
-            throw new ResourceNotFoundCustomException("존재하지 않는 고객입니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        customerValidator.checkIfCustomerValid(customerModel);
 
+        // 충전 포인트 확인
+        CustomerPointHistoryModel customerPointHistoryModel;
+        customerPointHistoryModel = CustomerPointHistoryModel.create(customerId, pointAmount, PointType.CHARGE, null);
         // 충전 포인트 검증
-        customerPointHistory = CustomerPointHistory.create(customerPointRequest.getCustomerId(), customerPointRequest.getPointAmount(), PointType.CHARGE, null);
-        isAvailable = customerService.meetsIfPointValidBeforeCharge(customerPointHistory);
-        if (!isAvailable) {
-            throw new IllegalStateCustomException("충전이 불가능합니다.", ResponseMessage.FAIL);
-        }
+        customerValidator.checkIfPointValidBeforeCharge(customerPointHistoryModel);
 
         // 포인트 충전
-        savedCustomerPointHistory = customerService.saveCustomerPointHistory(customerPointHistory);
+        CustomerPointHistoryModel savedCustomerPointHistoryModel;
+        savedCustomerPointHistoryModel = customerService.saveCustomerPointHistory(customerPointHistoryModel);
 
         // 고객 포인트 잔액 조회
-        customerPointBalance = customerService.getCustomerPointBalance(customerPointRequest.getCustomerId());
+        BigDecimal customerPointBalance;
+        customerPointBalance = customerService.getCustomerPointBalance(customerId);
 
         // 응답 정보 반환
-        customer = Customer.create(customer.customerId(), customer.customerName(), customerPointBalance);
-        return new CustomerPointHistoryResponse(customer, savedCustomerPointHistory);
+        customerModel = CustomerModel.create(customerModel.customerId(), customerModel.customerName(), customerPointBalance);
+        return new CustomerInfoWithCustomerPointHistory(customerModel, savedCustomerPointHistoryModel);
     }
 }
