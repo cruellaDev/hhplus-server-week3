@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.infrastructure.reservation.entity;
+package com.io.hhplus.concert.domain.reservation.entity;
 
 import com.io.hhplus.concert.common.enums.PayMethod;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "PAYMENT")
-public class Payment  implements Auditable {
+public class PaymentEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)

@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.infrastructure.reservation.entity;
+package com.io.hhplus.concert.domain.reservation.entity;
 
 import com.io.hhplus.concert.common.enums.ReceiveMethod;
 import com.io.hhplus.concert.common.enums.ReservationStatus;
@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "RESERVATION")
-public class Reservation  implements Auditable {
+public class ReservationEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)

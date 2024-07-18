@@ -1,7 +1,8 @@
 package com.io.hhplus.concert.infrastructure.reservation.repository.impl;
 
 import com.io.hhplus.concert.common.enums.TicketStatus;
-import com.io.hhplus.concert.domain.reservation.model.Ticket;
+import com.io.hhplus.concert.domain.reservation.entity.TicketEntity;
+import com.io.hhplus.concert.domain.reservation.service.model.TicketModel;
 import com.io.hhplus.concert.domain.reservation.repository.TicketRepository;
 import com.io.hhplus.concert.infrastructure.reservation.repository.jpaRepository.TicketJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class TicketRepositoryImpl implements TicketRepository {
         return integer != null && integer.compareTo(1) == 0;
     }
 
-    private Ticket mapEntityToDto(com.io.hhplus.concert.infrastructure.reservation.entity.Ticket entity) {
-        return Ticket.create(
+    private TicketModel mapEntityToDto(TicketEntity entity) {
+        return TicketModel.create(
                 entity.getId(),
                 entity.getReservationId(),
                 entity.getConcertId(),
@@ -54,8 +55,8 @@ public class TicketRepositoryImpl implements TicketRepository {
         );
     }
 
-    private com.io.hhplus.concert.infrastructure.reservation.entity.Ticket mapDtoToEntity(Ticket dto) {
-        return com.io.hhplus.concert.infrastructure.reservation.entity.Ticket.builder()
+    private TicketEntity mapDtoToEntity(TicketModel dto) {
+        return TicketEntity.builder()
                 .id(dto.ticketId())
                 .reservationId(dto.reservationId())
                 .concertId(dto.concertId())
@@ -79,8 +80,8 @@ public class TicketRepositoryImpl implements TicketRepository {
     }
 
     @Override
-    public Ticket save(Ticket ticket) {
-        return mapEntityToDto(ticketJpaRepository.save(mapDtoToEntity(ticket)));
+    public TicketModel save(TicketModel ticketModel) {
+        return mapEntityToDto(ticketJpaRepository.save(mapDtoToEntity(ticketModel)));
     }
 
     @Override
@@ -88,12 +89,12 @@ public class TicketRepositoryImpl implements TicketRepository {
         return ticketJpaRepository.findAllByReservationId(reservationId)
                 .stream()
                 .filter(entity -> isNotDeleted(entity.getDeletedAt()) && isEqualTicketStatus(entity.getTicketStatus(), ticketStatus))
-                .map(com.io.hhplus.concert.infrastructure.reservation.entity.Ticket::getPrice)
+                .map(TicketEntity::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
-    public List<Ticket> findAllByReservationIdAndTicketStatus(Long reservationId, TicketStatus ticketStatus) {
+    public List<TicketModel> findAllByReservationIdAndTicketStatus(Long reservationId, TicketStatus ticketStatus) {
         return ticketJpaRepository.findAllByReservationId(reservationId)
                 .stream()
                 .filter(entity -> isNotDeleted(entity.getDeletedAt()) && isEqualTicketStatus(entity.getTicketStatus(), ticketStatus))
@@ -102,8 +103,8 @@ public class TicketRepositoryImpl implements TicketRepository {
     }
 
     @Override
-    public List<Ticket> saveAll(List<Ticket> tickets) {
-        return ticketJpaRepository.saveAll(tickets.stream().map(this::mapDtoToEntity).collect(Collectors.toList()))
+    public List<TicketModel> saveAll(List<TicketModel> ticketModels) {
+        return ticketJpaRepository.saveAll(ticketModels.stream().map(this::mapDtoToEntity).collect(Collectors.toList()))
                 .stream().map(this::mapEntityToDto).collect(Collectors.toList());
     }
 
