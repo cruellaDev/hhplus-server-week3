@@ -1,12 +1,10 @@
 package com.io.hhplus.concert.application.customer.facade;
 
-import com.io.hhplus.concert.application.customer.dto.CustomerPointHistoryResponse;
-import com.io.hhplus.concert.application.customer.dto.CustomerPointRequest;
-import com.io.hhplus.concert.application.customer.dto.CustomerResponse;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfoWithCustomerPointHistory;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfo;
 import com.io.hhplus.concert.common.enums.PointType;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
-import com.io.hhplus.concert.common.exceptions.IllegalArgumentCustomException;
-import com.io.hhplus.concert.common.exceptions.ResourceNotFoundCustomException;
+import com.io.hhplus.concert.common.exceptions.CustomException;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -31,13 +29,13 @@ class CustomerIntegrationTest {
      * 고객 포인트 조회 - 잘못된 고객 ID
      */
     @Test
-    void getCustomerPoint_customerId_is_wrong() {
+    void 고객_포인트_조회_고객ID_null_일_시_예외_처리() {
         // given
         Long customerId = null;
 
         // when - then
         assertThatThrownBy(() -> customerFacade.getCustomerPoint(customerId))
-                .isInstanceOf(IllegalArgumentCustomException.class)
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.INVALID);
 
@@ -47,13 +45,13 @@ class CustomerIntegrationTest {
      * 고객 포인트 조회 - 없는 고객
      */
     @Test
-    void getCustomerPoint_customer_not_exists() {
+    void 고객_포인트_조회_없는_고객일_시_예외_처리() {
         // given
         long customerId = 10001;
 
         // when - then
         assertThatThrownBy(() -> customerFacade.getCustomerPoint(customerId))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
 
@@ -63,12 +61,12 @@ class CustomerIntegrationTest {
      * 고객 포인트 조회 - 유효
      */
     @Test
-    void getCustomerPoint_when_valid() {
+    void 고객_포인트_조회_존재하는_고객일_시_고객_정보_및_포인트_정보를_반환한다() {
         // given
         long customerId = 1;
 
         // when
-        CustomerResponse result = customerFacade.getCustomerPoint(customerId);
+        CustomerInfo result = customerFacade.getCustomerPoint(customerId);
 
         // then
         assertAll(() -> assertEquals(customerId, result.getCustomer().customerId()),
@@ -79,35 +77,49 @@ class CustomerIntegrationTest {
      * 고객 포인트 충전 - 유효
      */
     @Test
-    void chargeCustomerPoint_when_valid() {
+    void 고객_포인트_충전_유효한_고객일_시_포인트를_충전하고_고객_정보_및_포인트_정보를_반환한다() {
         // given
-        CustomerPointRequest request = new CustomerPointRequest(
-                1L, BigDecimal.valueOf(10000)
-        );
+        Long customerId = 1L;
+        BigDecimal pointAmount = BigDecimal.valueOf(10000);
 
         // when
-        CustomerPointHistoryResponse result = customerFacade.chargeCustomerPoint(request);
+        CustomerInfoWithCustomerPointHistory result = customerFacade.chargeCustomerPoint(customerId, pointAmount);
 
         // then
-        assertAll(() -> assertEquals(request.getCustomerId(), result.getCustomer().customerId()),
+        assertAll(() -> assertEquals(customerId, result.getCustomer().customerId()),
                 () -> assertEquals(PointType.CHARGE, result.getCustomerPointHistory().pointType()),
-                () -> assertEquals(request.getPointAmount(), result.getCustomerPointHistory().pointAmount()));
+                () -> assertEquals(pointAmount, result.getCustomerPointHistory().pointAmount()));
 
+    }
+
+    /**
+     * 고객 포인트 충전 - 고객 ID 이상할 시
+     */
+    @Test
+    void 고객_포인트_충전_고객_ID_null_일_시_예외_처리() {
+        // given
+        Long customerId = null;
+        BigDecimal pointAmount = BigDecimal.valueOf(10000);
+
+        // when - then
+        assertThatThrownBy(() -> customerFacade.chargeCustomerPoint(customerId, pointAmount))
+                .isInstanceOf(CustomException.class)
+                .extracting("responseMessage")
+                .isEqualTo(ResponseMessage.INVALID);
     }
 
     /**
      * 고객 포인트 충전 - 존재하지 않는 고객
      */
     @Test
-    void chargeCustomerPoint_when_customer_not_exists() {
+    void 고객_포인트_충전_존재하지_않는_고객_일_시_예외_처리() {
         // given
-        CustomerPointRequest request = new CustomerPointRequest(
-                99999L, BigDecimal.valueOf(10000)
-        );
+        Long customerId = 99999L;
+        BigDecimal pointAmount = BigDecimal.valueOf(10000);
 
         // when - then
-        assertThatThrownBy(() -> customerFacade.chargeCustomerPoint(request))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+        assertThatThrownBy(() -> customerFacade.chargeCustomerPoint(customerId, pointAmount))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
     }
@@ -116,17 +128,16 @@ class CustomerIntegrationTest {
      * 고객 포인트 충전 - 유효하지 않은 충전금액
      */
     @Test
-    void chargeCustomerPoint_when_chargeAmount_not_valid() {
+    void 고객_포인트_충전_유효하지_않은_충전_금액_일_시_예외_처리() {
         // given
-        CustomerPointRequest request = new CustomerPointRequest(
-                1L, BigDecimal.valueOf(10000).negate()
-        );
+        Long customerId = 1L;
+        BigDecimal pointAmount = BigDecimal.valueOf(10000).negate();
 
         // when - then
-        assertThatThrownBy(() -> customerFacade.chargeCustomerPoint(request))
-                .isInstanceOf(IllegalArgumentCustomException.class)
+        assertThatThrownBy(() -> customerFacade.chargeCustomerPoint(customerId, pointAmount))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
-                .isEqualTo(ResponseMessage.INVALID);
+                .isEqualTo(ResponseMessage.NOT_AVAILABLE);
     }
 
 }

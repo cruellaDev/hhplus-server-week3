@@ -1,22 +1,20 @@
 package com.io.hhplus.concert.application.reservation.facade;
 
-import com.io.hhplus.concert.application.reservation.dto.PaymentRequest;
-import com.io.hhplus.concert.application.reservation.dto.ReservationRequest;
-import com.io.hhplus.concert.application.reservation.dto.ReservationResponse;
+import com.io.hhplus.concert.application.reservation.dto.PaymentInfo;
+import com.io.hhplus.concert.application.reservation.dto.ReserverInfo;
+import com.io.hhplus.concert.application.reservation.dto.TicketInfo;
+import com.io.hhplus.concert.application.reservation.dto.ReservationResultInfoWithTickets;
 import com.io.hhplus.concert.common.enums.*;
-import com.io.hhplus.concert.common.exceptions.IllegalStateCustomException;
-import com.io.hhplus.concert.common.exceptions.InsufficientResourcesCustomException;
-import com.io.hhplus.concert.common.exceptions.ResourceNotFoundCustomException;
-import com.io.hhplus.concert.common.exceptions.TimeOutCustomException;
+import com.io.hhplus.concert.common.exceptions.*;
 import com.io.hhplus.concert.common.utils.DateUtils;
-import com.io.hhplus.concert.domain.concert.model.Seat;
+import com.io.hhplus.concert.domain.concert.service.model.SeatModel;
 import com.io.hhplus.concert.domain.concert.repository.SeatRepository;
-import com.io.hhplus.concert.domain.reservation.model.Reservation;
-import com.io.hhplus.concert.domain.reservation.model.Ticket;
+import com.io.hhplus.concert.domain.reservation.service.model.ReservationModel;
+import com.io.hhplus.concert.domain.reservation.service.model.TicketModel;
 import com.io.hhplus.concert.domain.reservation.repository.ReservationRepository;
 import com.io.hhplus.concert.domain.reservation.repository.TicketRepository;
-import com.io.hhplus.concert.domain.waiting.model.WaitingEnterHistory;
-import com.io.hhplus.concert.domain.waiting.model.WaitingQueue;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingEnterHistoryModel;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingQueueModel;
 import com.io.hhplus.concert.domain.waiting.repository.WaitingRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +51,12 @@ class ReservationIntegrationTest {
     @BeforeEach
     void setUp() {
         for (long i = 2; i < 10; i++) {
-            WaitingQueue waitingQueue = waitingRepository.saveWaitingQueue(WaitingQueue.create(null, i, "userToken" + (new Date()).toString(), WaitingStatus.ACTIVE, null, null));
-            waitingRepository.saveWaitingEnterHistory(WaitingEnterHistory.create(null, waitingQueue.waitingId(), null));
+            WaitingQueueModel waitingQueueModel = waitingRepository.saveWaitingQueue(WaitingQueueModel.create(null, i, "userToken" + (new Date()).toString(), WaitingStatus.ACTIVE, null, null));
+            waitingRepository.saveWaitingEnterHistory(WaitingEnterHistoryModel.create(null, waitingQueueModel.waitingId(), null));
         }
 
         for (long i = 4; i < 50; i+=5) {
-            seatRepository.save(Seat.create(i, 1L, 1L, String.valueOf(i), SeatStatus.WAITING_FOR_RESERVATION));
+            seatRepository.save(SeatModel.create(i, 1L, 1L, String.valueOf(i), SeatStatus.WAITING_FOR_RESERVATION));
         }
     }
 
@@ -68,7 +66,7 @@ class ReservationIntegrationTest {
         waitingRepository.deleteAllWaitingEnterHistory();
 
         for (long i = 4; i < 50; i+=5) {
-            seatRepository.save(Seat.create(i, 1L, 1L, String.valueOf(i), SeatStatus.AVAILABLE));
+            seatRepository.save(SeatModel.create(i, 1L, 1L, String.valueOf(i), SeatStatus.AVAILABLE));
         }
     }
 
@@ -76,19 +74,28 @@ class ReservationIntegrationTest {
      * 유효하지 않은 고객의 예약 요청
      */
     @Test
-    void requestReservation_unavailable_customer() {
+    void 예약_요청_유효하지_않은_고객일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(9999L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(3L, "03"))
+        long customerId = 0;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(3L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
 
@@ -98,21 +105,30 @@ class ReservationIntegrationTest {
      * 대기열에 없는 고객의 예약 요청
      */
     @Test
-    void requestReservation_not_waiting_customer() {
+    void 예약_요청_대기열에_없는_고객일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(1L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(3L, "03"))
+        long customerId = 1;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(3L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
-                .isEqualTo(ResponseMessage.NOT_FOUND);
+                .isEqualTo(ResponseMessage.WAITING_NOT_FOUND);
 
     }
 
@@ -120,19 +136,28 @@ class ReservationIntegrationTest {
      * 유효하지 않은 콘서트에 대한 고객의 예약 요청
      */
     @Test
-    void requestReservation_unavailable_concert() {
+    void 예약_요청_유효하지_않은_콘서트일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(2L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(999L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(3L, "03"))
+        long customerId = 2;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                999L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(3L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(IllegalStateCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
 
@@ -142,19 +167,28 @@ class ReservationIntegrationTest {
      * 유효하지 않은 공연에 대한 고객의 예약 요청
      */
     @Test
-    void requestReservation_unavailable_performance() {
+    void 예약_요청_유효하지_않은_공연일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(2L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(999L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(3L, "03"))
+        long customerId = 2;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                999L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(3L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(IllegalStateCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
 
@@ -164,19 +198,28 @@ class ReservationIntegrationTest {
      * 유효하지 않은 좌석에 대한 고객의 예약 요청
      */
     @Test
-    void requestReservation_unavailable_seats() {
+    void 예약_요청_유효하지_않은_좌석일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(2L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(999L, "999"))
+        long customerId = 2;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(999L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(IllegalStateCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
 
@@ -186,19 +229,28 @@ class ReservationIntegrationTest {
      * 이미 배정된 좌석에 대한 고객의 예약 요청
      */
     @Test
-    void requestReservation_occupied_seats() {
+    void 예약_요청_이미_배정된_좌석일_시_예외_처리() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(2L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(9L, "09"))
+        long customerId = 2;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(9L)
         );
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestReservation(request))
-                .isInstanceOf(IllegalStateCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
     }
@@ -207,47 +259,54 @@ class ReservationIntegrationTest {
      * 예약 요청 성공
      */
     @Test
-    void requestReservation_success() {
+    void 예약_요청_모두_통과() {
         // given
-        ReservationRequest request = new ReservationRequest(
-                new ReservationRequest.Reserver(2L, "테스트사용자"),
-                new ReservationRequest.Receiver(ReceiveMethod.ONLINE, "테스트수령인", null, null, null),
-                new ReservationRequest.Concert(1L, "항해콘서트"),
-                new ReservationRequest.Performance(1L, DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0), BigDecimal.valueOf(10000)),
-                List.of(new ReservationRequest.Seat(12L, "12"))
+        long customerId = 2;
+        ReserverInfo reserverInfo = new ReserverInfo(
+                "테스트사용자",
+                ReceiveMethod.ONLINE,
+                "테스트수령인",
+                null,
+                null,
+                null
+        );
+        TicketInfo ticketInfo = new TicketInfo(
+                1L,
+                1L,
+                BigDecimal.valueOf(10000),
+                DateUtils.createTemporalDateByIntParameters(2024, 8, 12, 23,0,0),
+                List.of(12L)
         );
 
         // when
-        ReservationResponse result = reservationFacade.requestReservation(request);
-        Seat seat = seatRepository.findById(12L).orElseGet(Seat::noContents);
+        ReservationResultInfoWithTickets result = reservationFacade.requestReservation(customerId, reserverInfo, ticketInfo);
+        SeatModel seatModel = seatRepository.findById(12L).orElseGet(SeatModel::noContents);
 
         // then
-        assertAll(() -> assertEquals(request.getReserver().getCustomerId(), result.getReservation().customerId()),
-                () -> assertEquals(request.getConcert().getConcertId(), result.getTickets().get(0).concertId()),
-                () -> assertEquals(request.getPerformance().getPerformanceId(), result.getTickets().get(0).performanceId()),
-                () -> assertEquals(request.getSeats().get(0).getSeatId(), result.getTickets().get(0).seatId()),
+        assertAll(() -> assertEquals(customerId, result.getReservation().customerId()),
+                () -> assertEquals(ticketInfo.getConcertId(), result.getTickets().get(0).concertId()),
+                () -> assertEquals(ticketInfo.getPerformanceId(), result.getTickets().get(0).performanceId()),
+                () -> assertEquals(ticketInfo.getSeatIds().get(0), result.getTickets().get(0).seatId()),
                 () -> assertEquals(ReservationStatus.REQUESTED, result.getReservation().reservationStatus()),
                 () -> assertEquals(TicketStatus.PAY_WAITING, result.getTickets().get(0).ticketStatus()));
-        assertAll(() -> assertEquals("12", seat.seatNo()),
-                () -> assertEquals(SeatStatus.WAITING_FOR_RESERVATION, seat.seatStatus()));
+        assertAll(() -> assertEquals("12", seatModel.seatNo()),
+                () -> assertEquals(SeatStatus.WAITING_FOR_RESERVATION, seatModel.seatStatus()));
     }
 
     /**
      * 유효하지 않은 고객의 결제 요청
      */
     @Test
-    void requestPayment_when_unavailable_customer() {
+    void 결제_요청_유효하지_않은_고객일_시_예외_처리() {
         // given
-        PaymentRequest request = new PaymentRequest(
-                3L, 10L,
-                List.of(
-                        new PaymentRequest.PayInfo(PayMethod.POINT, BigDecimal.valueOf(10000))
-                )
-        );
+        long customerId = 999;
+        long reservationId = 10;
+        List<PaymentInfo> paymentInfos = List.of(
+                new PaymentInfo(PayMethod.POINT, BigDecimal.valueOf(10000)));
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestPayment(request))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestPayment(customerId, reservationId, paymentInfos))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.NOT_AVAILABLE);
     }
@@ -256,50 +315,64 @@ class ReservationIntegrationTest {
      * 유효하지 않은 예약의 결제 요청
      */
     @Test
-    void requestPayment_when_unavailable_reservation() {
+    void 결제_요청_존재하지_않는_예약일_시_예외_처리() {
         // given
-        PaymentRequest request = new PaymentRequest(
-                1L, 11L,
-                List.of(
-                        new PaymentRequest.PayInfo(PayMethod.POINT, BigDecimal.valueOf(10000))
-                )
-        );
+        long customerId = 1;
+        long reservationId = 9999;
+        List<PaymentInfo> paymentInfos = List.of(
+                        new PaymentInfo(PayMethod.POINT, BigDecimal.valueOf(10000)));
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestPayment(request))
-                .isInstanceOf(ResourceNotFoundCustomException.class)
+        assertThatThrownBy(() -> reservationFacade.requestPayment(customerId, reservationId, paymentInfos))
+                .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
-                .isEqualTo(ResponseMessage.NOT_AVAILABLE);
+                .isEqualTo(ResponseMessage.RESERVATION_NOT_FOUND);
     }
 
     /**
      *  결제 시간이 초과된 예약의 결제 요청
      */
     @Test
-    void requestPayment_when_timeout_reservation() {
+    void 결제_요청_결제_요청_시간이_초과된_예약일_시_예외_처리() {
         // given
-        PaymentRequest request = new PaymentRequest(
-                2L, 10L,
-                List.of(
-                        new PaymentRequest.PayInfo(PayMethod.POINT, BigDecimal.valueOf(10000))
-                )
-        );
+        long customerId = 2;
+        long reservationId = 10;
+        List<PaymentInfo> paymentInfos = List.of(
+                new PaymentInfo(PayMethod.POINT, BigDecimal.valueOf(10000)));
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestPayment(request))
+        assertThatThrownBy(() -> reservationFacade.requestPayment(customerId, reservationId, paymentInfos))
                 .isInstanceOf(TimeOutCustomException.class)
                 .extracting("responseMessage")
-                .isEqualTo(ResponseMessage.OUT_OF_TIME);
+                .isEqualTo(ResponseMessage.PAYMENT_OUT_OF_TIME);
 
         // when
-        Reservation reservation = reservationRepository.findByIdAndCustomerId(10L, 1L).orElseGet(Reservation::noContents);
-        List<Ticket> tickets = ticketRepository.findAllByReservationIdAndTicketStatus(10L, TicketStatus.PAY_WAITING);
-        List<Seat> seats = seatRepository.findAllByReservationIdAndSeatStatus(10L, SeatStatus.WAITING_FOR_RESERVATION);
+        ReservationModel reservationModel = reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(ReservationModel::noContents);
+        List<TicketModel> ticketModels = ticketRepository.findAllByReservationIdAndTicketStatus(reservationId, TicketStatus.PAY_WAITING);
+        List<SeatModel> seatModels = seatRepository.findAllByReservationIdAndSeatStatus(reservationId, SeatStatus.WAITING_FOR_RESERVATION);
 
         // then
-        assertEquals(ReservationStatus.CANCELLED, reservation.reservationStatus());
-        assertTrue(tickets.isEmpty());
-        assertTrue(seats.isEmpty());
+        assertEquals(ReservationStatus.CANCELLED, reservationModel.reservationStatus());
+        assertTrue(ticketModels.isEmpty());
+        assertTrue(seatModels.isEmpty());
+    }
+
+    /**
+     * 결제 취소 된 예약의 결제 요청
+     */
+    @Test
+    void 결제_요청_결제가_불가능한_상태인_예약일_시_예외_처리() {
+        // given
+        long customerId = 2;
+        long reservationId = 10;
+        List<PaymentInfo> paymentInfos = List.of(
+                new PaymentInfo(PayMethod.POINT, BigDecimal.valueOf(10000)));
+
+        // when - then
+        assertThatThrownBy(() -> reservationFacade.requestPayment(customerId, reservationId, paymentInfos))
+                .isInstanceOf(CustomException.class)
+                .extracting("responseMessage")
+                .isEqualTo(ResponseMessage.RESERVATION_NOT_AVAILABLE);
     }
 
     /**
@@ -308,28 +381,39 @@ class ReservationIntegrationTest {
     @Test
     void requestPayment_when_out_of_budget() {
         // given
-        PaymentRequest request = new PaymentRequest(
-                2L, 10L,
-                List.of(
-                        new PaymentRequest.PayInfo(PayMethod.POINT, BigDecimal.valueOf(10000))
-                )
-        );
+        long customerId = 1;
+        long reservationId = 10;
+        List<PaymentInfo> paymentInfos = List.of(
+                new PaymentInfo(PayMethod.POINT, BigDecimal.valueOf(10000)));
 
         // when - then
-        assertThatThrownBy(() -> reservationFacade.requestPayment(request))
+        assertThatThrownBy(() -> reservationFacade.requestPayment(customerId, reservationId, paymentInfos))
                 .isInstanceOf(InsufficientResourcesCustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.OUT_OF_BUDGET);
 
         // when
-        Reservation reservation = reservationRepository.findByIdAndCustomerId(10L, 1L).orElseGet(Reservation::noContents);
-        List<Ticket> tickets = ticketRepository.findAllByReservationIdAndTicketStatus(10L, TicketStatus.PAY_WAITING);
-        List<Seat> seats = seatRepository.findAllByReservationIdAndSeatStatus(10L, SeatStatus.WAITING_FOR_RESERVATION);
+        ReservationModel reservationModel = reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(ReservationModel::noContents);
+        List<TicketModel> ticketModels = ticketRepository.findAllByReservationIdAndTicketStatus(reservationId, TicketStatus.PAY_WAITING);
+        List<SeatModel> seatModels = seatRepository.findAllByReservationIdAndSeatStatus(reservationId, SeatStatus.WAITING_FOR_RESERVATION);
 
         // then
-        assertEquals(ReservationStatus.CANCELLED, reservation.reservationStatus());
-        assertTrue(tickets.isEmpty());
-        assertTrue(seats.isEmpty());
+        assertEquals(ReservationStatus.CANCELLED, reservationModel.reservationStatus());
+        assertTrue(ticketModels.isEmpty());
+        assertTrue(seatModels.isEmpty());
+    }
+
+    /**
+     * 결제 요청 시간이 만료된 예약의 좌석 임시 배정 취소
+     */
+    @Test
+    void 결제_요청_시간이_만료된_예약의_좌석_임시_배정_취소() {
+        // given - when
+        reservationFacade.removeWaitingReservation();
+
+        // then
+        List<ReservationModel> result = reservationRepository.findAllByReservationStatus(ReservationStatus.REQUESTED);
+        assertTrue(result.isEmpty());
     }
 
 }
