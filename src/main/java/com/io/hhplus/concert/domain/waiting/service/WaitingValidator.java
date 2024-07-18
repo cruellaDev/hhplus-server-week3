@@ -73,7 +73,7 @@ public class WaitingValidator {
         if (seconds == null || tokenActiveAt == null) {
             return false;
         }
-        Date currentDate = new Date();
+        Date currentDate = DateUtils.getSysDate();
         long targetSeconds = DateUtils.calculateDuration(currentDate, tokenActiveAt);
         return this.isInActiveDuration(seconds, targetSeconds);
     }

@@ -2,14 +2,10 @@ package com.io.hhplus.concert.domain.waiting.service;
 
 import com.io.hhplus.concert.common.enums.WaitingStatus;
 import com.io.hhplus.concert.common.utils.DateUtils;
-import com.io.hhplus.concert.domain.waiting.model.WaitingEnterHistory;
-import com.io.hhplus.concert.domain.waiting.model.WaitingQueue;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingEnterHistoryModel;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingQueueModel;
 import com.io.hhplus.concert.domain.waiting.repository.WaitingRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -44,7 +40,7 @@ class WaitingServiceTest {
     @Test
     void getActiveWaitingTokenByCustomerId() {
         // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
+        WaitingQueueModel waitingQueueModel = WaitingQueueModel.create(
                 1L,
                 1L,
                 "userToken",
@@ -52,157 +48,17 @@ class WaitingServiceTest {
                 DateUtils.getSysDate(),
                 null
         );
-        given(waitingRepository.findWaitingQueueByCustomerIdAndWaitingStatus(anyLong(), any())).willReturn(Optional.of(waitingQueue));
+        given(waitingRepository.findWaitingQueueByCustomerIdAndWaitingStatus(anyLong(), any())).willReturn(Optional.of(waitingQueueModel));
 
         // when
-        WaitingQueue result = waitingService.getActiveWaitingTokenByCustomerId(1L);
+        WaitingQueueModel result = waitingService.getActiveWaitingTokenByCustomerId(1L);
 
         // then
-        assertAll(() -> assertEquals(waitingQueue.waitingId(), result.waitingId()),
-                () -> assertEquals(waitingQueue.customerId(), result.customerId()),
-                () -> assertEquals(waitingQueue.token(), result.token()),
-                () -> assertEquals(waitingQueue.waitingStatus(), result.waitingStatus()),
-                () -> assertEquals(waitingQueue.createdAt(), result.createdAt()));
-    }
-
-    /**
-     * 대기열 정보 검증 모두 통과 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueExists_when_pass_all() {
-        // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
-                1L,
-                1L,
-                "userToken",
-                WaitingStatus.ACTIVE,
-                DateUtils.getSysDate(),
-                null
-        );
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
-
-        // then
-        assertThat(isActive).isTrue();
-    }
-
-    /**
-     * 대기열 정보 검증 모두 대기열_ID 이상 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueExists_when_waitingId_is_wrong() {
-        // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
-                -1L,
-                1L,
-                "userToken",
-                WaitingStatus.ACTIVE,
-                DateUtils.getSysDate(),
-                null
-        );
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
-
-        // then
-        assertThat(isActive).isFalse();
-    }
-
-    /**
-     * 대기열 정보 검증 모두 고객_ID 이상 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueExists_when_customerId_is_wrong() {
-        // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
-                1L,
-                -1L,
-                "userToken",
-                WaitingStatus.ACTIVE,
-                DateUtils.getSysDate(),
-                null
-        );
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
-
-        // then
-        assertThat(isActive).isFalse();
-    }
-
-    /**
-     * 대기열 정보 검증 모두 토큰 값 이상 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueExists_when_token_is_wrong() {
-        // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
-                1L,
-                1L,
-                "",
-                WaitingStatus.ACTIVE,
-                DateUtils.getSysDate(),
-                null
-        );
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
-
-        // then
-        assertThat(isActive).isFalse();
-    }
-
-    /**
-     * 대기열 정보 검증 모두 대기상태 이상 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueExists_when_waitingStatus_is_wrong() {
-        // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
-                1L,
-                1L,
-                "userToken",
-                WaitingStatus.EXPIRED,
-                DateUtils.getSysDate(),
-                null
-        );
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
-
-        // then
-        assertThat(isActive).isFalse();
-    }
-
-    /**
-     * 대기열 활성 토큰 시간 초과 확인 - 시간 이내일 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueInTimeLimits_when_in_duration() {
-        // given
-        Date tokenActiveAt = DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 12, 36, 59);
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueInTimeLimits(300L, tokenActiveAt);
-
-        // then
-        assertThat(isActive).isTrue();
-    }
-
-    /**
-     * 대기열 활성 토큰 시간 초과 확인 - 시간 이내일 시
-     */
-    @Test
-    void meetsIfActiveWaitingQueueInTimeLimits_when_expired() {
-        // given
-        Date tokenActiveAt = DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 12, 33, 59);
-
-        // when
-        boolean isActive = waitingService.meetsIfActiveWaitingQueueInTimeLimits(300L, tokenActiveAt);
-
-        // then
-        assertThat(isActive).isFalse();
+        assertAll(() -> assertEquals(waitingQueueModel.waitingId(), result.waitingId()),
+                () -> assertEquals(waitingQueueModel.customerId(), result.customerId()),
+                () -> assertEquals(waitingQueueModel.token(), result.token()),
+                () -> assertEquals(waitingQueueModel.waitingStatus(), result.waitingStatus()),
+                () -> assertEquals(waitingQueueModel.createdAt(), result.createdAt()));
     }
 
     /**
@@ -211,7 +67,7 @@ class WaitingServiceTest {
     @Test
     void enterWaitingQueue() {
         // given
-        WaitingQueue waitingQueue = WaitingQueue.create(
+        WaitingQueueModel waitingQueueModel = WaitingQueueModel.create(
                 1L,
                 1L,
                 "userToken",
@@ -219,18 +75,18 @@ class WaitingServiceTest {
                 DateUtils.getSysDate(),
                 null
         );
-        WaitingEnterHistory waitingEnterHistory = WaitingEnterHistory.create(
+        WaitingEnterHistoryModel waitingEnterHistoryModel = WaitingEnterHistoryModel.create(
                 1L,
                 1L,
                 DateUtils.getSysDate()
         );
-        given(waitingRepository.saveWaitingQueue(any(WaitingQueue.class))).willReturn(waitingQueue);
-        given(waitingRepository.saveWaitingEnterHistory(any(WaitingEnterHistory.class))).willReturn(waitingEnterHistory);
+        given(waitingRepository.saveWaitingQueue(any(WaitingQueueModel.class))).willReturn(waitingQueueModel);
+        given(waitingRepository.saveWaitingEnterHistory(any(WaitingEnterHistoryModel.class))).willReturn(waitingEnterHistoryModel);
 
         // when
-        WaitingQueue result = waitingService.enterWaitingQueue(1L);
+        WaitingQueueModel result = waitingService.enterWaitingQueue(1L);
 
-        assertThat(result.waitingStatus()).isEqualTo(waitingQueue.waitingStatus());
+        assertThat(result.waitingStatus()).isEqualTo(waitingQueueModel.waitingStatus());
     }
 
     /**
@@ -274,7 +130,7 @@ class WaitingServiceTest {
     @Test
     void expireWaitingQueueToken() {
         // given
-        WaitingQueue asisWaitingQueue = WaitingQueue.create(
+        WaitingQueueModel asisWaitingQueueModel = WaitingQueueModel.create(
                 1L,
                 1L,
                 "userToken",
@@ -282,7 +138,7 @@ class WaitingServiceTest {
                 DateUtils.getSysDate(),
                 null
         );
-        WaitingQueue tobeWaitingQueue = WaitingQueue.create(
+        WaitingQueueModel tobeWaitingQueueModel = WaitingQueueModel.create(
                 1L,
                 1L,
                 "userToken",
@@ -290,10 +146,10 @@ class WaitingServiceTest {
                 DateUtils.getSysDate(),
                 null
         );
-        given(waitingRepository.saveWaitingQueue(any(WaitingQueue.class))).willReturn(tobeWaitingQueue);
+        given(waitingRepository.saveWaitingQueue(any(WaitingQueueModel.class))).willReturn(tobeWaitingQueueModel);
 
         // when
-        boolean isExpired = waitingService.expireWaitingQueueToken(asisWaitingQueue);
+        boolean isExpired = waitingService.expireWaitingQueueToken(asisWaitingQueueModel);
 
         // then
         assertThat(isExpired).isTrue();
@@ -305,8 +161,8 @@ class WaitingServiceTest {
     @Test
     void removeAllExpiredWaitingQueueToken() {
         // given
-        List<WaitingQueue> asisWaitingQueues = List.of(
-            WaitingQueue.create(
+        List<WaitingQueueModel> asisWaitingQueueModels = List.of(
+            WaitingQueueModel.create(
                     1L,
                     1L,
                     "userToken",
@@ -314,7 +170,7 @@ class WaitingServiceTest {
                     DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 11, 23, 11),
                     null
             ),
-            WaitingQueue.create(
+            WaitingQueueModel.create(
                     2L,
                     2L,
                     "userToken",
@@ -324,8 +180,8 @@ class WaitingServiceTest {
             )
         );
         // given
-        List<WaitingQueue> tobeWaitingQueues = List.of(
-                WaitingQueue.create(
+        List<WaitingQueueModel> tobeWaitingQueueModels = List.of(
+                WaitingQueueModel.create(
                         1L,
                         1L,
                         "userToken",
@@ -333,7 +189,7 @@ class WaitingServiceTest {
                         DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 11, 23, 11),
                         DateUtils.getSysDate()
                 ),
-                WaitingQueue.create(
+                WaitingQueueModel.create(
                         2L,
                         2L,
                         "userToken",
@@ -342,15 +198,15 @@ class WaitingServiceTest {
                         DateUtils.getSysDate()
                 )
         );
-        given(waitingRepository.findAllExpiredWaitingQueue()).willReturn(asisWaitingQueues);
-        given(waitingRepository.saveWaitingQueue(any(WaitingQueue.class))).willReturn(tobeWaitingQueues.get(0));
-        given(waitingRepository.saveWaitingQueue(any(WaitingQueue.class))).willReturn(tobeWaitingQueues.get(1));
+        given(waitingRepository.findAllExpiredWaitingQueue()).willReturn(asisWaitingQueueModels);
+        given(waitingRepository.saveWaitingQueue(any(WaitingQueueModel.class))).willReturn(tobeWaitingQueueModels.get(0));
+        given(waitingRepository.saveWaitingQueue(any(WaitingQueueModel.class))).willReturn(tobeWaitingQueueModels.get(1));
 
         // when
-        List<WaitingQueue> result = waitingService.removeAllExpiredWaitingQueueToken();
+        List<WaitingQueueModel> result = waitingService.removeAllExpiredWaitingQueueToken();
 
         // then
-        assertAll(() -> assertEquals(tobeWaitingQueues.get(0).deletedAt(), result.get(0).deletedAt()));
-        assertAll(() -> assertEquals(tobeWaitingQueues.get(1).deletedAt(), result.get(1).deletedAt()));
+        assertAll(() -> assertEquals(tobeWaitingQueueModels.get(0).deletedAt(), result.get(0).deletedAt()));
+        assertAll(() -> assertEquals(tobeWaitingQueueModels.get(1).deletedAt(), result.get(1).deletedAt()));
     }
 }
