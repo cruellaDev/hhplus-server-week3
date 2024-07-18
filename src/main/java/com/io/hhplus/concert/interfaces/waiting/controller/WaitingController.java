@@ -1,12 +1,10 @@
 package com.io.hhplus.concert.interfaces.waiting.controller;
 
-import com.io.hhplus.concert.application.waiting.dto.WaitingResponse;
+import com.io.hhplus.concert.application.waiting.dto.WaitingResultInfo;
 import com.io.hhplus.concert.application.waiting.facade.WaitingFacade;
-import com.io.hhplus.concert.interfaces.common.dto.CommonResponse;
+import com.io.hhplus.concert.common.dto.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +19,7 @@ public class WaitingController {
      * @return 응답 정보
      */
     @PostMapping("/enter")
-    public CommonResponse<WaitingResponse> enter(@RequestHeader("customerId") Long customerId) {
+    public CommonResponse<WaitingResultInfo> enter(@RequestHeader("customerId") Long customerId) {
         return CommonResponse.success(waitingFacade.publishWaitingToken(customerId));
     }
 
@@ -31,7 +29,7 @@ public class WaitingController {
      * @return 응답 정보
      */
     @GetMapping("check")
-    public CommonResponse<WaitingResponse> check(@RequestHeader("customerId") Long customerId) {
+    public CommonResponse<WaitingResultInfo> check(@RequestHeader("customerId") Long customerId) {
         return CommonResponse.success(waitingFacade.getWaitingToken(customerId));
     }
 }

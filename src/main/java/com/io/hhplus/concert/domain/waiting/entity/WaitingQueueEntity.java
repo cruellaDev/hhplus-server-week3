@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.infrastructure.waiting.entity;
+package com.io.hhplus.concert.domain.waiting.entity;
 
 import com.io.hhplus.concert.common.enums.WaitingStatus;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
@@ -18,7 +18,7 @@ import java.util.Date;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "WAITING_QUEUE")
-public class WaitingQueue  implements Auditable {
+public class WaitingQueueEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)

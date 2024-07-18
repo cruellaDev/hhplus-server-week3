@@ -2,59 +2,33 @@ package com.io.hhplus.concert.domain.waiting.service;
 
 import com.io.hhplus.concert.common.enums.WaitingStatus;
 import com.io.hhplus.concert.common.utils.DateUtils;
-import com.io.hhplus.concert.domain.waiting.model.WaitingEnterHistory;
-import com.io.hhplus.concert.domain.waiting.model.WaitingQueue;
+import com.io.hhplus.concert.domain.customer.service.CustomerValidator;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingEnterHistoryModel;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingQueueModel;
 import com.io.hhplus.concert.domain.waiting.repository.WaitingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
+    private final WaitingValidator waitingValidator;
+    private final CustomerValidator customerValidator;
 
     /**
      * 고객의 활성화된 대기열 토큰 조회
      * @param customerId 고객_ID
      * @return 대기열 토큰 정보
      */
-    public WaitingQueue getActiveWaitingTokenByCustomerId(Long customerId) {
-        return waitingRepository.findWaitingQueueByCustomerIdAndWaitingStatus(customerId, WaitingStatus.ACTIVE).orElseGet(WaitingQueue::noContents);
-    }
-
-    /**
-     * 대기열 정보 검증
-     * @param waitingQueue 대기열 정보
-     * @return 유효 여부
-     */
-    public boolean meetsIfActiveWaitingQueueExists(WaitingQueue waitingQueue) {
-        return waitingQueue != null
-                && WaitingQueue.isAvailableWaitingId(waitingQueue.waitingId())
-                && WaitingQueue.isAvailableCustomerId(waitingQueue.customerId())
-                && WaitingQueue.isAvailableToken(waitingQueue.token())
-                && WaitingQueue.isAvailableWaitingStatus(waitingQueue.waitingStatus());
-    }
-
-    /**
-     * 대기열 활성 토큰 시간 초과 확인
-     * @param seconds 기준 단위 (초)
-     * @param tokenActiveAt 토큰 활성 시간
-     * @return 토큰 활성 시간 이내 존재 여부
-     */
-    public boolean meetsIfActiveWaitingQueueInTimeLimits(Long seconds, Date tokenActiveAt) {
-        if (seconds == null || tokenActiveAt == null) {
-            return false;
-        }
-        Date currentDate = new Date();
-        long targetSeconds = TimeUnit.MILLISECONDS.toSeconds(currentDate.getTime() - tokenActiveAt.getTime());
-        return WaitingQueue.isInActiveDuration(seconds, targetSeconds);
+    public WaitingQueueModel getActiveWaitingTokenByCustomerId(Long customerId) {
+        return waitingRepository.findWaitingQueueByCustomerIdAndWaitingStatus(customerId, WaitingStatus.ACTIVE).orElseGet(WaitingQueueModel::noContents);
     }
 
     /**
@@ -63,10 +37,10 @@ public class WaitingService {
      * @return 대기열 진입 정보
      */
     @Transactional
-    public WaitingQueue enterWaitingQueue(Long customerId) {
-        WaitingQueue savedWaitingQueue = waitingRepository.saveWaitingQueue(WaitingQueue.create(null, customerId, (new Date()).toString() + customerId.toString(), WaitingStatus.ACTIVE, null, null));
-        waitingRepository.saveWaitingEnterHistory(WaitingEnterHistory.create(null, savedWaitingQueue.waitingId(), null));
-        return savedWaitingQueue;
+    public WaitingQueueModel enterWaitingQueue(Long customerId) {
+        WaitingQueueModel savedWaitingQueueModel = waitingRepository.saveWaitingQueue(WaitingQueueModel.create(null, customerId, (new Date()).toString() + customerId.toString(), WaitingStatus.ACTIVE, null, null));
+        waitingRepository.saveWaitingEnterHistory(WaitingEnterHistoryModel.create(null, savedWaitingQueueModel.waitingId(), null));
+        return savedWaitingQueueModel;
     }
 
     /**
@@ -90,13 +64,13 @@ public class WaitingService {
 
     /**
      * 대기열 토큰 만료 처리
-     * @param waitingQueue 대기열 정보
+     * @param waitingQueueModel 대기열 정보
      * @return 토큰 만료 처리 여부
      */
-    public boolean expireWaitingQueueToken(WaitingQueue waitingQueue) {
+    public boolean expireWaitingQueueToken(WaitingQueueModel waitingQueueModel) {
         boolean isExpired = true;
         try {
-            waitingRepository.saveWaitingQueue(WaitingQueue.create(waitingQueue.waitingId(), waitingQueue.customerId(), waitingQueue.token(), WaitingStatus.EXPIRED, waitingQueue.createdAt(), waitingQueue.deletedAt()));
+            waitingRepository.saveWaitingQueue(WaitingQueueModel.create(waitingQueueModel.waitingId(), waitingQueueModel.customerId(), waitingQueueModel.token(), WaitingStatus.EXPIRED, waitingQueueModel.createdAt(), waitingQueueModel.deletedAt()));
             return isExpired;
         } catch (Exception e) {
             return !isExpired;
@@ -106,18 +80,17 @@ public class WaitingService {
     /**
      * 시간이 지나 만료됐거나 만료된 토큰 모두 제거
      */
-    public List<WaitingQueue> removeAllExpiredWaitingQueueToken() {
-        List<WaitingQueue> waitingQueues = waitingRepository.findAllExpiredWaitingQueue();
-        Date now = DateUtils.getSysDate();
-        List<WaitingQueue> savedWaitingQueues = new ArrayList<>();
-        for (WaitingQueue waitingQueue : waitingQueues) {
-            Date createdAt = waitingQueue.createdAt();
-            long duration = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - createdAt.getTime());
-            if (duration > 300) {
-                WaitingQueue savedWaitingQueue = waitingRepository.saveWaitingQueue(WaitingQueue.create(waitingQueue.waitingId(), waitingQueue.customerId(), waitingQueue.token(), WaitingStatus.EXPIRED, waitingQueue.createdAt(), now));
-                savedWaitingQueues.add(savedWaitingQueue);
-            }
-        }
-        return savedWaitingQueues;
+    public List<WaitingQueueModel> removeAllExpiredWaitingQueueToken() {
+        List<WaitingQueueModel> waitingQueueModels = waitingRepository.findAllExpiredWaitingQueue();
+        Date currentDate = DateUtils.getSysDate();
+        long durationLimit = 300;
+        return waitingQueueModels
+                .stream()
+                .filter(waitingQueueModel -> {
+                    long duration = DateUtils.calculateDuration(currentDate, waitingQueueModel.createdAt());
+                    return duration > durationLimit;
+                })
+                .map(waitingQueueModel -> waitingRepository.saveWaitingQueue(WaitingQueueModel.create(waitingQueueModel.waitingId(), waitingQueueModel.customerId(), waitingQueueModel.token(), WaitingStatus.EXPIRED, waitingQueueModel.createdAt(), currentDate)))
+                .collect(Collectors.toList());
     }
 }
