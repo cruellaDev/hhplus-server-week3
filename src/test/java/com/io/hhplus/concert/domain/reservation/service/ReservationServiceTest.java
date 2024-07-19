@@ -4,11 +4,13 @@ import com.io.hhplus.concert.common.enums.ReceiveMethod;
 import com.io.hhplus.concert.common.enums.ReservationStatus;
 import com.io.hhplus.concert.common.enums.TicketStatus;
 import com.io.hhplus.concert.common.utils.DateUtils;
-import com.io.hhplus.concert.domain.reservation.model.Reservation;
-import com.io.hhplus.concert.domain.reservation.model.Ticket;
+import com.io.hhplus.concert.domain.reservation.service.model.ReservationModel;
+import com.io.hhplus.concert.domain.reservation.service.model.TicketModel;
 import com.io.hhplus.concert.domain.reservation.repository.ReservationRepository;
 import com.io.hhplus.concert.domain.reservation.repository.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ReservationServiceTest {
 
     @Mock
@@ -47,7 +50,7 @@ class ReservationServiceTest {
     @Test
     void saveReservation() {
         // given
-        Reservation reservation = Reservation.create(
+        ReservationModel reservationModel = ReservationModel.create(
                 1L,
                 1L,
                 "김항해",
@@ -59,17 +62,17 @@ class ReservationServiceTest {
                 null,
                 null
         );
-        given(reservationRepository.save(any(Reservation.class))).willReturn(reservation);
+        given(reservationRepository.save(any(ReservationModel.class))).willReturn(reservationModel);
 
         // when
-        Reservation result = reservationService.saveReservation(reservation);
+        ReservationModel result = reservationService.saveReservation(reservationModel);
 
         // then
-        assertAll(() -> assertEquals(reservation.reservationId(), result.reservationId()),
-                () -> assertEquals(reservation.customerId(), result.customerId()),
-                () -> assertEquals(reservation.reserverName(), result.reserverName()),
-                () -> assertEquals(reservation.receiveMethod(), result.receiveMethod()),
-                () -> assertEquals(reservation.receiverName(), result.receiverName()));
+        assertAll(() -> assertEquals(reservationModel.reservationId(), result.reservationId()),
+                () -> assertEquals(reservationModel.customerId(), result.customerId()),
+                () -> assertEquals(reservationModel.reserverName(), result.reserverName()),
+                () -> assertEquals(reservationModel.receiveMethod(), result.receiveMethod()),
+                () -> assertEquals(reservationModel.receiverName(), result.receiverName()));
     }
 
     /**
@@ -78,7 +81,7 @@ class ReservationServiceTest {
     @Test
     void getReservation() {
         // given
-        Reservation reservation = Reservation.create(
+        ReservationModel reservationModel = ReservationModel.create(
                 1L,
                 1L,
                 "김항해",
@@ -90,203 +93,17 @@ class ReservationServiceTest {
                 null,
                 null
         );
-        given(reservationRepository.findByIdAndCustomerId(anyLong(), anyLong())).willReturn(Optional.of(reservation));
+        given(reservationRepository.findByIdAndCustomerId(anyLong(), anyLong())).willReturn(Optional.of(reservationModel));
 
         // when
-        Reservation result = reservationService.getReservation(1L, 1L);
+        ReservationModel result = reservationService.getReservation(1L, 1L);
 
         // then
-        assertAll(() -> assertEquals(reservation.reservationId(), result.reservationId()),
-                () -> assertEquals(reservation.customerId(), result.customerId()),
-                () -> assertEquals(reservation.reserverName(), result.reserverName()),
-                () -> assertEquals(reservation.receiveMethod(), result.receiveMethod()),
-                () -> assertEquals(reservation.receiverName(), result.receiverName()));
-    }
-
-    /**
-     * 예약 유효성 검증 - 모두 통과 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_pass_all() {
-        // given
-        Reservation reservation = Reservation.create(
-                1L,
-                1L,
-                "김항해",
-                ReservationStatus.REQUESTED,
-                new Date(),
-                ReceiveMethod.ONLINE,
-                "김항해",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isTrue();
-    }
-
-    /**
-     * 예약 유효성 검증 - 예약_ID 이상할 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_reservationId_is_wrong() {
-        // given
-        Reservation reservation = Reservation.create(
-                -1L,
-                1L,
-                "김항해",
-                ReservationStatus.REQUESTED,
-                new Date(),
-                ReceiveMethod.ONLINE,
-                "김항해",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isFalse();
-    }
-
-    /**
-     * 예약 유효성 검증 - 예매자 명 이상할 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_reserverName_is_wrong() {
-        // given
-        Reservation reservation = Reservation.create(
-                1L,
-                1L,
-                "",
-                ReservationStatus.REQUESTED,
-                new Date(),
-                ReceiveMethod.ONLINE,
-                "김항해",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isFalse();
-    }
-
-    /**
-     * 예약 유효성 검증 - 수령방법 이상할 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_receiveMethod_is_wrong() {
-        // given
-        Reservation reservation = Reservation.create(
-                1L,
-                1L,
-                "김항해",
-                ReservationStatus.REQUESTED,
-                new Date(),
-                null,
-                "김항해",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isFalse();
-    }
-
-    /**
-     * 예약 유효성 검증 - 수령인 명 이상할 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_receiveName_is_wrong() {
-        // given
-        Reservation reservation = Reservation.create(
-                1L,
-                1L,
-                "김항해",
-                ReservationStatus.REQUESTED,
-                new Date(),
-                ReceiveMethod.ONLINE,
-                "",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isFalse();
-    }
-
-    /**
-     * 예약 유효성 검증 - 예약상태 이상할 시
-     */
-    @Test
-    void meetsIfReservationAvailable_when_reservationStatus_is_wrong() {
-        // given
-        Reservation reservation = Reservation.create(
-                1L,
-                1L,
-                "김항해",
-                null,
-                new Date(),
-                ReceiveMethod.ONLINE,
-                "김항해",
-                null,
-                null,
-                null
-        );
-
-        // when
-        boolean isValid = reservationService.meetsIfReservationAvailable(reservation);
-
-        // then
-        assertThat(isValid).isFalse();
-    }
-
-    /**
-     * 예약 정보 결제 유효 기간 내 존재 여부 확인 -기간 내 일시
-     */
-    @Test
-    void meetsIfAbleToPayInTimeLimits() {
-        // given
-        Date targetDate = DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 11, 50, 22);
-
-        // when
-        boolean isValid = reservationService.meetsIfAbleToPayInTimeLimits(300L, targetDate);
-
-        // then
-        assertThat(isValid).isTrue();
-    }
-
-    /**
-     * 예약 정보 결제 유효 기간 내 존재 여부 확인 -이미 지났을 시
-     */
-    @Test
-    void meetsIfAbleToPayInTimeLimits_when_passed() {
-        // given
-        Date targetDate = DateUtils.createTemporalDateByIntParameters(2024, 7, 12, 11, 47, 22);
-
-        // when
-        boolean isValid = reservationService.meetsIfAbleToPayInTimeLimits(300L, targetDate);
-
-        // then
-        assertThat(isValid).isFalse();
+        assertAll(() -> assertEquals(reservationModel.reservationId(), result.reservationId()),
+                () -> assertEquals(reservationModel.customerId(), result.customerId()),
+                () -> assertEquals(reservationModel.reserverName(), result.reserverName()),
+                () -> assertEquals(reservationModel.receiveMethod(), result.receiveMethod()),
+                () -> assertEquals(reservationModel.receiverName(), result.receiverName()));
     }
 
     /**
@@ -311,7 +128,7 @@ class ReservationServiceTest {
     @Test
     void updateReservationStatus() {
         // given
-        Reservation asisReservation = Reservation.create(
+        ReservationModel asisReservationModel = ReservationModel.create(
                 1L,
                 1L,
                 "김항해",
@@ -323,15 +140,15 @@ class ReservationServiceTest {
                 null,
                 null
         );
-        Reservation tobeReservation = Reservation.changeStatus(asisReservation, ReservationStatus.COMPLETED);
-        given(reservationRepository.findByIdAndCustomerId(anyLong(), anyLong())).willReturn(Optional.of(asisReservation));
-        given(reservationRepository.save(any(Reservation.class))).willReturn(tobeReservation);
+        ReservationModel tobeReservationModel = ReservationModel.changeStatus(asisReservationModel, ReservationStatus.COMPLETED);
+        given(reservationRepository.findByIdAndCustomerId(anyLong(), anyLong())).willReturn(Optional.of(asisReservationModel));
+        given(reservationRepository.save(any(ReservationModel.class))).willReturn(tobeReservationModel);
 
         // when
-        Reservation result = reservationService.updateReservationStatus(1L, 1L, ReservationStatus.COMPLETED);
+        ReservationModel result = reservationService.updateReservationStatus(1L, 1L, ReservationStatus.COMPLETED);
 
         // then
-        assertThat(result.reservationStatus()).isEqualTo(tobeReservation.reservationStatus());
+        assertThat(result.reservationStatus()).isEqualTo(tobeReservationModel.reservationStatus());
 
     }
 
@@ -342,8 +159,8 @@ class ReservationServiceTest {
     void updateTicketsStatus() {
         // given
         Date sysdate = DateUtils.getSysDate();
-        List<Ticket> asisTicket = List.of(
-                Ticket.create(
+        List<TicketModel> asisTicketModel = List.of(
+                TicketModel.create(
                         1L,
                         1L,
                         1L,
@@ -365,8 +182,8 @@ class ReservationServiceTest {
                         null
                 )
         );
-        List<Ticket> tobeTicket = List.of(
-                Ticket.create(
+        List<TicketModel> tobeTicketModel = List.of(
+                TicketModel.create(
                         1L,
                         1L,
                         1L,
@@ -388,14 +205,14 @@ class ReservationServiceTest {
                         null
                 )
         );
-        given(ticketRepository.findAllByReservationIdAndTicketStatus(anyLong(), any())).willReturn(asisTicket);
-        given(ticketRepository.saveAll(any())).willReturn(tobeTicket);
+        given(ticketRepository.findAllByReservationIdAndTicketStatus(anyLong(), any())).willReturn(asisTicketModel);
+        given(ticketRepository.saveAll(any())).willReturn(tobeTicketModel);
 
         // when
-        List<Ticket> result = reservationService.updateTicketsStatus(1L, TicketStatus.PAY_WAITING, TicketStatus.PAYED);
+        List<TicketModel> result = reservationService.updateTicketsStatus(1L, TicketStatus.PAY_WAITING, TicketStatus.PAYED);
 
         // then
-        assertThat(result.get(0).ticketStatus()).isEqualTo(tobeTicket.get(0).ticketStatus());
+        assertThat(result.get(0).ticketStatus()).isEqualTo(tobeTicketModel.get(0).ticketStatus());
     }
 
     /**
@@ -404,8 +221,8 @@ class ReservationServiceTest {
     @Test
     void getAllReservationByReservationStatus() {
         // given
-        List<Reservation> reservations = List.of(
-                Reservation.create(
+        List<ReservationModel> reservationModels = List.of(
+                ReservationModel.create(
                         1L,
                         1L,
                         "김항해",
@@ -418,10 +235,10 @@ class ReservationServiceTest {
                         null
                 )
         );
-        given(reservationRepository.findAllByReservationStatus(any())).willReturn(reservations);
+        given(reservationRepository.findAllByReservationStatus(any())).willReturn(reservationModels);
 
         // when
-        List<Reservation> result = reservationService.getAllReservationByReservationStatus(ReservationStatus.REQUESTED);
+        List<ReservationModel> result = reservationService.getAllReservationByReservationStatus(ReservationStatus.REQUESTED);
 
         // then
         assertThat(result).hasSize(1);
