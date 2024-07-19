@@ -35,7 +35,7 @@ public class CustomerValidator {
     }
 
     public boolean isSufficientPointAmount(BigDecimal pointAmount) {
-        return pointAmount == null || pointAmount.compareTo(BigDecimal.ZERO) <= 0;
+        return pointAmount != null && pointAmount.compareTo(BigDecimal.ZERO) > 0;
     }
 
     public boolean isInsufficientPointAmount(BigDecimal pointAmount) {
@@ -91,7 +91,7 @@ public class CustomerValidator {
      * @param token 토큰 정보
      */
     public void validateCustomer(String token) {
-        if (token == null) throw new CustomException(ResponseMessage.INVALID, "토큰 정보가 존재하지 않습니다.");
+        if (token == null || token.isBlank()) throw new CustomException(ResponseMessage.INVALID, "토큰 정보가 존재하지 않습니다.");
         Optional<CustomerModel> customerModel = customerRepository.findAvailableOneById(Long.valueOf(token));
         if (customerModel.isEmpty()) throw new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND, "존재하지 않는 고객입니다.");
         if (customerModel.get().customerId().compareTo(0L) <= 0) throw new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND, "존재하지 않는 고객입니다.");
