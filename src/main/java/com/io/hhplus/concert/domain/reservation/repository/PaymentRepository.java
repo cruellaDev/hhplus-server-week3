@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.domain.reservation.repository;
 
-import com.io.hhplus.concert.domain.reservation.model.Payment;
+import com.io.hhplus.concert.domain.reservation.service.model.PaymentModel;
 
 public interface PaymentRepository {
-    Payment save(Payment payment);
+    PaymentModel save(PaymentModel paymentModel);
 }

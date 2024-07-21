@@ -1,12 +1,11 @@
 package com.io.hhplus.concert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.io.hhplus.concert.presentation.concert.controller.ConcertController;
-import com.io.hhplus.concert.presentation.customer.controller.CustomerController;
-import com.io.hhplus.concert.presentation.customer.dto.request.PostBalanceRequestBody;
-import com.io.hhplus.concert.presentation.customer.dto.request.PostChargeRequestBody;
-import com.io.hhplus.concert.presentation.reservation.controller.ReservationController;
-import com.io.hhplus.concert.presentation.waiting.controller.WaitingController;
+import com.io.hhplus.concert.interfaces.concert.controller.ConcertController;
+import com.io.hhplus.concert.interfaces.customer.controller.CustomerController;
+import com.io.hhplus.concert.interfaces.customer.dto.request.CustomerPointRequest;
+import com.io.hhplus.concert.interfaces.reservation.controller.ReservationController;
+import com.io.hhplus.concert.interfaces.waiting.controller.WaitingController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +43,11 @@ public class MockApiTest {
 
     @Test
     @Disabled
-    public void balanceCustomerPointTest() throws Exception {
+    public void getCustomerPointTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
 
-        PostBalanceRequestBody requestBody = new PostBalanceRequestBody(1L);
-        String content = objectMapper.writeValueAsString(requestBody);
-
-        mockMvc.perform(post("/customer/point/balance")
-                        .content(content)
+        mockMvc.perform(post("/customer/point")
+                        .header("customerId", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -64,7 +60,7 @@ public class MockApiTest {
     public void chargeCustomerPointTest() throws Exception {
         mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
 
-        PostChargeRequestBody requestBody = new PostChargeRequestBody(1L, BigDecimal.valueOf(1000));
+        CustomerPointRequest requestBody = new CustomerPointRequest(1L, BigDecimal.valueOf(1000));
         String content = objectMapper.writeValueAsString(requestBody);
 
         mockMvc.perform(post("/customer/point/charge")

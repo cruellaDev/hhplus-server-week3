@@ -1,7 +1,8 @@
 package com.io.hhplus.concert.infrastructure.concert.repository.impl;
 
 import com.io.hhplus.concert.common.enums.SeatStatus;
-import com.io.hhplus.concert.domain.concert.model.Seat;
+import com.io.hhplus.concert.domain.concert.entity.SeatEntity;
+import com.io.hhplus.concert.domain.concert.service.model.SeatModel;
 import com.io.hhplus.concert.domain.concert.repository.SeatRepository;
 import com.io.hhplus.concert.infrastructure.concert.repository.jpaRepository.SeatJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +31,12 @@ public class SeatRepositoryImpl implements SeatRepository {
         return seatStatus != null && seatStatus.equals(SeatStatus.AVAILABLE);
     }
 
-    private Seat mapEntityToDto(com.io.hhplus.concert.infrastructure.concert.entity.Seat entity) {
-        return Seat.create(entity.getId(), entity.getPerformanceId(), entity.getConcertId(), entity.getSeatNo(), entity.getSeatStatus());
+    private SeatModel mapEntityToDto(SeatEntity entity) {
+        return SeatModel.create(entity.getId(), entity.getPerformanceId(), entity.getConcertId(), entity.getSeatNo(), entity.getSeatStatus());
     }
 
-    private com.io.hhplus.concert.infrastructure.concert.entity.Seat mapDtoToEntity(Seat dto) {
-        return com.io.hhplus.concert.infrastructure.concert.entity.Seat.builder()
+    private SeatEntity mapDtoToEntity(SeatModel dto) {
+        return SeatEntity.builder()
                 .id(dto.seatId())
                 .performanceId(dto.performanceId())
                 .concertId(dto.concertId())
@@ -45,7 +46,7 @@ public class SeatRepositoryImpl implements SeatRepository {
     }
 
     @Override
-    public List<Seat> findAvailableAllByPerformanceId(Long performanceId) {
+    public List<SeatModel> findAvailableAllByPerformanceId(Long performanceId) {
         return seatJpaRepository.findAllByPerformanceId(performanceId)
                 .stream()
                 .filter(entity -> isNotDeleted(entity.getDeletedAt()) && isAvailableStatus(entity.getSeatStatus()))
@@ -54,7 +55,7 @@ public class SeatRepositoryImpl implements SeatRepository {
     }
 
     @Override
-    public Optional<Seat> findAvailableOneByPerformanceIdAndSeatId(Long performanceId, Long seatId) {
+    public Optional<SeatModel> findAvailableOneByPerformanceIdAndSeatId(Long performanceId, Long seatId) {
         return seatJpaRepository.findById(seatId)
                 .filter(entity -> isEqualPerformanceId(performanceId, entity.getPerformanceId())
                         && isNotDeleted(entity.getDeletedAt())
@@ -63,18 +64,18 @@ public class SeatRepositoryImpl implements SeatRepository {
     }
 
     @Override
-    public Optional<Seat> findById(Long seatId) {
+    public Optional<SeatModel> findById(Long seatId) {
         return seatJpaRepository.findById(seatId)
                 .map(this::mapEntityToDto);
     }
 
     @Override
-    public Seat save(Seat seat) {
-        return mapEntityToDto(seatJpaRepository.save(mapDtoToEntity(seat)));
+    public SeatModel save(SeatModel seatModel) {
+        return mapEntityToDto(seatJpaRepository.save(mapDtoToEntity(seatModel)));
     }
 
     @Override
-    public List<Seat> findAllByReservationIdAndSeatStatus(Long reservationId, SeatStatus seatStatus) {
+    public List<SeatModel> findAllByReservationIdAndSeatStatus(Long reservationId, SeatStatus seatStatus) {
         return seatJpaRepository.findAllWaitingSeatsByReservationId(reservationId)
                 .stream()
                 .filter(entity -> entity.getSeatStatus().equals(seatStatus))

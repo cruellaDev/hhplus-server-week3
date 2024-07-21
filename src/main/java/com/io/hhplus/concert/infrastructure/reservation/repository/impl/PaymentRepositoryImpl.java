@@ -1,6 +1,7 @@
 package com.io.hhplus.concert.infrastructure.reservation.repository.impl;
 
-import com.io.hhplus.concert.domain.reservation.model.Payment;
+import com.io.hhplus.concert.domain.reservation.entity.PaymentEntity;
+import com.io.hhplus.concert.domain.reservation.service.model.PaymentModel;
 import com.io.hhplus.concert.domain.reservation.repository.PaymentRepository;
 import com.io.hhplus.concert.infrastructure.reservation.repository.jpaRepository.PaymentJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +13,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     private final PaymentJpaRepository paymentJpaRepository;
 
-    private Payment mapEntityToDto(com.io.hhplus.concert.infrastructure.reservation.entity.Payment entity) {
-        return Payment.create(entity.getId(), entity.getReservationId(), entity.getPayMethod(), entity.getPayAmount(), entity.getRefundableAmount(), entity.getRefundAmount());
+    private PaymentModel mapEntityToDto(PaymentEntity entity) {
+        return PaymentModel.create(entity.getId(), entity.getReservationId(), entity.getPayMethod(), entity.getPayAmount(), entity.getRefundableAmount(), entity.getRefundAmount());
     }
 
-    private com.io.hhplus.concert.infrastructure.reservation.entity.Payment mapDtoToEntity(Payment dto) {
-        return com.io.hhplus.concert.infrastructure.reservation.entity.Payment.builder()
+    private PaymentEntity mapDtoToEntity(PaymentModel dto) {
+        return PaymentEntity.builder()
                 .id(dto.paymentId())
                 .reservationId(dto.reservationId())
                 .payMethod(dto.payMethod())
@@ -28,8 +29,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Payment save(Payment payment) {
-        return mapEntityToDto(paymentJpaRepository.save(mapDtoToEntity(payment)));
+    public PaymentModel save(PaymentModel paymentModel) {
+        return mapEntityToDto(paymentJpaRepository.save(mapDtoToEntity(paymentModel)));
     }
 
 }

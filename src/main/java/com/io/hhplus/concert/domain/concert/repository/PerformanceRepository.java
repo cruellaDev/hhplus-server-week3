@@ -1,11 +1,11 @@
 package com.io.hhplus.concert.domain.concert.repository;
 
-import com.io.hhplus.concert.domain.concert.model.Performance;
+import com.io.hhplus.concert.domain.concert.service.model.PerformanceModel;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface PerformanceRepository {
-    List<Performance> findAvailableAllByConcertId(Long concertId);
-    Optional<Performance> findAvailableOneByConcertIdAndPerformanceId(Long concertId, Long performanceId);
+    List<PerformanceModel> findAvailableAllByConcertId(Long concertId);
+    Optional<PerformanceModel> findAvailableOneByConcertIdAndPerformanceId(Long concertId, Long performanceId);
 }

@@ -1,15 +1,15 @@
 package com.io.hhplus.concert.domain.concert.repository;
 
 import com.io.hhplus.concert.common.enums.SeatStatus;
-import com.io.hhplus.concert.domain.concert.model.Seat;
+import com.io.hhplus.concert.domain.concert.service.model.SeatModel;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SeatRepository {
-    List<Seat> findAvailableAllByPerformanceId(Long performanceId);
-    Optional<Seat> findAvailableOneByPerformanceIdAndSeatId(Long performanceId, Long seatId);
-    Optional<Seat> findById(Long seatId);
-    Seat save(Seat seat);
-    List<Seat> findAllByReservationIdAndSeatStatus(Long reservationId, SeatStatus seatStatus);
+    List<SeatModel> findAvailableAllByPerformanceId(Long performanceId);
+    Optional<SeatModel> findAvailableOneByPerformanceIdAndSeatId(Long performanceId, Long seatId);
+    Optional<SeatModel> findById(Long seatId);
+    SeatModel save(SeatModel seatModel);
+    List<SeatModel> findAllByReservationIdAndSeatStatus(Long reservationId, SeatStatus seatStatus);
 }

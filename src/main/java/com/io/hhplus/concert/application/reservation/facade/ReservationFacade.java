@@ -1,35 +1,34 @@
 package com.io.hhplus.concert.application.reservation.facade;
 
-import com.io.hhplus.concert.application.reservation.dto.PaymentRequest;
-import com.io.hhplus.concert.application.reservation.dto.PaymentResponse;
-import com.io.hhplus.concert.application.reservation.dto.ReservationRequest;
-import com.io.hhplus.concert.application.reservation.dto.ReservationResponse;
+import com.io.hhplus.concert.application.reservation.dto.*;
 import com.io.hhplus.concert.common.enums.*;
 import com.io.hhplus.concert.common.exceptions.*;
-import com.io.hhplus.concert.domain.concert.model.Concert;
-import com.io.hhplus.concert.domain.concert.model.Performance;
-import com.io.hhplus.concert.domain.concert.model.Seat;
+import com.io.hhplus.concert.common.utils.DateUtils;
+import com.io.hhplus.concert.domain.concert.service.ConcertValidator;
+import com.io.hhplus.concert.domain.concert.service.model.ConcertModel;
+import com.io.hhplus.concert.domain.concert.service.model.PerformanceModel;
+import com.io.hhplus.concert.domain.concert.service.model.SeatModel;
 import com.io.hhplus.concert.domain.concert.service.ConcertService;
-import com.io.hhplus.concert.domain.concert.service.PerformanceService;
-import com.io.hhplus.concert.domain.concert.service.SeatService;
-import com.io.hhplus.concert.domain.customer.model.Customer;
+import com.io.hhplus.concert.domain.customer.service.CustomerValidator;
+import com.io.hhplus.concert.domain.customer.service.model.CustomerModel;
 import com.io.hhplus.concert.domain.customer.service.CustomerService;
-import com.io.hhplus.concert.domain.reservation.model.Payment;
-import com.io.hhplus.concert.domain.reservation.model.Reservation;
-import com.io.hhplus.concert.domain.reservation.model.Ticket;
+import com.io.hhplus.concert.domain.reservation.service.PaymentValidator;
+import com.io.hhplus.concert.domain.reservation.service.ReservationValidator;
+import com.io.hhplus.concert.domain.reservation.service.model.PaymentModel;
+import com.io.hhplus.concert.domain.reservation.service.model.ReservationModel;
+import com.io.hhplus.concert.domain.reservation.service.model.TicketModel;
 import com.io.hhplus.concert.domain.reservation.service.PaymentService;
 import com.io.hhplus.concert.domain.reservation.service.ReservationService;
-import com.io.hhplus.concert.domain.waiting.model.WaitingQueue;
+import com.io.hhplus.concert.domain.waiting.service.WaitingValidator;
+import com.io.hhplus.concert.domain.waiting.service.model.WaitingQueueModel;
 import com.io.hhplus.concert.domain.waiting.service.WaitingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -38,232 +37,151 @@ public class ReservationFacade {
     private final CustomerService customerService;
     private final WaitingService waitingService;
     private final ConcertService concertService;
-    private final PerformanceService performanceService;
-    private final SeatService seatService;
     private final ReservationService reservationService;
     private final PaymentService paymentService;
 
+    private final ConcertValidator concertValidator;
+    private final CustomerValidator customerValidator;
+    private final WaitingValidator waitingValidator;
+    private final PaymentValidator paymentValidator;
+    private final ReservationValidator reservationValidator;
+
     /**
      * 좌석 예약 요청
-     * @param reservationRequest 예약 요청 정보
+     * @param customerId 고객_ID
+     * @param reserverInfo 예약 정보
+     * @param ticketInfo 예매 정보
      * @return 예약 요청 결과
      */
     @Transactional
-    public ReservationResponse requestReservation(ReservationRequest reservationRequest) {
-        // request body 확인
-        if (reservationRequest == null) {
-            throw new IllegalArgumentCustomException("예약 요청 정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        // 예약자 정보
-        ReservationRequest.Reserver requestedReserver = reservationRequest.getReserver();
-        if (requestedReserver == null) {
-            throw new IllegalArgumentCustomException("예약 요청자 정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        if (!Reservation.isAvailableReserverName(requestedReserver.getReserverName())) {
-            throw new IllegalArgumentCustomException("예매자 명이 잘못되었습니다.", ResponseMessage.INVALID);
-        }
-        if (!Customer.isAvailableCustomerId(requestedReserver.getCustomerId())) {
-            throw new IllegalArgumentCustomException("고객 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
-        // 수령인 정보
-        ReservationRequest.Receiver requestedReceiver = reservationRequest.getReceiver();
-        if (requestedReceiver == null) {
-            throw new IllegalArgumentCustomException("수령인 정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        if (!Reservation.isAvailableReceiverName(requestedReceiver.getReceiverName())) {
-            throw new IllegalArgumentCustomException("수령인 명이 잘못되었습니다.", ResponseMessage.INVALID);
-        }
-        if (!Reservation.isAvailableReceiveMethod(requestedReceiver.getReceiveMethod())) {
-            throw new IllegalArgumentCustomException("수령방법이 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        // 콘서트 정보
-        ReservationRequest.Concert requestedConcert = reservationRequest.getConcert();
-        if (requestedConcert == null) {
-            throw new IllegalArgumentCustomException("예약할 콘서트 정보가 존재하지 않습니다.", ResponseMessage.NOT_FOUND);
-        }
-        if (!Concert.isAvailableConcertId(requestedConcert.getConcertId())) {
-            throw new IllegalArgumentCustomException("콘서트 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
-        // 공연 정보
-        ReservationRequest.Performance requestedPerformance = reservationRequest.getPerformance();
-        if (requestedPerformance == null) {
-            throw new IllegalArgumentCustomException("예약할 공연 정보가 존재하지 않습니다", ResponseMessage.NOT_FOUND);
-        }
-        if (!Performance.isAvailablePerformanceId(requestedPerformance.getPerformanceId())) {
-            throw new IllegalArgumentCustomException("공연 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
-        List<ReservationRequest.Seat> requestedSeats = reservationRequest.getSeats();
-        if (requestedSeats == null || requestedSeats.isEmpty()) {
-            throw new IllegalArgumentCustomException("예약할 좌석 정보가 존재하지 않습니다.", ResponseMessage.NOT_FOUND);
-        }
-        if (requestedSeats.stream().anyMatch(requestedSeat -> !Seat.isAvailableSeatId(requestedSeat.getSeatId()))) {
-            throw new IllegalArgumentCustomException("좌석 ID 값이 잘못되었습니다.", ResponseMessage.INVALID);
-        }
-
+    public ReservationResultInfoWithTickets requestReservation(Long customerId, ReserverInfo reserverInfo, TicketInfo ticketInfo) {
         // 고객 확인
-        Customer customer;
-        boolean isAvailable;
-
+        CustomerModel customerModel;
         // 고객 조회
-        customer = customerService.getAvailableCustomer(requestedReserver.getCustomerId());
+        customerModel = customerService.getAvailableCustomer(customerId);
         // 고객 검증
-        isAvailable = customerService.meetsIfCustomerValid(customer);
-        if (!isAvailable) {
-            throw new ResourceNotFoundCustomException("존재하지 않는 고객입니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        customerValidator.checkIfCustomerValid(customerModel);
 
         // 대기열 토큰 확인
-        WaitingQueue waitingQueue;
+        WaitingQueueModel waitingQueueModel;
         boolean isExists;
-        boolean isValid;
+        boolean isActive;
         // 대기열 조회
-        waitingQueue = waitingService.getActiveWaitingTokenByCustomerId(requestedReserver.getCustomerId());
+        waitingQueueModel = waitingService.getActiveWaitingTokenByCustomerId(customerId);
 
         // 대기열 존재 여부 확인
-        isExists = waitingService.meetsIfActiveWaitingQueueExists(waitingQueue);
+        isExists = waitingValidator.meetsIfActiveWaitingQueueExists(waitingQueueModel);
 
         // 토큰 활성 시간 확인
-        isValid = waitingService.meetsIfActiveWaitingQueueInTimeLimits(300L, waitingQueue.createdAt());
+        isActive = waitingValidator.meetsIfActiveWaitingQueueInTimeLimits(300L, waitingQueueModel.createdAt());
         // 유효 대기열 없을 시
-        if (!isExists && !isValid) {
-            throw new ResourceNotFoundCustomException("대기열 진입 정보가 존재하지 않습니다.", ResponseMessage.NOT_FOUND);
+        if (!isExists && !isActive) {
+            throw new CustomException(ResponseMessage.WAITING_NOT_FOUND, "대기열 진입 정보가 존재하지 않습니다.");
         }
 
         // 콘서트 확인
-        Concert concert;
+        ConcertModel concertModel;
         // 콘서트 조회
-        concert = concertService.getAvailableConcert(requestedConcert.getConcertId());
+        concertModel = concertService.getAvailableConcert(ticketInfo.getConcertId());
         // 콘서트 검증
-        isAvailable = concertService.meetsIfConcertToBeReserved(concert);
-        if (!isAvailable) {
-            throw new IllegalStateCustomException("해당 콘서트는 예약이 불가능합니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        concertValidator.checkIfConcertToBeReserved(concertModel);
 
         // 공연 확인
-        Performance performance;
+        PerformanceModel performanceModel;
         // 공연 조회
-        performance = performanceService.getAvailablePerformance(requestedConcert.getConcertId(), requestedPerformance.getPerformanceId());
+        performanceModel = concertService.getAvailablePerformance(ticketInfo.getConcertId(), ticketInfo.getPerformanceId());
         // 공연 검증
-        isAvailable = performanceService.meetsIfPerformanceToBeReserved(performance);
-        if (!isAvailable) {
-            throw new IllegalStateCustomException("해당 공연은 예약이 불가능합니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        concertValidator.checkIfPerformanceToBeReserved(performanceModel, DateUtils.getSysDate());
 
         // 좌석 확인
-        List<Seat> seats = new ArrayList<>();
-        // 좌석 조회
-        for (ReservationRequest.Seat requestedSeat : requestedSeats) {
-            Seat seat = seatService.getAvailableSeat(requestedPerformance.getPerformanceId(), requestedSeat.getSeatId());
-            if (Seat.isTaken(seat.seatStatus()) || Seat.isOccupied(seat.seatStatus())) {
-                throw new IllegalStateCustomException("이미 선점된 좌석입니다.", ResponseMessage.NOT_AVAILABLE);
-            }
-            isAvailable = seatService.meetsIfSeatToBeReserved(seat);
-            if (!isAvailable) {
-                throw new IllegalStateCustomException("해당 좌석은 예약이 불가능합니다. " + requestedSeat, ResponseMessage.NOT_AVAILABLE);
-            }
-            seats.add(seat);
-        }
-
-        // 좌석 임시 배정
-        boolean isAssigned;
-        for (Seat seat : seats) {
-            isAssigned = seatService.assignSeatTemporarily(seat.seatId());
-            if (!isAssigned) {
-                throw new IllegalStateCustomException("좌석 예약에 실패했습니다.", ResponseMessage.FAIL);
-            }
-        }
+        List<SeatModel> seatModels;
+        // 좌석 조회 후 임시 배정
+        seatModels = ticketInfo.getSeatIds()
+                .stream()
+                .map(seatId -> {
+                    SeatModel seatModel = concertService.getAvailableSeat(ticketInfo.getPerformanceId(), seatId);
+                    if (concertValidator.isTaken(seatModel.seatStatus()) || concertValidator.isOccupied(seatModel.seatStatus())) {
+                        throw new CustomException(ResponseMessage.CONCERT_NOT_AVAILABLE, "이미 선점된 좌석입니다.");
+                    }
+                    concertValidator.checkIfSeatToBeReserved(seatModel);
+                    concertValidator.checkIfSeatNotAssigned(seatModel.seatId());
+                    return concertService.assignSeatTemporarily(seatModel.seatId());
+                }).toList();
 
         // 토큰 대기 만료 처리
         boolean isExpired;
-        isExpired = waitingService.expireWaitingQueueToken(waitingQueue);
+        isExpired = waitingService.expireWaitingQueueToken(waitingQueueModel);
         if (!isExpired) {
-            throw new IllegalStateCustomException("오류가 발생하였습니다 [대기열 토큰]", ResponseMessage.FAIL);
+            throw new CustomException(ResponseMessage.FAIL, "오류가 발생하였습니다 [대기열 토큰]");
         }
 
         // 예약 및 티켓 생성
-        Reservation reservation;
-        List<Ticket> tickets = new ArrayList<>();
+        ReservationModel reservationModel;
+        List<TicketModel> ticketModels;
         // 예약 저장
-        reservation = reservationService.saveReservation(ReservationRequest.makeReservationOf(customer, requestedReserver, requestedReceiver));
+        reservationModel = reservationService.saveReservation(ReservationModel.create(
+                null,
+                customerId,
+                reserverInfo.getReserverName(),
+                ReservationStatus.REQUESTED,
+                new Date(),
+                reserverInfo.getReceiveMethod(),
+                reserverInfo.getReceiverName(),
+                reserverInfo.getReceiverPostcode(),
+                reserverInfo.getReceiverBaseAddress(),
+                reserverInfo.getReceiverDetailAddress()
+        ));
         // 티켓 저장
-        for (Seat seat : seats) {
-            Ticket ticket = reservationService.saveTicket(Ticket.makeTicketOf(reservation, concert, performance, seat));
-            tickets.add(ticket);
-        }
+        ticketModels = seatModels
+                .stream()
+                .map(seatModel -> reservationService.saveTicket(TicketModel.makeTicketOf(reservationModel, concertModel, performanceModel, seatModel)))
+                .toList();
 
-        return new ReservationResponse(reservation, tickets);
+        return new ReservationResultInfoWithTickets(reservationModel, ticketModels);
     }
-
 
     /**
      * 결제 요청
-     * @param paymentRequest 결제 요청 정보
+     * @param customerId 고객_ID
+     * @param reservationId 예약_ID
+     * @param paymentInfos 결제 정보
      * @return 결제 요청 결과
      */
     @Transactional(noRollbackFor = { TimeOutCustomException.class, InsufficientResourcesCustomException.class })
-    public PaymentResponse requestPayment(PaymentRequest paymentRequest) {
-        // request body 확인
-        if (paymentRequest == null) {
-            throw new IllegalArgumentCustomException("결제 요청 정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        // 고객 ID
-        if (!Customer.isAvailableCustomerId(paymentRequest.getCustomerId())) {
-            throw new IllegalArgumentCustomException("고객 ID 값이 잘못 되었습니다.", ResponseMessage.INVALID);
-        }
-        // 예약 ID
-        if (!Reservation.isAvailableReservationId(paymentRequest.getReservationId())) {
-            throw new IllegalArgumentCustomException("예약 ID 값이 잘못 되었습니다.", ResponseMessage.NOT_FOUND);
-        }
-        // 결제 정보 확인
-        if (paymentRequest.getPayInfos() == null || paymentRequest.getPayInfos().isEmpty()) {
-            throw new IllegalArgumentCustomException("결제 정보가 없습니다.", ResponseMessage.NOT_FOUND);
-        }
-        boolean isValid;
-        isValid = paymentRequest.getPayInfos()
-                .stream()
-                .anyMatch(payInfo -> Payment.isAvailablePayMethod(payInfo.getPayMethod())
-                                    && Payment.isAvailablePayAmount(payInfo.getPayAmount()));
-        if (!isValid) {
-            throw new IllegalArgumentCustomException("결제 정보가 유효하지 않습니다.", ResponseMessage.INVALID);
-        }
+    public PaymentResultInfoWithReservationAndTickets requestPayment(Long customerId, Long reservationId, List<PaymentInfo> paymentInfos) {
+        if (customerId == null) throw new CustomException(ResponseMessage.INVALID, "고객 ID가 존재하지 않습니다.");
+        if (reservationId == null) throw new CustomException(ResponseMessage.INVALID, "예약 ID가 존재하지 않습니다.");
+        if (paymentInfos == null || paymentInfos.isEmpty()) throw new CustomException(ResponseMessage.INVALID, "결제 정보가 존재하지 않습니다.");
 
         // 고객 확인
-        Customer customer;
-        boolean isAvailable;
-
+        CustomerModel customerModel;
         // 고객 조회
-        customer = customerService.getAvailableCustomer(paymentRequest.getCustomerId());
+        customerModel = customerService.getAvailableCustomer(customerId);
         // 고객 검증
-        isAvailable = customerService.meetsIfCustomerValid(customer);
-        if (!isAvailable) {
-            throw new ResourceNotFoundCustomException("존재하지 않는 고객입니다.", ResponseMessage.NOT_AVAILABLE);
-        }
+        customerValidator.checkIfCustomerValid(customerModel);
 
         // 예약 정보 확인
-        Reservation reservation;
-        boolean isRequested;
+        ReservationModel reservationModel;
         boolean isValidDuration;
         // 예약 조회
-        reservation = reservationService.getReservation(paymentRequest.getReservationId(), paymentRequest.getCustomerId());
+        reservationModel = reservationService.getReservation(reservationId, customerId);
         // 예약 유효성 검증
-        isAvailable = reservationService.meetsIfReservationAvailable(reservation);
-        if (!isAvailable) {
-            throw new ResourceNotFoundCustomException("존재하지 않는 예약 정보입니다.", ResponseMessage.NOT_AVAILABLE);
+        if (!reservationValidator.meetsIfReservationAvailable(reservationModel)) {
+            throw new CustomException(ResponseMessage.RESERVATION_NOT_FOUND, "존재하지 않는 예약 정보입니다.");
         }
         // 예약 상태 확인
-        isRequested = Reservation.isAbleToPayReservationStatus(reservation.reservationStatus());
-        if (!isRequested) {
-            throw new IllegalStateCustomException("결제가 불가능한 예약 상태입니다.", ResponseMessage.INVALID);
+        if (reservationValidator.isNotAbleToPayReservationStatus(reservationModel.reservationStatus())) {
+            throw new CustomException(ResponseMessage.RESERVATION_NOT_AVAILABLE, "결제가 불가능한 예약 상태입니다.");
         }
         // 예약 상태 변경 일시로 결제 가능 기간 확인 (5분)
-        isValidDuration = reservationService.meetsIfAbleToPayInTimeLimits(300L, reservation.reservationStatusChangedAt());
+        isValidDuration = reservationValidator.meetsIfAbleToPayInTimeLimits(300L, reservationModel.reservationStatusChangedAt());
         if (!isValidDuration) {
             // 예약 및 티켓 취소 처리, 좌석 상태 변경
-            reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.CANCELLED);
-            reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
-            seatService.updateSeatStatusByReservationIdAndReservationStatus(paymentRequest.getReservationId(), SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
+            reservationService.updateReservationStatus(reservationId, customerId, ReservationStatus.CANCELLED);
+            reservationService.updateTicketsStatus(reservationId, TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
+            concertService.updateSeatStatusByReservationIdAndReservationStatus(reservationId, SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
 
-            throw new TimeOutCustomException("결제 가능 시간을 초과하였습니다.", ResponseMessage.OUT_OF_TIME);
+            throw new TimeOutCustomException(ResponseMessage.PAYMENT_OUT_OF_TIME, "결제 가능 시간을 초과하였습니다.");
         }
 
         // 결제금액 == 결제 요청 중인 티켓 총액 확인
@@ -271,71 +189,71 @@ public class ReservationFacade {
         boolean isEqualAmount;
 
         // 결제금액 총액
-        sumOfPayInfoPayAmount = paymentRequest.getPayInfos()
+        sumOfPayInfoPayAmount = paymentInfos
                 .stream()
-                .map(PaymentRequest.PayInfo::getPayAmount)
+                .map(PaymentInfo::getPayAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         // 결제금액 검증 - client 에서 받은 금액 과 티켓 금액 합해서 확인
-        isEqualAmount = paymentService.meetsIfSumOfPayAmountEqualsToSumOfTicketsPrice(sumOfPayInfoPayAmount, reservationService.getSumOfTicketPrice(reservation.reservationId(), TicketStatus.PAY_WAITING));
+        isEqualAmount = paymentValidator.meetsIfSumOfPayAmountEqualsToSumOfTicketsPrice(sumOfPayInfoPayAmount, reservationService.getSumOfTicketPrice(reservationModel.reservationId(), TicketStatus.PAY_WAITING));
 
         // 결제 방식으로 검증 - 포인트, (카드, 무통장입금은 아직 미구현)
-        boolean isPointAffordable = paymentRequest.getPayInfos()
+        boolean isSufficientPointBalance = paymentInfos
                 .stream()
                 .filter(payInfo -> payInfo.getPayMethod().equals(PayMethod.POINT))
+                .map(payInfo -> customerValidator.meetsIfPointBalanceSufficient(customerId, payInfo.getPayAmount()))
                 .findAny()
-                .map(payInfo -> customerService.meetsIfPointBalanceSufficient(paymentRequest.getCustomerId(), payInfo.getPayAmount()))
                 .orElse(false);
 
-        if (!isEqualAmount || !isPointAffordable) {
+        if (!isEqualAmount || !isSufficientPointBalance) {
             // 예약 및 티켓 취소 처리, 좌석 상태 변경
-            reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.CANCELLED);
-            reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
-            seatService.updateSeatStatusByReservationIdAndReservationStatus(paymentRequest.getReservationId(), SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
+            reservationService.updateReservationStatus(reservationId, customerId, ReservationStatus.CANCELLED);
+            reservationService.updateTicketsStatus(reservationId, TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
+            concertService.updateSeatStatusByReservationIdAndReservationStatus(customerId, SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
 
-            if (!isEqualAmount) throw new InsufficientResourcesCustomException("결제금액이 맞지 않습니다.", ResponseMessage.INVALID);
-            throw new InsufficientResourcesCustomException("포인트 잔액이 부족합니다.", ResponseMessage.OUT_OF_BUDGET);
+            if (!isEqualAmount) throw new InsufficientResourcesCustomException(ResponseMessage.INVALID, "결제금액이 맞지 않습니다.");
+            throw new InsufficientResourcesCustomException(ResponseMessage.OUT_OF_BUDGET, "포인트 잔액이 부족합니다.");
         }
 
         // 포인트 차감
-        BigDecimal pointUseAmount = paymentRequest.getPayInfos()
+        BigDecimal pointUseAmount = paymentInfos
                 .stream()
                 .filter(payInfo -> payInfo.getPayMethod().equals(PayMethod.POINT))
                 .findAny()
-                .map(PaymentRequest.PayInfo::getPayAmount)
+                .map(PaymentInfo::getPayAmount)
                 .orElse(BigDecimal.ZERO);
-        customerService.useCustomerPoint(paymentRequest.getCustomerId(), pointUseAmount);
+        customerService.useCustomerPoint(customerId, pointUseAmount);
 
         // 결제 정보 생성
-        Payment payment = paymentService.savePayment(Payment.create(null, reservation.reservationId(), PayMethod.POINT, pointUseAmount, pointUseAmount, BigDecimal.ZERO));
+        PaymentModel paymentModel = paymentService.savePayment(PaymentModel.create(null, reservationModel.reservationId(), PayMethod.POINT, pointUseAmount, pointUseAmount, BigDecimal.ZERO));
 
         // 예약 및 티켓 상태 변경, 좌석 상태 변경
-        Reservation changedReservation = reservationService.updateReservationStatus(paymentRequest.getReservationId(), paymentRequest.getCustomerId(), ReservationStatus.COMPLETED);
-        List<Ticket> changedTickets = reservationService.updateTicketsStatus(paymentRequest.getReservationId(), TicketStatus.PAY_WAITING, TicketStatus.PAYED);
-        seatService.updateSeatStatusByReservationIdAndReservationStatus(paymentRequest.getReservationId(), SeatStatus.WAITING_FOR_RESERVATION ,SeatStatus.TAKEN);
+        ReservationModel changedReservationModel = reservationService.updateReservationStatus(reservationId, customerId, ReservationStatus.COMPLETED);
+        List<TicketModel> changedTicketModels = reservationService.updateTicketsStatus(reservationId, TicketStatus.PAY_WAITING, TicketStatus.PAYED);
+        concertService.updateSeatStatusByReservationIdAndReservationStatus(reservationId, SeatStatus.WAITING_FOR_RESERVATION ,SeatStatus.TAKEN);
 
-        return new PaymentResponse(changedReservation, changedTickets, List.of(payment));
+        return new PaymentResultInfoWithReservationAndTickets(changedReservationModel, changedTicketModels, List.of(paymentModel));
     }
 
     /**
      * 결제 요청 시간이 만료된 예약의 좌석 임시 배정 취소
      */
     public void removeWaitingReservation() {
-        Date now = new Date();
+        Date currentDate = DateUtils.getSysDate();
+        long durationLimit = 300;
 
-        List<Reservation> reservations = reservationService.getAllReservationByReservationStatus(ReservationStatus.REQUESTED);
+        List<ReservationModel> reservationModels = reservationService.getAllReservationByReservationStatus(ReservationStatus.REQUESTED);
 
-        for (Reservation reservation : reservations) {
-            Date statusChangedAt = reservation.reservationStatusChangedAt();
-            long duration = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - statusChangedAt.getTime());
-
-            if (duration > 300) {
+        reservationModels.forEach(reservationModel -> {
+            Date statusChangedAt = reservationModel.reservationStatusChangedAt();
+            long duration = DateUtils.calculateDuration(currentDate, statusChangedAt);
+            if (duration > durationLimit) {
                 // 예약 취소
-                reservationService.updateReservationStatus(reservation.reservationId(), reservation.customerId(), ReservationStatus.CANCELLED);
+                reservationService.updateReservationStatus(reservationModel.reservationId(), reservationModel.customerId(), ReservationStatus.CANCELLED);
                 // 티켓 취소
-                reservationService.updateTicketsStatus(reservation.reservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
+                reservationService.updateTicketsStatus(reservationModel.reservationId(), TicketStatus.PAY_WAITING, TicketStatus.CANCELLED_AFTER_PAY_WAITING);
                 // 좌석 배정 취소
-                seatService.updateSeatStatusByReservationIdAndReservationStatus(reservation.reservationId(), SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
+                concertService.updateSeatStatusByReservationIdAndReservationStatus(reservationModel.reservationId(), SeatStatus.WAITING_FOR_RESERVATION, SeatStatus.AVAILABLE);
             }
-        }
+        });
     }
 }

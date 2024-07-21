@@ -1,16 +1,19 @@
 package com.io.hhplus.concert.interfaces.reservation.controller;
 
-import com.io.hhplus.concert.application.reservation.dto.PaymentRequest;
-import com.io.hhplus.concert.application.reservation.dto.PaymentResponse;
-import com.io.hhplus.concert.application.reservation.dto.ReservationRequest;
-import com.io.hhplus.concert.application.reservation.dto.ReservationResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.io.hhplus.concert.application.reservation.dto.*;
+import com.io.hhplus.concert.interfaces.reservation.dto.request.PaymentRequest;
+import com.io.hhplus.concert.interfaces.reservation.dto.request.ReservationRequest;
 import com.io.hhplus.concert.application.reservation.facade.ReservationFacade;
-import com.io.hhplus.concert.interfaces.common.dto.CommonResponse;
+import com.io.hhplus.concert.common.dto.CommonResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RestController
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
 
     private final ReservationFacade reservationFacade;
+    private final ObjectMapper objectMapper;
 
     /**
      * 좌석 예약 요청
@@ -26,8 +30,10 @@ public class ReservationController {
      * @return 응답 정보
      */
     @PostMapping("/reserve")
-    public CommonResponse<ReservationResponse> reserve(@RequestBody ReservationRequest requestBody) {
-        return CommonResponse.success(reservationFacade.requestReservation(requestBody));
+    public CommonResponse<ReservationResultInfoWithTickets> reserve(@RequestBody @Valid ReservationRequest requestBody) {
+        ReserverInfo reserverInfo = objectMapper.convertValue(requestBody.getReserverInfo(), ReserverInfo.class);
+        TicketInfo ticketInfo = objectMapper.convertValue(requestBody.getTicketInfo(), TicketInfo.class);
+        return CommonResponse.success(reservationFacade.requestReservation(requestBody.getCustomerId(), reserverInfo, ticketInfo));
     }
 
     /**
@@ -36,8 +42,9 @@ public class ReservationController {
      * @return 응답 정보
      */
     @PostMapping("/pay")
-    public CommonResponse<PaymentResponse> pay(@RequestBody PaymentRequest requestBody) {
-        return CommonResponse.success(reservationFacade.requestPayment(requestBody));
+    public CommonResponse<PaymentResultInfoWithReservationAndTickets> pay(@RequestBody @Valid PaymentRequest requestBody) {
+        List<PaymentInfo> paymentInfos = requestBody.getPayInfos().stream().map(payInfo -> objectMapper.convertValue(payInfo, PaymentInfo.class)).toList();
+        return CommonResponse.success(reservationFacade.requestPayment(requestBody.getCustomerId(), requestBody.getReservationId(), paymentInfos));
     }
 
 }

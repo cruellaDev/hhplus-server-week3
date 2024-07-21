@@ -1,6 +1,7 @@
 package com.io.hhplus.concert.infrastructure.concert.repository.impl;
 
-import com.io.hhplus.concert.domain.concert.model.Performance;
+import com.io.hhplus.concert.domain.concert.entity.PerformanceEntity;
+import com.io.hhplus.concert.domain.concert.service.model.PerformanceModel;
 import com.io.hhplus.concert.domain.concert.repository.PerformanceRepository;
 import com.io.hhplus.concert.infrastructure.concert.repository.jpaRepository.PerformanceJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,12 @@ public class PerformanceRepositoryImpl implements PerformanceRepository {
         return performedAt != null && (new Date()).before(performedAt);
     }
 
-    private Performance mapEntityToResponseModel(com.io.hhplus.concert.infrastructure.concert.entity.Performance entity) {
-        return Performance.create(entity.getId(), entity.getConcertPrice(), entity.getCapacityLimit(), entity.getPerformedAt());
+    private PerformanceModel mapEntityToResponseModel(PerformanceEntity entity) {
+        return PerformanceModel.create(entity.getId(), entity.getConcertPrice(), entity.getCapacityLimit(), entity.getPerformedAt());
     };
 
     @Override
-    public List<Performance> findAvailableAllByConcertId(Long concertId) {
+    public List<PerformanceModel> findAvailableAllByConcertId(Long concertId) {
         return performanceJpaRepository.findAllByConcertId(concertId)
                 .stream()
                 .filter(entity -> isNotDeleted(entity.getDeletedAt())
@@ -42,7 +43,7 @@ public class PerformanceRepositoryImpl implements PerformanceRepository {
     }
 
     @Override
-    public Optional<Performance> findAvailableOneByConcertIdAndPerformanceId(Long concertId, Long performanceId) {
+    public Optional<PerformanceModel> findAvailableOneByConcertIdAndPerformanceId(Long concertId, Long performanceId) {
         return performanceJpaRepository.findById(performanceId)
                 .filter(entity -> isEqualConcertId(entity.getConcertId(), concertId)
                         && isNotDeleted(entity.getDeletedAt())

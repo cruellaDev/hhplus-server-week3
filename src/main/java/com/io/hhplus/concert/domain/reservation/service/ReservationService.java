@@ -2,41 +2,40 @@ package com.io.hhplus.concert.domain.reservation.service;
 
 import com.io.hhplus.concert.common.enums.ReservationStatus;
 import com.io.hhplus.concert.common.enums.TicketStatus;
-import com.io.hhplus.concert.domain.reservation.model.Reservation;
-import com.io.hhplus.concert.domain.reservation.model.Ticket;
+import com.io.hhplus.concert.domain.reservation.service.model.ReservationModel;
+import com.io.hhplus.concert.domain.reservation.service.model.TicketModel;
 import com.io.hhplus.concert.domain.reservation.repository.ReservationRepository;
 import com.io.hhplus.concert.domain.reservation.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
+
     private final ReservationRepository reservationRepository;
     private final TicketRepository ticketRepository;
 
     /**
      * 예약 저장
-     * @param reservation 예약 정보
+     * @param reservationModel 예약 정보
      * @return 예약 저장 정보
      */
-    public Reservation saveReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
+    public ReservationModel saveReservation(ReservationModel reservationModel) {
+        return reservationRepository.save(reservationModel);
     }
 
     /**
      * 티켓 저장
-     * @param ticket 티켓 정보
+     * @param ticketModel 티켓 정보
      * @return 티켓 저장 정보
      */
-    public Ticket saveTicket(Ticket ticket) {
-        return ticketRepository.save(ticket);
+    public TicketModel saveTicket(TicketModel ticketModel) {
+        return ticketRepository.save(ticketModel);
     }
 
     /**
@@ -45,34 +44,8 @@ public class ReservationService {
      * @param customerId 고객_ID
      * @return 예약 정보
      */
-    public Reservation getReservation(Long reservationId, Long customerId) {
-        return reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(Reservation::noContents);
-    }
-
-    /**
-     * 예약 유효성 검증
-     * @param reservation 예약 정보
-     * @return 예약 유효 여부
-     */
-    public boolean meetsIfReservationAvailable(Reservation reservation) {
-        return reservation != null
-                && Reservation.isAvailableReservationId(reservation.reservationId())
-                && Reservation.isAvailableReserverName(reservation.reserverName())
-                && Reservation.isAvailableReceiveMethod(reservation.receiveMethod())
-                && Reservation.isAvailableReceiverName(reservation.receiverName())
-                && Reservation.isAvailableReservationStatus(reservation.reservationStatus());
-    }
-
-    /**
-     * 예약 정보 결제 유효 기간 내 존재 여부
-     * @param seconds 유효 기준 기간 단위 (초)
-     * @param reservationStatusChangedAt 예약상태변경일시
-     * @return 예약 정보 결제 유효 기간 내 존재 여부 (예약상태변경일시와 현재일시의 차가 유효 기준 기간 단위 이내 이면 true)
-     */
-    public boolean meetsIfAbleToPayInTimeLimits(Long seconds, Date reservationStatusChangedAt) {
-        Date currentDate = new Date();
-        long targetSeconds = TimeUnit.MILLISECONDS.toSeconds(currentDate.getTime() - reservationStatusChangedAt.getTime());
-        return Reservation.isInPayableDuration(seconds, targetSeconds);
+    public ReservationModel getReservation(Long reservationId, Long customerId) {
+        return reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(ReservationModel::noContents);
     }
 
     /**
@@ -91,9 +64,9 @@ public class ReservationService {
      * @param reservationStatus 예약 상태
      * @return 변경된 예약 상태 정보
      */
-    public Reservation updateReservationStatus(Long reservationId, Long customerId, ReservationStatus reservationStatus) {
-        Reservation reservation = reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(Reservation::noContents);
-        return reservationRepository.save(Reservation.changeStatus(reservation, reservationStatus));
+    public ReservationModel updateReservationStatus(Long reservationId, Long customerId, ReservationStatus reservationStatus) {
+        ReservationModel reservationModel = reservationRepository.findByIdAndCustomerId(reservationId, customerId).orElseGet(ReservationModel::noContents);
+        return reservationRepository.save(ReservationModel.changeStatus(reservationModel, reservationStatus));
     }
 
     /**
@@ -103,16 +76,13 @@ public class ReservationService {
      * @param tobeTicketStatus 이후 티켓상태
      * @return 변경된 티켓
      */
-    public List<Ticket> updateTicketsStatus(Long reservationId, TicketStatus asisTicketStatus, TicketStatus tobeTicketStatus) {
-        List<Ticket> asisTickets = ticketRepository.findAllByReservationIdAndTicketStatus(reservationId, asisTicketStatus);
-        List<Ticket> tobeTickets = new ArrayList<>();
-        for (Ticket asisTicket : asisTickets) {
-            if (tobeTicketStatus.equals(TicketStatus.PAYED)) {
-                Ticket tobeTicket = Ticket.changeByTicketStatus(asisTicket, tobeTicketStatus);
-                tobeTickets.add(tobeTicket);
-            }
-        }
-        return ticketRepository.saveAll(tobeTickets);
+    public List<TicketModel> updateTicketsStatus(Long reservationId, TicketStatus asisTicketStatus, TicketStatus tobeTicketStatus) {
+        List<TicketModel> asisTicketModels = ticketRepository.findAllByReservationIdAndTicketStatus(reservationId, asisTicketStatus);
+        List<TicketModel> tobeTicketModels = asisTicketModels
+                .stream()
+                .map(asisTicketModel -> TicketModel.changeByTicketStatus(asisTicketModel, tobeTicketStatus))
+                .collect(Collectors.toList());
+        return ticketRepository.saveAll(tobeTicketModels);
     }
 
     /**
@@ -120,7 +90,7 @@ public class ReservationService {
      * @param reservationStatus 예약 상태
      * @return 예약 목록
      */
-    public List<Reservation> getAllReservationByReservationStatus(ReservationStatus reservationStatus) {
+    public List<ReservationModel> getAllReservationByReservationStatus(ReservationStatus reservationStatus) {
         return reservationRepository.findAllByReservationStatus(reservationStatus);
     }
 

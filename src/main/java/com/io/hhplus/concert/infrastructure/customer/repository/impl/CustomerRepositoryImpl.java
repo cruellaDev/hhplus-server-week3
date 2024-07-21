@@ -1,8 +1,10 @@
 package com.io.hhplus.concert.infrastructure.customer.repository.impl;
 
 import com.io.hhplus.concert.common.enums.PointType;
-import com.io.hhplus.concert.domain.customer.model.Customer;
-import com.io.hhplus.concert.domain.customer.model.CustomerPointHistory;
+import com.io.hhplus.concert.domain.customer.entity.CustomerEntity;
+import com.io.hhplus.concert.domain.customer.entity.CustomerPointHistoryEntity;
+import com.io.hhplus.concert.domain.customer.service.model.CustomerModel;
+import com.io.hhplus.concert.domain.customer.service.model.CustomerPointHistoryModel;
 import com.io.hhplus.concert.domain.customer.repository.CustomerRepository;
 import com.io.hhplus.concert.infrastructure.customer.repository.jpaRepository.CustomerJpaRepository;
 import com.io.hhplus.concert.infrastructure.customer.repository.jpaRepository.CustomerPointJpaRepository;
@@ -39,20 +41,20 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return pointType.equals(PointType.USE) ? pointAmount.negate() : pointAmount;
     }
 
-    private Customer mapEntityToDto(com.io.hhplus.concert.infrastructure.customer.entity.Customer entity, BigDecimal pointAmount) {
-        return Customer.create(entity.getId(), entity.getCustomerName(), pointAmount);
+    private CustomerModel mapEntityToDto(CustomerEntity entity, BigDecimal pointAmount) {
+        return CustomerModel.create(entity.getId(), entity.getCustomerName(), pointAmount);
     }
 
-    private CustomerPointHistory mapEntityToDto(com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistory entity) {
-        return CustomerPointHistory.create(entity.getCustomerId(), entity.getPointAmount(), entity.getPointType(), entity.getAuditSection().getCreatedAt());
+    private CustomerPointHistoryModel mapEntityToDto(CustomerPointHistoryEntity entity) {
+        return CustomerPointHistoryModel.create(entity.getCustomerId(), entity.getPointAmount(), entity.getPointType(), entity.getAuditSection().getCreatedAt());
     }
 
     @Override
-    public Optional<Customer> findAvailableOneById(Long customerId) {
+    public Optional<CustomerModel> findAvailableOneById(Long customerId) {
         return customerJpaRepository.findById(customerId)
-                .filter(customerEntity -> isNotDreamed(customerEntity.getDreamedAt())
-                        && isNotWithdraw(customerEntity.getWithdrawAt())
-                        && isNotDeleted(customerEntity.getDeletedAt()))
+                .filter(customerEntityEntity -> isNotDreamed(customerEntityEntity.getDreamedAt())
+                        && isNotWithdraw(customerEntityEntity.getWithdrawAt())
+                        && isNotDeleted(customerEntityEntity.getDeletedAt()))
                 .map(entity -> mapEntityToDto(entity, BigDecimal.ZERO));
     }
 
@@ -66,26 +68,26 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> findAvailableOneWithPointBalanceById(Long customerId) {
+    public Optional<CustomerModel> findAvailableOneWithPointBalanceById(Long customerId) {
         return customerJpaRepository.findById(customerId)
-                .filter(customerEntity -> isNotDreamed(customerEntity.getDreamedAt())
-                        && isNotWithdraw(customerEntity.getWithdrawAt())
-                        && isNotDeleted(customerEntity.getDeletedAt()))
-                .map(customerEntity -> {
+                .filter(customerEntityEntity -> isNotDreamed(customerEntityEntity.getDreamedAt())
+                        && isNotWithdraw(customerEntityEntity.getWithdrawAt())
+                        && isNotDeleted(customerEntityEntity.getDeletedAt()))
+                .map(customerEntityEntity -> {
                     BigDecimal pointBalance = sumCustomerPointBalanceByCustomerId(customerId);
-                    return mapEntityToDto(customerEntity, pointBalance);
+                    return mapEntityToDto(customerEntityEntity, pointBalance);
                 });
     }
 
     @Override
-    public CustomerPointHistory saveCustomerPointHistory(CustomerPointHistory customerPointHistory) {
-        com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistory entity
-                = com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistory.builder()
-                .customerId(customerPointHistory.customerId())
-                .pointType(customerPointHistory.pointType())
-                .pointAmount(customerPointHistory.pointAmount())
+    public CustomerPointHistoryModel saveCustomerPointHistory(CustomerPointHistoryModel customerPointHistoryModel) {
+        CustomerPointHistoryEntity entity
+                = CustomerPointHistoryEntity.builder()
+                .customerId(customerPointHistoryModel.customerId())
+                .pointType(customerPointHistoryModel.pointType())
+                .pointAmount(customerPointHistoryModel.pointAmount())
                 .build();
-        com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistory saved
+        CustomerPointHistoryEntity saved
                 = customerPointJpaRepository.save(entity);
         return mapEntityToDto(saved);
     }

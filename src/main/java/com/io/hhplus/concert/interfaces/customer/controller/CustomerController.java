@@ -1,10 +1,11 @@
 package com.io.hhplus.concert.interfaces.customer.controller;
 
-import com.io.hhplus.concert.application.customer.dto.CustomerPointHistoryResponse;
-import com.io.hhplus.concert.application.customer.dto.CustomerPointRequest;
-import com.io.hhplus.concert.application.customer.dto.CustomerResponse;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfoWithCustomerPointHistory;
+import com.io.hhplus.concert.interfaces.customer.dto.request.CustomerPointRequest;
+import com.io.hhplus.concert.application.customer.dto.CustomerInfo;
 import com.io.hhplus.concert.application.customer.facade.CustomerFacade;
-import com.io.hhplus.concert.interfaces.common.dto.CommonResponse;
+import com.io.hhplus.concert.common.dto.CommonResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class CustomerController {
      * @return 응답 정보
      */
     @GetMapping("/point")
-    public CommonResponse<CustomerResponse> getCustomerPoint(@RequestHeader("customerId") Long customerId) {
+    public CommonResponse<CustomerInfo> getCustomerPoint(@RequestHeader("customerId") Long customerId) {
         return CommonResponse.success(customerFacade.getCustomerPoint(customerId));
     }
 
@@ -31,7 +32,7 @@ public class CustomerController {
      * @return 응답 정보
      */
     @PostMapping("/point/charge")
-    public CommonResponse<CustomerPointHistoryResponse> chargeCustomerPoint(@RequestBody CustomerPointRequest requestBody) {
-        return CommonResponse.success(customerFacade.chargeCustomerPoint(requestBody));
+    public CommonResponse<CustomerInfoWithCustomerPointHistory> chargeCustomerPoint(@RequestBody @Valid CustomerPointRequest requestBody) {
+        return CommonResponse.success(customerFacade.chargeCustomerPoint(requestBody.getCustomerId(), requestBody.getPointAmount()));
     }
 }
