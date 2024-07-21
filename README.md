@@ -159,79 +159,92 @@
 ### 패키지 구조
 
 ```
-/common
-    /config
-/presentation
-    /common
-    /concert
-        /controller
-        /dto
-            /response
-            /request
-    /customer
-        /controller
-        /dto
-            /response
-            /request
-    /waiting
-        controller/
-        /dto
-            /response
-            /request
-    /reservation
-        /controller
-        /dto
-            /response
-            /request
-/application
-    /customer
-    /concert
-    /waiting
-    /reservation
-/domain
-    /common
-        /model
-        /exception 
-    /concert
-        /model
-        /service
-        /repository
-    /customer
-        /model
-        /service
-        /repository
-    /waiting
-        /model
-        /service
-        /repository
-    /reservation
-        /model
-        /service
-        /repository
-/infrastructure
-    /common
-        /jpa
-    /db
-        /customer
-            /entity
-            /repository
-                /jpaRepository
-                /impl
-        /concert
-            /entity
-            /repository
-                /jpaRepository
-                /impl
-        /waiting
-            /entity
-            /repository
-                /jpaRepository
-                /impl
-        /reservation
-            /entity
-            /repository
-                /jpaRepository
-                /impl
+├─java
+│  └─com
+│      └─io
+│          └─hhplus
+│              └─concert
+│                  ├─application
+│                  │  ├─concert
+│                  │  │  ├─dto
+│                  │  │  └─facade
+│                  │  ├─customer
+│                  │  │  ├─dto
+│                  │  │  └─facade
+│                  │  ├─reservation
+│                  │  │  ├─dto
+│                  │  │  └─facade
+│                  │  └─waiting
+│                  │      ├─dto
+│                  │      └─facade
+│                  ├─common
+│                  │  ├─dto
+│                  │  ├─enums
+│                  │  ├─exceptions
+│                  │  └─utils
+│                  ├─domain
+│                  │  ├─concert
+│                  │  │  ├─entity
+│                  │  │  ├─repository
+│                  │  │  └─service
+│                  │  │      └─model
+│                  │  ├─customer
+│                  │  │  ├─entity
+│                  │  │  ├─repository
+│                  │  │  └─service
+│                  │  │      └─model
+│                  │  ├─reservation
+│                  │  │  ├─entity
+│                  │  │  ├─repository
+│                  │  │  └─service
+│                  │  │      └─model
+│                  │  └─waiting
+│                  │      ├─entity
+│                  │      ├─repository
+│                  │      └─service
+│                  │          └─model
+│                  ├─infrastructure
+│                  │  ├─audit
+│                  │  │  └─entity
+│                  │  ├─concert
+│                  │  │  └─repository
+│                  │  │      ├─impl
+│                  │  │      └─jpaRepository
+│                  │  ├─customer
+│                  │  │  └─repository
+│                  │  │      ├─impl
+│                  │  │      └─jpaRepository
+│                  │  ├─reservation
+│                  │  │  └─repository
+│                  │  │      ├─impl
+│                  │  │      └─jpaRepository
+│                  │  └─waiting
+│                  │      └─repository
+│                  │          ├─impl
+│                  │          └─jpaRepository
+│                  ├─interfaces
+│                  │  ├─common
+│                  │  │  └─exception
+│                  │  ├─concert
+│                  │  │  └─controller
+│                  │  ├─customer
+│                  │  │  ├─controller
+│                  │  │  └─dto
+│                  │  │      └─request
+│                  │  ├─reservation
+│                  │  │  ├─controller
+│                  │  │  ├─dto
+│                  │  │  │  └─request
+│                  │  │  └─scheduler
+│                  │  └─waiting
+│                  │      ├─controller
+│                  │      └─scheduler
+│                  └─support
+│                      ├─filter
+│                      └─interceptor
+└─resources
+    ├─sql
+    └─static
 ```
 
 ---
