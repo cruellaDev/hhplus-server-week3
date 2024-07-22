@@ -1,10 +1,10 @@
 package com.io.hhplus.concert.interfaces.concert.controller;
 
-import com.io.hhplus.concert.application.concert.dto.ConcertInfoWithPerformance;
-import com.io.hhplus.concert.application.concert.dto.ConcertInfoWithPerformanceAndSeats;
-import com.io.hhplus.concert.application.concert.dto.ConcertsInfo;
 import com.io.hhplus.concert.application.concert.facade.ConcertFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
+import com.io.hhplus.concert.interfaces.concert.dto.ConcertDto;
+import com.io.hhplus.concert.interfaces.concert.dto.PerformanceDto;
+import com.io.hhplus.concert.interfaces.concert.dto.SeatDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +24,8 @@ public class ConcertController {
      * @return 예약 가능 콘서트 목록
      */
     @GetMapping("/")
-    public CommonResponse<ConcertsInfo> concerts() {
-        return CommonResponse.success(concertFacade.getAvailableConcerts());
+    public CommonResponse<ConcertDto.Response> concerts() {
+        return CommonResponse.success(ConcertDto.Response.from(concertFacade.getAvailableConcerts()));
     }
 
     /**
@@ -34,8 +34,8 @@ public class ConcertController {
      * @return 예약 가능 날짜 공연 목록
      */
     @GetMapping("/{concertId}/performances")
-    public CommonResponse<ConcertInfoWithPerformance> performances(@PathVariable("concertId") Long concertId) {
-        return CommonResponse.success(concertFacade.getAvailablePerformances(concertId));
+    public CommonResponse<PerformanceDto.Response> performances(@PathVariable("concertId") Long concertId) {
+        return CommonResponse.success(PerformanceDto.Response.from(concertFacade.getAvailablePerformances(concertId)));
     }
 
     /**
@@ -45,8 +45,8 @@ public class ConcertController {
      * @return 예약가능 좌석 목록
      */
     @GetMapping("/{concertId}/performances/{performanceId}/seats")
-    public CommonResponse<ConcertInfoWithPerformanceAndSeats> seats(@PathVariable("concertId") Long concertId,
-                                                                    @PathVariable("performanceId") Long performanceId) {
-        return CommonResponse.success(concertFacade.getAvailableSeats(concertId, performanceId));
+    public CommonResponse<SeatDto.Response> seats(@PathVariable("concertId") Long concertId,
+                                                  @PathVariable("performanceId") Long performanceId) {
+        return CommonResponse.success(SeatDto.Response.from(concertFacade.getAvailableSeats(concertId, performanceId)));
     }
 }

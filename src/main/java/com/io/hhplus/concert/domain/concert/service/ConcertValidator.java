@@ -5,9 +5,9 @@ import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.enums.SeatStatus;
 import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.domain.concert.repository.SeatRepository;
-import com.io.hhplus.concert.domain.concert.service.model.ConcertModel;
-import com.io.hhplus.concert.domain.concert.service.model.PerformanceModel;
-import com.io.hhplus.concert.domain.concert.service.model.SeatModel;
+import com.io.hhplus.concert.domain.concert.model.Concert;
+import com.io.hhplus.concert.domain.concert.model.Performance;
+import com.io.hhplus.concert.domain.concert.model.Seat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -107,12 +107,12 @@ public class ConcertValidator {
 
     /**
      * 예약 가능 콘서트 검증
-     * @param concertModel 콘서트 정보
+     * @param concert 콘서트 정보
      */
-    public void checkIfConcertToBeReserved(ConcertModel concertModel) {
-        if (concertModel != null
-                && isAvailableConcertId(concertModel.concertId())
-                && isAvailableStatus(concertModel.concertStatus())) {
+    public void checkIfConcertToBeReserved(Concert concert) {
+        if (concert != null
+                && isAvailableConcertId(concert.concertId())
+                && isAvailableStatus(concert.concertStatus())) {
             return;
         }
         throw new CustomException(ResponseMessage.NOT_AVAILABLE, "해당 콘서트는 예약이 불가능합니다.");
@@ -120,14 +120,14 @@ public class ConcertValidator {
 
     /**
      * 예약 가능 공연 검증
-     * @param performanceModel 공연 정보
+     * @param performance 공연 정보
      * @param currentDate 현재일시
      */
-    public void checkIfPerformanceToBeReserved(PerformanceModel performanceModel, Date currentDate) {
-        if (performanceModel != null
-                && this.isAvailablePerformanceId(performanceModel.performanceId())
-                && this.isAvailableCapacityLimit(performanceModel.capacityLimit())
-                && this.isPerformAtAfterTargetDate(performanceModel.performedAt(), currentDate)) {
+    public void checkIfPerformanceToBeReserved(Performance performance, Date currentDate) {
+        if (performance != null
+                && this.isAvailablePerformanceId(performance.performanceId())
+                && this.isAvailableCapacityLimit(performance.capacityLimit())
+                && this.isPerformAtAfterTargetDate(performance.performedAt(), currentDate)) {
             return;
         }
         throw new CustomException(ResponseMessage.NOT_AVAILABLE, "해당 공연은 예약이 불가능합니다.");
@@ -135,38 +135,38 @@ public class ConcertValidator {
 
     /**
      * 예약 가능 좌석 검증
-     * @param seatModel 좌석 정보
+     * @param seat 좌석 정보
      */
-    public void checkIfSeatToBeReserved(SeatModel seatModel) {
-        if (seatModel != null
-                && this.isAvailableSeatId(seatModel.seatId())
-                && this.isAvailablePerformanceId(seatModel.performanceId())
-                && this.isAvailableConcertId(seatModel.concertId())
-                && this.isAvailableSeatNo(seatModel.seatNo())
-                && this.isAvailableSeatStatus(seatModel.seatStatus())) {
+    public void checkIfSeatToBeReserved(Seat seat) {
+        if (seat != null
+                && this.isAvailableSeatId(seat.seatId())
+                && this.isAvailablePerformanceId(seat.performanceId())
+                && this.isAvailableConcertId(seat.concertId())
+                && this.isAvailableSeatNo(seat.seatNo())
+                && this.isAvailableSeatStatus(seat.seatStatus())) {
             return;
         }
         throw new CustomException(ResponseMessage.NOT_AVAILABLE, "해당 좌석은 예약이 불가능합니다.");
     }
 
-    /**
-     * 좌석 배정 가능 검증
-     * @param seatId 좌석_ID
-     */
-    public void checkIfSeatNotAssigned(Long seatId) {
-        Optional<SeatModel> optionalSeat = seatRepository.findById(seatId);
-        if (optionalSeat.isEmpty()) {
-            throw new CustomException(ResponseMessage.NOT_FOUND, "좌석이 없습니다.");
-        }
-        SeatModel seatModel = optionalSeat.get();
-        if (this.isOccupied(seatModel.seatStatus())) {
-            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "이미 선점된 좌석입니다.");
-        }
-        if (this.isTaken(seatModel.seatStatus())) {
-            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "이미 예약된 좌석입니다.");
-        }
-        if (this.isNotAvailableSeatStatus(seatModel.seatStatus())) {
-            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "예약 가능한 상태가 아닙니다.");
-        }
-    }
+//    /**
+//     * 좌석 배정 가능 검증
+//     * @param seatId 좌석_ID
+//     */
+//    public void checkIfSeatNotAssigned(Long seatId) {
+//        Optional<Seat> optionalSeat = seatRepository.findById(seatId);
+//        if (optionalSeat.isEmpty()) {
+//            throw new CustomException(ResponseMessage.NOT_FOUND, "좌석이 없습니다.");
+//        }
+//        Seat seat = optionalSeat.get();
+//        if (this.isOccupied(seat.seatStatus())) {
+//            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "이미 선점된 좌석입니다.");
+//        }
+//        if (this.isTaken(seat.seatStatus())) {
+//            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "이미 예약된 좌석입니다.");
+//        }
+//        if (this.isNotAvailableSeatStatus(seat.seatStatus())) {
+//            throw new CustomException(ResponseMessage.NOT_AVAILABLE, "예약 가능한 상태가 아닙니다.");
+//        }
+//    }
 }

@@ -1,6 +1,7 @@
-package com.io.hhplus.concert.domain.concert.entity;
+package com.io.hhplus.concert.infrastructure.concert.entity;
 
 import com.io.hhplus.concert.common.enums.SeatStatus;
+import com.io.hhplus.concert.domain.concert.model.Seat;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
 import com.io.hhplus.concert.infrastructure.audit.entity.Auditable;
@@ -34,7 +35,7 @@ public class SeatEntity implements Auditable {
     private String seatNo;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name="STATUS", nullable = false, length = 50)
+    @Column(name = "SEAT_STATUS", nullable = false, length = 50)
     private SeatStatus seatStatus;
 
     @Builder.Default
@@ -43,4 +44,28 @@ public class SeatEntity implements Auditable {
 
     @Column(name = "DELETED_AT", nullable = true)
     private Date deletedAt;
+
+    public static SeatEntity from(Seat seat) {
+        return SeatEntity.builder()
+                .id(seat.seatId())
+                .performanceId(seat.performanceId())
+                .concertId(seat.concertId())
+                .seatNo(seat.seatNo())
+                .seatStatus(seat.seatStatus())
+                .deletedAt(seat.deletedAt())
+                .build();
+    }
+
+    public Seat toDomain() {
+        return Seat.builder()
+                .seatId(this.id)
+                .performanceId(this.performanceId)
+                .concertId(this.concertId)
+                .seatNo(this.seatNo)
+                .seatStatus(this.seatStatus)
+                .createdAt(this.auditSection.getCreatedAt())
+                .modifiedAt(this.auditSection.getModifiedAt())
+                .deletedAt(this.deletedAt)
+                .build();
+    }
 }
