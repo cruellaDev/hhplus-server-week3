@@ -1,11 +1,21 @@
 package com.io.hhplus.concert.domain.customer.service;
 
+import com.io.hhplus.concert.application.customer.dto.ChargeCustomerPointServiceResponse;
+import com.io.hhplus.concert.application.customer.dto.CustomerPointBalanceServiceResponse;
+import com.io.hhplus.concert.application.customer.dto.UseCustomerPointServiceResponse;
 import com.io.hhplus.concert.common.enums.PointType;
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
+import com.io.hhplus.concert.domain.customer.dto.ChargeCustomerPointServiceRequest;
+import com.io.hhplus.concert.domain.customer.dto.UseCustomerPointServiceRequest;
+import com.io.hhplus.concert.domain.customer.model.Customer;
+import com.io.hhplus.concert.domain.customer.model.CustomerPointHistory;
 import com.io.hhplus.concert.domain.customer.service.model.CustomerModel;
 import com.io.hhplus.concert.domain.customer.service.model.CustomerPointHistoryModel;
 import com.io.hhplus.concert.domain.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -16,40 +26,61 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     /**
-     * 고객 조회
-     * @param customerId 고객_ID
-     * @return 고객 정보
-     */
-    public CustomerModel getAvailableCustomer(Long customerId) {
-        return customerRepository.findAvailableOneById(customerId).orElseGet(CustomerModel::noContents);
-    }
-
-    /**
      * 고객 포인트 잔액 조회
      * @param customerId 고객 ID
      * @return 포인트잔액
      */
-    public BigDecimal getCustomerPointBalance(Long customerId) {
-        return customerRepository.sumCustomerPointBalanceByCustomerId(customerId);
+    public CustomerPointBalanceServiceResponse getCustomerPointBalance(Long customerId) {
+        Customer customer = customerRepository.findAvailableCustomer(customerId)
+                .filter(o
+                        -> o.isNotDreamed()
+                        && o.isNotWithdrawn()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        return CustomerPointBalanceServiceResponse.from(customer);
     }
 
     /**
-     * 고객 포인트 내역 저장
-     * @param customerPointHistoryModel 고객포인트내역 정보
-     * @return 고객포인트내역 저장 정보
+     * 고객 포인트 충전
+     * @param customerId 고객_ID
+     * @param chargeAmount 충전 금액
+     * @return 고객 포인트 충전 정보
      */
-    public CustomerPointHistoryModel saveCustomerPointHistory(CustomerPointHistoryModel customerPointHistoryModel) {
-        return customerRepository.saveCustomerPointHistory(customerPointHistoryModel);
+    @Transactional
+    public ChargeCustomerPointServiceResponse chargeCustomerPoint(Long customerId, BigDecimal chargeAmount){
+        // 고객 조회
+        Customer customer = customerRepository.findAvailableCustomer(customerId)
+                .filter(o
+                        -> o.isNotDreamed()
+                        && o.isNotWithdrawn()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        // 포인트 update
+        Customer updatedCustomer = customerRepository.saveCustomer(customer.chargePoint(chargeAmount));
+        // 포인트 내역 insert
+        CustomerPointHistory customerPointHistory = customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePointOf(customer, chargeAmount));
+        return ChargeCustomerPointServiceResponse.of(updatedCustomer, customerPointHistory);
     }
 
     /**
      * 고객 포인트 사용
      * @param customerId 고객_ID
-     * @param amount 금액
+     * @param useAmount 충전 금액
      * @return 고객 포인트 사용 정보
      */
-    public CustomerPointHistoryModel useCustomerPoint(Long customerId, BigDecimal amount) {
-        CustomerPointHistoryModel customerPointHistoryModel = CustomerPointHistoryModel.create(customerId, amount, PointType.USE, null);
-        return saveCustomerPointHistory(customerPointHistoryModel);
+    @Transactional
+    public UseCustomerPointServiceResponse useCustomerPoint(Long customerId, BigDecimal useAmount) {
+        // 고객 조회
+        Customer customer = customerRepository.findAvailableCustomer(customerId)
+                .filter(o
+                        -> o.isNotDreamed()
+                        && o.isNotWithdrawn()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        // 포인트 update
+        Customer updatedCustomer = customerRepository.saveCustomer(customer.usePoint(useAmount));
+        // 포인트 내역 insert
+        CustomerPointHistory customerPointHistory = customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePointOf(customer, useAmount));
+        return UseCustomerPointServiceResponse.of(updatedCustomer, customerPointHistory);
     }
 }

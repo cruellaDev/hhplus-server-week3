@@ -1,13 +1,15 @@
 package com.io.hhplus.concert.infrastructure.customer.repository.impl;
 
 import com.io.hhplus.concert.common.enums.PointType;
-import com.io.hhplus.concert.domain.customer.entity.CustomerEntity;
-import com.io.hhplus.concert.domain.customer.entity.CustomerPointHistoryEntity;
+import com.io.hhplus.concert.infrastructure.customer.entity.CustomerEntity;
+import com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistoryEntity;
+import com.io.hhplus.concert.domain.customer.model.Customer;
+import com.io.hhplus.concert.domain.customer.model.CustomerPointHistory;
 import com.io.hhplus.concert.domain.customer.service.model.CustomerModel;
 import com.io.hhplus.concert.domain.customer.service.model.CustomerPointHistoryModel;
 import com.io.hhplus.concert.domain.customer.repository.CustomerRepository;
 import com.io.hhplus.concert.infrastructure.customer.repository.jpaRepository.CustomerJpaRepository;
-import com.io.hhplus.concert.infrastructure.customer.repository.jpaRepository.CustomerPointJpaRepository;
+import com.io.hhplus.concert.infrastructure.customer.repository.jpaRepository.CustomerPointHistoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
 public class CustomerRepositoryImpl implements CustomerRepository {
 
     private final CustomerJpaRepository customerJpaRepository;
-    private final CustomerPointJpaRepository customerPointJpaRepository;
+    private final CustomerPointHistoryJpaRepository customerPointHistoryJpaRepository;
 
     private boolean isNotDreamed(Date dreamedAt) {
         return dreamedAt == null;
@@ -50,33 +52,37 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
+    public Optional<Customer> findAvailableCustomer(Long customerId) {
+        return customerJpaRepository.findByDreamedAtIsNullAndWithdrawAtIsNullAndDeletedAtIsNullAndIdEquals(customerId)
+                .map(CustomerEntity::toDomain);
+    }
+
+    @Override
+    public Customer saveCustomer(Customer customer) {
+        return customerJpaRepository.save(CustomerEntity.from(customer)).toDomain();
+    }
+
+    @Override
+    public CustomerPointHistory saveCustomerPointHistory(CustomerPointHistory customerPointHistory) {
+        return customerPointHistoryJpaRepository.save(CustomerPointHistoryEntity.from(customerPointHistory)).toDomain();
+    }
+
+    @Override
     public Optional<CustomerModel> findAvailableOneById(Long customerId) {
         return customerJpaRepository.findById(customerId)
                 .filter(customerEntityEntity -> isNotDreamed(customerEntityEntity.getDreamedAt())
-                        && isNotWithdraw(customerEntityEntity.getWithdrawAt())
+                        && isNotWithdraw(customerEntityEntity.getWithdrawnAt())
                         && isNotDeleted(customerEntityEntity.getDeletedAt()))
                 .map(entity -> mapEntityToDto(entity, BigDecimal.ZERO));
     }
 
     @Override
     public BigDecimal sumCustomerPointBalanceByCustomerId(Long customerId) {
-        return customerPointJpaRepository.findAllByCustomerId(customerId)
+        return customerPointHistoryJpaRepository.findAllByCustomerId(customerId)
                 .stream()
                 .filter(pointEntity -> isNotDeleted(pointEntity.getDeletedAt()))
                 .map(pointEntity -> convertPositiveOrNegative(pointEntity.getPointType(), pointEntity.getPointAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    @Override
-    public Optional<CustomerModel> findAvailableOneWithPointBalanceById(Long customerId) {
-        return customerJpaRepository.findById(customerId)
-                .filter(customerEntityEntity -> isNotDreamed(customerEntityEntity.getDreamedAt())
-                        && isNotWithdraw(customerEntityEntity.getWithdrawAt())
-                        && isNotDeleted(customerEntityEntity.getDeletedAt()))
-                .map(customerEntityEntity -> {
-                    BigDecimal pointBalance = sumCustomerPointBalanceByCustomerId(customerId);
-                    return mapEntityToDto(customerEntityEntity, pointBalance);
-                });
     }
 
     @Override
@@ -88,7 +94,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 .pointAmount(customerPointHistoryModel.pointAmount())
                 .build();
         CustomerPointHistoryEntity saved
-                = customerPointJpaRepository.save(entity);
+                = customerPointHistoryJpaRepository.save(entity);
         return mapEntityToDto(saved);
     }
 }
