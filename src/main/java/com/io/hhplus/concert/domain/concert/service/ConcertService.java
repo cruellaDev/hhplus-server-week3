@@ -1,6 +1,5 @@
 package com.io.hhplus.concert.domain.concert.service;
 
-import com.io.hhplus.concert.common.utils.DateUtils;
 import com.io.hhplus.concert.domain.concert.model.Concert;
 import com.io.hhplus.concert.domain.concert.model.Performance;
 import com.io.hhplus.concert.domain.concert.model.Seat;
@@ -44,7 +43,7 @@ public class ConcertService {
         return performanceRepository.findPerformances(concertId)
                 .stream()
                 .filter(performance
-                        -> performance.isToBePerformed(DateUtils.getSysDate())
+                        -> performance.isToBePerformed()
                         && performance.isNotDeleted())
                 .toList();
     }

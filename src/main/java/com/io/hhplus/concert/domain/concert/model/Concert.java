@@ -1,6 +1,7 @@
 package com.io.hhplus.concert.domain.concert.model;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
+import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
 import java.util.Date;
@@ -20,12 +21,13 @@ public record Concert(
         Date modifiedAt,
         Date deletedAt
 ) {
-    public boolean isOnSale(Date currentDate) {
+    public boolean isOnSale() {
+        Date currentDate = DateUtils.getSysDate();
         return this.saleBeginAt.before(currentDate) && this.saleEndAt.after(currentDate);
     }
 
     public boolean isAvailableConcertStatus() {
-        return ConcertStatus.AVAILABLE.equals(this.concertStatus);
+        return this.concertStatus.isAvailable();
     }
 
     public boolean isNotDeleted() {

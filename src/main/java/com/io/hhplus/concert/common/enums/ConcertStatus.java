@@ -4,5 +4,9 @@ public enum ConcertStatus {
     WAITING,
     AVAILABLE,
     NOT_AVAILABLE,
-    CLOSED
+    CLOSED;
+
+    public boolean isAvailable() {
+        return AVAILABLE.equals(this);
+    }
 }

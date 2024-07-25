@@ -1,5 +1,6 @@
 package com.io.hhplus.concert.domain.concert.model;
 
+import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -16,8 +17,8 @@ public record Performance(
         Date modifiedAt,
         Date deletedAt
 ) {
-    public boolean isToBePerformed(Date currentDate) {
-        return this.performedAt().after(currentDate);
+    public boolean isToBePerformed() {
+        return this.performedAt().after(DateUtils.getSysDate());
     }
 
     public boolean isNotDeleted() {

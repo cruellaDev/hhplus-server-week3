@@ -17,7 +17,7 @@ public record Seat(
         Date deletedAt
 ) {
     public boolean isAvailableStatus() {
-        return SeatStatus.AVAILABLE.equals(this.seatStatus);
+        return this.seatStatus.isAvailable();
     }
     public boolean isNotDeleted() {
         return this.deletedAt == null;

@@ -5,5 +5,9 @@ public enum SeatStatus {
     AVAILABLE,
     WAITING_FOR_RESERVATION,
     TAKEN,
-    WAITING_FOR_CANCEL,
+    WAITING_FOR_CANCEL;
+
+    public boolean isAvailable() {
+        return AVAILABLE.equals(this);
+    }
 }
