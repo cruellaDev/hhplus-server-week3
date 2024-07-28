@@ -1,7 +1,7 @@
-package com.io.hhplus.concert.infrastructure.reservation.repository.jpaRepository;
+package com.io.hhplus.concert.infrastructure.concert.repository.jpa;
 
 import com.io.hhplus.concert.common.enums.ReservationStatus;
-import com.io.hhplus.concert.domain.reservation.entity.ReservationEntity;
+import com.io.hhplus.concert.infrastructure.concert.entity.ReservationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

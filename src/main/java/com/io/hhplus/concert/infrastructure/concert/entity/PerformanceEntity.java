@@ -22,34 +22,26 @@ import java.util.Date;
 public class PerformanceEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
+    @Column(name = "ID", unique = true, nullable = false, updatable = false, columnDefinition = "공연_ID")
     private Long id;
 
-    @Column(name = "CONCERT_ID", nullable = false, updatable = false)
+    @Column(name = "CONCERT_ID", nullable = false, updatable = false, columnDefinition = "콘서트_ID")
     private Long concertId;
 
-    @Column(name = "PERFORMANCE_PRICE", nullable = false, precision = 18, scale = 3)
-    private BigDecimal performancePrice;
-
-    @Column(name = "CAPACITY_LIMIT", nullable = false)
-    private Integer capacityLimit;
-
-    @Column(name = "PERFORMED_AT", nullable = false)
+    @Column(name = "PERFORMED_AT", nullable = false, columnDefinition = "공연_일시")
     private Date performedAt;
 
     @Builder.Default
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "DELETED_AT", nullable = true)
+    @Column(name = "DELETED_AT", nullable = true, columnDefinition = "삭제_일시")
     private Date deletedAt;
 
     public static PerformanceEntity from(Performance performance) {
         return PerformanceEntity.builder()
                 .id(performance.performanceId())
                 .concertId(performance.concertId())
-                .performancePrice(performance.performancePrice())
-                .capacityLimit(performance.capacityLimit())
                 .performedAt(performance.performedAt())
                 .deletedAt(performance.deletedAt())
                 .build();
@@ -59,8 +51,6 @@ public class PerformanceEntity implements Auditable {
         return Performance.builder()
                 .performanceId(this.id)
                 .concertId(this.concertId)
-                .performancePrice(this.performancePrice)
-                .capacityLimit(this.capacityLimit)
                 .performedAt(this.performedAt)
                 .createdAt(this.auditSection.getCreatedAt())
                 .modifiedAt(this.auditSection.getModifiedAt())

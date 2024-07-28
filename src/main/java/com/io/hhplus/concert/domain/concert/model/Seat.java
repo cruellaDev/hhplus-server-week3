@@ -3,23 +3,35 @@ package com.io.hhplus.concert.domain.concert.model;
 import com.io.hhplus.concert.common.enums.SeatStatus;
 import lombok.Builder;
 
-import java.util.Date;
-
 @Builder
 public record Seat(
-        Long seatId,
-        Long performanceId,
         Long concertId,
-        String seatNo,
-        SeatStatus seatStatus,
-        Date createdAt,
-        Date modifiedAt,
-        Date deletedAt
+        Long performanceId,
+        Long areaId,
+        String seatNumber,
+        SeatStatus seatStatus
 ) {
     public boolean isAvailableStatus() {
         return this.seatStatus.isAvailable();
     }
-    public boolean isNotDeleted() {
-        return this.deletedAt == null;
+
+    public static Seat createAvailableSeat(Area area, Long number) {
+        return Seat.builder()
+                .concertId(area.concertId())
+                .performanceId(area.performanceId())
+                .areaId(area.areaId())
+                .seatNumber(area.areaName() + number)
+                .seatStatus(SeatStatus.AVAILABLE)
+                .build();
+    }
+
+    public static Seat createNotAvailableSeat(Area area, Long number) {
+        return Seat.builder()
+                .concertId(area.concertId())
+                .performanceId(area.performanceId())
+                .areaId(area.areaId())
+                .seatNumber(area.areaName() + number)
+                .seatStatus(SeatStatus.NOT_AVAILABLE)
+                .build();
     }
 }

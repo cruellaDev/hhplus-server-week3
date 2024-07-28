@@ -11,19 +11,19 @@ public record Concert(
         Long concertId,
         String concertName,
         String artistName,
-        Date saleBeginAt,
-        Date saleEndAt,
+        Date bookBeginAt,
+        Date bookEndAt,
         ConcertStatus concertStatus,
         Boolean isReceiveOnline,
         Boolean isReceiveOnSite,
-        Boolean isReceiveOnPost,
+        Boolean isReceiveByPost,
         Date createdAt,
         Date modifiedAt,
         Date deletedAt
 ) {
-    public boolean isOnSale() {
+    public boolean isAbleToBook() {
         Date currentDate = DateUtils.getSysDate();
-        return this.saleBeginAt.before(currentDate) && this.saleEndAt.after(currentDate);
+        return this.bookBeginAt.before(currentDate) && this.bookEndAt.after(currentDate);
     }
 
     public boolean isAvailableConcertStatus() {

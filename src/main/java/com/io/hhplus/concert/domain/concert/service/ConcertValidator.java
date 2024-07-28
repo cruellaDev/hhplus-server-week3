@@ -4,7 +4,6 @@ import com.io.hhplus.concert.common.enums.ConcertStatus;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.enums.SeatStatus;
 import com.io.hhplus.concert.common.exceptions.CustomException;
-import com.io.hhplus.concert.domain.concert.repository.SeatRepository;
 import com.io.hhplus.concert.domain.concert.model.Concert;
 import com.io.hhplus.concert.domain.concert.model.Performance;
 import com.io.hhplus.concert.domain.concert.model.Seat;
@@ -12,13 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class ConcertValidator {
-
-    private final SeatRepository seatRepository;
 
     // insert 시 id는 null 이어야 하기 때문에 select, update 시에만 사용.
     public boolean isAvailableConcertId(Long concertId) {
@@ -139,10 +135,9 @@ public class ConcertValidator {
      */
     public void checkIfSeatToBeReserved(Seat seat) {
         if (seat != null
-                && this.isAvailableSeatId(seat.seatId())
                 && this.isAvailablePerformanceId(seat.performanceId())
                 && this.isAvailableConcertId(seat.concertId())
-                && this.isAvailableSeatNo(seat.seatNo())
+                && this.isAvailableSeatNo(seat.seatNumber())
                 && this.isAvailableSeatStatus(seat.seatStatus())) {
             return;
         }

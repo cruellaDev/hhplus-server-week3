@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.interfaces.concert.dto;
 
-import com.io.hhplus.concert.application.concert.dto.AvailablePerformanceServiceResponse;
+import com.io.hhplus.concert.application.concert.dto.PerformanceServiceResponse;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ public class PerformanceDto {
     public static class Response {
         private List<PerformanceDto.PerformanceResponse> performances;
 
-        public static PerformanceDto.Response from(List<AvailablePerformanceServiceResponse> performances) {
+        public static PerformanceDto.Response from(List<PerformanceServiceResponse> performances) {
             List<PerformanceDto.PerformanceResponse> performanceResponses = performances
                     .stream()
                     .map(performance

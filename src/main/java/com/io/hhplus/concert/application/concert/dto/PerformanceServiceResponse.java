@@ -7,15 +7,15 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Builder
-public record AvailablePerformanceServiceResponse(
+public record PerformanceServiceResponse(
         Long performanceId,
         Long concertId,
         BigDecimal performancePrice,
         Integer capacityLimit,
         Date performedAt
 ) {
-    public static AvailablePerformanceServiceResponse from(Performance performance) {
-        return AvailablePerformanceServiceResponse.builder()
+    public static PerformanceServiceResponse from(Performance performance) {
+        return PerformanceServiceResponse.builder()
                 .performanceId(performance.performanceId())
                 .concertId(performance.concertId())
                 .performancePrice(performance.performancePrice())
