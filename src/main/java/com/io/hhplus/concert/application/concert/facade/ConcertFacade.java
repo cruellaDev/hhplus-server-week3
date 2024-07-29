@@ -5,6 +5,7 @@ import com.io.hhplus.concert.domain.concert.service.ConcertService;
 import com.io.hhplus.concert.domain.payment.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,25 +65,14 @@ public class ConcertFacade {
     }
 
     /**
-     * 좌석 배정
+     * 좌석 배정 및 예약 요청
      * @param serviceRequest 요청 정보
      * @return 응답 정보
      */
+    @Transactional
     public List<HeldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
         // 대기열 검증
-        // 고객 검증
-        // 콘서트, 공연, 구역 검증
+        // 대기열 만료
         return concertService.holdSeats(serviceRequest);
-    }
-
-    /**
-     * TODO 좌석 예약 요청
-     * 예약 가능 시간 초과 ? 좌석 배정 취소 : 예약 완료
-     */
-    public Object confirmReservation(Object object) {
-        // 대기열 검증
-        // 고객 검증
-        // 예약 검증 && 예약 완료
-        return null;
     }
 }

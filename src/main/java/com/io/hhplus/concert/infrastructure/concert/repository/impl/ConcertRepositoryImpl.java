@@ -95,4 +95,18 @@ public class ConcertRepositoryImpl implements ConcertRepository {
         return areaJpaRepository.findById(areaId)
                 .map(AreaEntity::toDomain);
     }
+
+    @Override
+    public Optional<Reservation> findReservation(Long reservationId) {
+        return reservationJpaRepository.findById(reservationId)
+                .map(ReservationEntity::toDomain);
+    }
+
+    @Override
+    public List<Ticket> findTickets(Long reservationId) {
+        return ticketJpaRepository.findAllByReservationId(reservationId)
+                .stream()
+                .map(TicketEntity::toDomain)
+                .collect(Collectors.toList());
+    }
 }

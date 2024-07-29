@@ -1,5 +1,9 @@
 package com.io.hhplus.concert.domain.concert.model;
 
+import com.io.hhplus.concert.common.GlobalConstants;
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
+import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -44,6 +48,38 @@ public record Ticket(
                 .isReceiveOnline(concert.isReceiveOnline())
                 .isReceiveOnSite(concert.isReceiveOnSite())
                 .isReceiveByPost(concert.isReceiveByPost())
+                .ticketPrice(area.seatPrice())
+                .build();
+    }
+
+    public boolean isReservable() {
+        return (this.reservedAt == null || this.cancelAcceptedAt == null)
+                && DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
+                && this.deletedAt == null;
+    }
+
+    public Ticket confirmReservation(Reservation reservation) {
+        if (!isReservable()) {
+            throw new CustomException(ResponseMessage.INVALID, "예약이 가능한 상태가 아닙니다.");
+        }
+        Date currentDate = DateUtils.getSysDate();
+        return Ticket.builder()
+                .reservationId(this.reservationId)
+                .concertId(this.concertId)
+                .performanceId(this.performanceId)
+                .areaId(this.areaId)
+                .concertName(this.concertName)
+                .artistName(this.artistName)
+                .performedAt(this.performedAt)
+                .areaName(this.areaName)
+                .seatNumber(this.seatNumber)
+                .isReceiveOnline(this.isReceiveOnline)
+                .isReceiveOnSite(this.isReceiveOnSite)
+                .isReceiveByPost(this.isReceiveByPost)
+                .ticketPrice(this.ticketPrice)
+                .reservedAt(currentDate)
+                .publishedAt(reservation.isReceivedOnline() ? currentDate : this.publishedAt)
+                .receivedAt(reservation.isReceivedOnline() ? currentDate : this.receivedAt)
                 .build();
     }
 }

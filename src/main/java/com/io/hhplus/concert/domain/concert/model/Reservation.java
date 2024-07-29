@@ -20,9 +20,41 @@ public record Reservation(
         Date modifiedAt,
         Date deletedAt
 ) {
+    @Builder
+    public record ReceiveInfo(
+            String reserverName,
+            ReceiveMethod receiveMethod,
+            String receiverName,
+            String receiverPostcode,
+            String receiverBaseAddress,
+            String receiverDetailAddress
+            ) {
+    }
+
     public static Reservation create(Long customerId) {
         return Reservation.builder()
                 .customerId(customerId)
+                .build();
+    }
+
+    public boolean isNotDeleted() {
+        return this.deletedAt == null;
+    }
+
+    public boolean isReceivedOnline() {
+        return this.receiveMethod.isReceivedOnline();
+    }
+
+    public Reservation fillReceiveInfo(Reservation.ReceiveInfo receiveInfo) {
+        return Reservation.builder()
+                .reservationId(this.reservationId)
+                .customerId(this.customerId)
+                .reserverName(receiveInfo.reserverName)
+                .receiveMethod(receiveInfo.receiveMethod())
+                .receiverName(receiveInfo.receiverName)
+                .receiverPostcode(receiveInfo.receiverPostcode)
+                .receiverBaseAddress(receiveInfo.receiverBaseAddress)
+                .receiverDetailAddress(receiveInfo.receiverDetailAddress)
                 .build();
     }
 }

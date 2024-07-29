@@ -16,4 +16,6 @@ public interface ConcertRepository {
     Optional<Concert> findConcert(Long concertId);
     Optional<Performance> findPerformance(Long performanceId);
     Optional<Area> findArea(Long areaId);
+    Optional<Reservation> findReservation(Long reservationId);
+    List<Ticket> findTickets(Long reservationId);
 }

@@ -2,15 +2,9 @@ package com.io.hhplus.concert.interfaces.concert.controller;
 
 import com.io.hhplus.concert.application.concert.facade.ConcertFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
-import com.io.hhplus.concert.interfaces.concert.dto.AreaDto;
-import com.io.hhplus.concert.interfaces.concert.dto.ConcertDto;
-import com.io.hhplus.concert.interfaces.concert.dto.PerformanceDto;
-import com.io.hhplus.concert.interfaces.concert.dto.SeatDto;
+import com.io.hhplus.concert.interfaces.concert.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -52,7 +46,7 @@ public class ConcertController {
     }
 
     /**
-     * 예약가능 좌석 조회
+     * 예약가능 좌석 목록 조회
      * @param concertId 콘서트_ID
      * @param performanceId 공연_ID
      * @param areaId 구역_ID
@@ -63,5 +57,15 @@ public class ConcertController {
                                                   @PathVariable("performanceId") Long performanceId,
                                                   @PathVariable("areaId") Long areaId) {
         return CommonResponse.success(SeatDto.Response.from(concertFacade.getAvailableSeats(concertId, performanceId, areaId)));
+    }
+
+    /**
+     * 좌석 배정 및 예약 요청
+     * @param request 요청 정보
+     * @return 응답 정보
+     */
+    @PostMapping("/hold/seats")
+    public CommonResponse<ReservationDto.HoldSeatsResponse> holdSeats(ReservationDto.HoldSeatsRequest request) {
+        return CommonResponse.success(ReservationDto.HoldSeatsResponse.from(concertFacade.holdSeats(request.toServiceRequest())));
     }
 }

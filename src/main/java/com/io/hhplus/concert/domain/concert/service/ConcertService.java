@@ -1,5 +1,7 @@
 package com.io.hhplus.concert.domain.concert.service;
 
+import com.io.hhplus.concert.application.concert.dto.ConfirmReservationServiceRequest;
+import com.io.hhplus.concert.application.concert.dto.ConfirmedReservationServiceResponse;
 import com.io.hhplus.concert.application.concert.dto.HeldSeatServiceResponse;
 import com.io.hhplus.concert.application.concert.dto.HoldSeatServiceRequest;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 
@@ -96,10 +99,15 @@ public class ConcertService {
                 });
         // 콘서트 정보 조회
         Concert concert = concertRepository.findConcert(serviceRequest.getConcertId())
-                .filter(o -> o.isAbleToBook() && o.isAvailableConcertStatus() && o.isNotDeleted())
+                .filter(o
+                        -> o.isAbleToBook()
+                        && o.isAvailableConcertStatus()
+                        && o.isNotDeleted())
                 .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
         Performance performance = concertRepository.findPerformance(serviceRequest.getPerformanceId())
-                .filter(o -> o.isToBePerformed() && o.isNotDeleted())
+                .filter(o
+                        -> o.isToBePerformed()
+                        && o.isNotDeleted())
                 .orElseThrow(() -> new CustomException(ResponseMessage.NOT_FOUND));
         Area area = concertRepository.findArea(serviceRequest.getAreaId())
                 .filter(Area::isNotDeleted)
@@ -114,13 +122,24 @@ public class ConcertService {
     }
 
     /**
-     * TODO 예약 완료
+     * 예약 완료
      */
     @Transactional
-    public Object confirmReservation(Object object) {
-        // 수령인 정보
-        // reservedAt not null
-        // isReceiveOnline == true -> publishedAt not null, receivedAt not null
-        return null;
+    public ConfirmedReservationServiceResponse confirmReservation(ConfirmReservationServiceRequest serviceRequest) {
+        // 예약
+        Reservation reservation = concertRepository.findReservation(serviceRequest.getReservationId())
+                .filter(Reservation::isNotDeleted)
+                .orElseThrow(() -> new CustomException(ResponseMessage.NOT_FOUND))
+                .fillReceiveInfo(serviceRequest.toReceiveInfoDomain());
+        // 티켓
+        List<Ticket> tickets = concertRepository.findTickets(serviceRequest.getReservationId())
+                .stream()
+                .map(ticket -> ticket.confirmReservation(reservation))
+                .toList();
+
+        return ConfirmedReservationServiceResponse.of(
+                concertRepository.saveReservation(reservation),
+                tickets.stream().map(concertRepository::saveTicket).collect(Collectors.toList())
+        );
     }
 }
