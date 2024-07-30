@@ -2,7 +2,6 @@ package com.io.hhplus.concert.application.concert.facade;
 
 import com.io.hhplus.concert.application.concert.dto.*;
 import com.io.hhplus.concert.domain.concert.service.ConcertService;
-import com.io.hhplus.concert.domain.payment.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,9 +69,7 @@ public class ConcertFacade {
      * @return 응답 정보
      */
     @Transactional
-    public List<HeldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
-        // 대기열 검증
-        // 대기열 만료
+    public List<HoldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
         return concertService.holdSeats(serviceRequest);
     }
 }
