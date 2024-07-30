@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.interfaces.customer.dto;
 
 import com.io.hhplus.concert.application.customer.dto.ChargeCustomerPointServiceResponse;
-import com.io.hhplus.concert.domain.customer.dto.ChargeCustomerPointServiceRequest;
+import com.io.hhplus.concert.application.customer.dto.ChargeCustomerPointServiceRequest;
 import lombok.Builder;
 
 import java.math.BigDecimal;

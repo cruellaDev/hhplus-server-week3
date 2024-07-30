@@ -2,7 +2,7 @@ package com.io.hhplus.concert.interfaces.customer.dto;
 
 
 import com.io.hhplus.concert.application.customer.dto.UseCustomerPointServiceResponse;
-import com.io.hhplus.concert.domain.customer.dto.UseCustomerPointServiceRequest;
+import com.io.hhplus.concert.application.customer.dto.UseCustomerPointServiceRequest;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -30,9 +30,8 @@ public class UseCustomerPointDto {
         private Date usedAt;
     }
 
-    // service response 한 번 생각해보기.
     public static UseCustomerPointDto.Response from(UseCustomerPointServiceResponse useCustomerPointServiceResponse) {
-        return Response.builder()
+        return UseCustomerPointDto.Response.builder()
                 .customerId(useCustomerPointServiceResponse.customerId())
                 .pointBalance(useCustomerPointServiceResponse.pointBalance())
                 .useAmount(useCustomerPointServiceResponse.useAmount())

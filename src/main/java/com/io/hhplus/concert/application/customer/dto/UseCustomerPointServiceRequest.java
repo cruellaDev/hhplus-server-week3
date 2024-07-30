@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.customer.dto;
+package com.io.hhplus.concert.application.customer.dto;
 
 import lombok.Builder;
 import lombok.Getter;
