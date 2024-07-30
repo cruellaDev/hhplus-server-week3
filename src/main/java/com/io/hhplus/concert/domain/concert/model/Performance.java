@@ -1,5 +1,7 @@
 package com.io.hhplus.concert.domain.concert.model;
 
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
@@ -23,5 +25,12 @@ public record Performance(
 
     public boolean isNotDeleted() {
         return this.deletedAt == null;
+    }
+
+    public void validate() {
+        if (isToBePerformed() && isNotDeleted()) {
+            return;
+        }
+        throw new CustomException(ResponseMessage.PERFORMANCE_INVALID);
     }
 }

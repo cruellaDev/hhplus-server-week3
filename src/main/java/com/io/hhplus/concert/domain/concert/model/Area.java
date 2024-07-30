@@ -1,5 +1,7 @@
 package com.io.hhplus.concert.domain.concert.model;
 
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -19,5 +21,12 @@ public record Area(
 ) {
     public boolean isNotDeleted() {
         return deletedAt == null;
+    }
+
+    public void validate() {
+        if (isNotDeleted()) {
+            return;
+        }
+        throw new CustomException(ResponseMessage.AREA_INVALID);
     }
 }

@@ -1,6 +1,8 @@
 package com.io.hhplus.concert.domain.concert.model;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
@@ -32,5 +34,12 @@ public record Concert(
 
     public boolean isNotDeleted() {
         return this.deletedAt == null;
+    }
+
+    public void validate() {
+        if (isAbleToBook() && isAvailableConcertStatus() && isNotDeleted()) {
+            return;
+        }
+        throw new CustomException(ResponseMessage.CONCERT_INVALID);
     }
 }

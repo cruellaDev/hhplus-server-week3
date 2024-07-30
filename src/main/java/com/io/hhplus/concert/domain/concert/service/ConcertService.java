@@ -2,7 +2,7 @@ package com.io.hhplus.concert.domain.concert.service;
 
 import com.io.hhplus.concert.application.concert.dto.ConfirmReservationServiceRequest;
 import com.io.hhplus.concert.application.concert.dto.ConfirmedReservationServiceResponse;
-import com.io.hhplus.concert.application.concert.dto.HeldSeatServiceResponse;
+import com.io.hhplus.concert.application.concert.dto.HoldSeatServiceResponse;
 import com.io.hhplus.concert.application.concert.dto.HoldSeatServiceRequest;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
@@ -90,34 +90,28 @@ public class ConcertService {
      * 좌석 배정
      */
     @Transactional
-    public List<HeldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
+    public List<HoldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
         // 좌석 확인
         serviceRequest.getSeats()
                 .forEach(seatRequest -> {
                     Boolean isAvailable = concertRepository.existsAvailableSeat(serviceRequest.getConcertId(), serviceRequest.getPerformanceId(), serviceRequest.getAreaId(), seatRequest.getSeatNumber());
                     if (!isAvailable) throw new CustomException(ResponseMessage.SEAT_TAKEN);
                 });
-        // 콘서트 정보 조회
-        Concert concert = concertRepository.findConcert(serviceRequest.getConcertId())
-                .filter(o
-                        -> o.isAbleToBook()
-                        && o.isAvailableConcertStatus()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
-        Performance performance = concertRepository.findPerformance(serviceRequest.getPerformanceId())
-                .filter(o
-                        -> o.isToBePerformed()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.NOT_FOUND));
-        Area area = concertRepository.findArea(serviceRequest.getAreaId())
-                .filter(Area::isNotDeleted)
-                .orElseThrow(() -> new CustomException(ResponseMessage.NOT_FOUND));
+        Concert concert = concertRepository.findConcert(serviceRequest.getConcertId()).orElseThrow();
+        concert.validate();
+
+        Performance performance = concertRepository.findPerformance(serviceRequest.getPerformanceId()).orElseThrow();
+        performance.validate();
+
+        Area area = concertRepository.findArea(serviceRequest.getAreaId()).orElseThrow();
+        area.validate();
+
         // 예약 저장
         Reservation reservation = concertRepository.saveReservation(Reservation.create(serviceRequest.getCustomerId()));
         // 티켓 저장
         return serviceRequest.getSeats()
                 .stream()
-                .map(seatRequest -> HeldSeatServiceResponse.from(concertRepository.saveTicket(Ticket.create(reservation, concert, performance, area, seatRequest.getSeatNumber()))))
+                .map(seatRequest -> HoldSeatServiceResponse.from(concertRepository.saveTicket(Ticket.create(reservation, concert, performance, area, seatRequest.getSeatNumber()))))
                 .toList();
     }
 
