@@ -3,7 +3,10 @@ package com.io.hhplus.concert.application.concert.facade;
 import com.io.hhplus.concert.application.concert.dto.*;
 import com.io.hhplus.concert.domain.concert.ConcertCommand;
 import com.io.hhplus.concert.domain.concert.ConcertService;
+import com.io.hhplus.concert.domain.concert.dto.AvailableSeatInfo;
 import com.io.hhplus.concert.domain.concert.dto.ReservationInfo;
+import com.io.hhplus.concert.domain.concert.model.Concert;
+import com.io.hhplus.concert.domain.concert.model.ConcertSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +23,8 @@ public class ConcertFacade {
      * 예약 가능한 콘서트 목록 조회
      * @return 콘서트 목록
      */
-    public List<ConcertServiceResponse> getAvailableConcerts() {
-        return concertService.getConcerts()
-                .stream()
-                .map(ConcertServiceResponse::from)
-                .toList();
+    public List<Concert> getAvailableConcerts() {
+        return concertService.getConcerts();
     }
 
     /**
@@ -32,11 +32,8 @@ public class ConcertFacade {
      * @param concertId 콘서트_ID
      * @return 응답 정보
      */
-    public List<PerformanceServiceResponse> getAvailableSchedules(Long concertId) {
-        return concertService.getAvailableSchedules(concertId)
-                .stream()
-                .map(PerformanceServiceResponse::from)
-                .toList();
+    public List<ConcertSchedule> getAvailableSchedules(Long concertId) {
+        return concertService.getAvailableSchedules(concertId);
     }
 
     /**
@@ -45,11 +42,8 @@ public class ConcertFacade {
      * @param concertScheduleId 공연_ID
      * @return 응답 정보
      */
-    public List<SeatServiceResponse> getAvailableSeats(Long concertId, Long concertScheduleId) {
-        return concertService.getAvailableSeats(concertId, concertScheduleId)
-                .stream()
-                .map(SeatServiceResponse::from)
-                .toList();
+    public List<AvailableSeatInfo> getAvailableSeats(Long concertId, Long concertScheduleId) {
+        return concertService.getAvailableSeats(concertId, concertScheduleId);
     }
 
     /**

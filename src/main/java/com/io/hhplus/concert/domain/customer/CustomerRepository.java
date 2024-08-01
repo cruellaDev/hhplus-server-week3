@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.customer.repository;
+package com.io.hhplus.concert.domain.customer;
 
 import com.io.hhplus.concert.domain.customer.model.Customer;
 import com.io.hhplus.concert.domain.customer.model.CustomerPointHistory;

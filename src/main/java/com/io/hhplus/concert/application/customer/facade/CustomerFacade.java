@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.application.customer.facade;
 
-import com.io.hhplus.concert.application.customer.dto.ChargeCustomerPointServiceRequest;
-import com.io.hhplus.concert.domain.customer.service.CustomerService;
+import com.io.hhplus.concert.domain.customer.CustomerCommand;
+import com.io.hhplus.concert.domain.customer.CustomerService;
 import com.io.hhplus.concert.interfaces.customer.dto.ChargeCustomerPointDto;
 import com.io.hhplus.concert.interfaces.customer.dto.CustomerPointBalanceDto;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ public class CustomerFacade {
 
     /**
      * 고객 포인트 충전
-     * @param serviceRequest 서비스 요청 정보
-     * @return 고객 포인트 충전 내역
+     * @param command 고객 포인트 충전 command
+     * @return 응답 정보
      */
-    public ChargeCustomerPointDto.Response chargeCustomerPoint(ChargeCustomerPointServiceRequest serviceRequest) {
-        return ChargeCustomerPointDto.Response.from(customerService.chargeCustomerPoint(serviceRequest.getCustomerId(), serviceRequest.getAmount()));
+    public ChargeCustomerPointDto.Response chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command) {
+        return ChargeCustomerPointDto.Response.from(customerService.chargeCustomerPoint(command));
     }
 }

@@ -16,9 +16,6 @@ public record Concert(
         Date bookBeginAt,
         Date bookEndAt,
         ConcertStatus concertStatus,
-        Boolean isReceiveOnline,
-        Boolean isReceiveOnSite,
-        Boolean isReceiveByPost,
         Date createdAt,
         Date modifiedAt,
         Date deletedAt
