@@ -97,4 +97,19 @@ public class DateUtils {
             return -9999;
         }
     }
+
+    /**
+     * 날짜에 초를 더한다.
+     * @param source 더할 날짜
+     * @param target 초 (s)
+     * @return 날짜
+     */
+    public static Date addSeconds(Date source, long target) {
+        source.setTime(source.getTime() + (target * 1000));
+        return source;
+    }
+
+    public static Date subtractSeconds(Date source, long target) {
+        return addSeconds(source, target * -1);
+    }
 }

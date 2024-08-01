@@ -19,8 +19,8 @@ public class CheckoutPaymentResultAndConfirmedReservationInfo {
     public static CheckoutPaymentResultAndConfirmedReservationInfo of(Payment payment, ReservationInfo reservationInfo) {
         return CheckoutPaymentResultAndConfirmedReservationInfo.builder()
                 .payment(payment)
-                .reservation(reservationInfo.getReservation())
-                .tickets(reservationInfo.getTickets())
+                .reservation(reservationInfo.reservation())
+                .tickets(reservationInfo.tickets())
                 .build();
     }
 }

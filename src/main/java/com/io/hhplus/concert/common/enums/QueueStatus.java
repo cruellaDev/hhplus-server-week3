@@ -9,6 +9,10 @@ public enum QueueStatus {
         return ACTIVE.equals(this);
     }
 
+    public boolean isWaiting() {
+        return WAITING.equals(this);
+    }
+
     public boolean isExpired() {
         return EXPIRED.equals(this);
     }

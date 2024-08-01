@@ -1,6 +1,5 @@
 package com.io.hhplus.concert.infrastructure.customer.repository.impl;
 
-import com.io.hhplus.concert.common.enums.PointType;
 import com.io.hhplus.concert.infrastructure.customer.entity.CustomerEntity;
 import com.io.hhplus.concert.infrastructure.customer.entity.CustomerPointHistoryEntity;
 import com.io.hhplus.concert.domain.customer.model.Customer;
@@ -11,8 +10,6 @@ import com.io.hhplus.concert.infrastructure.customer.repository.jpa.CustomerPoin
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Optional;
 
 @Repository
@@ -22,21 +19,12 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     private final CustomerJpaRepository customerJpaRepository;
     private final CustomerPointHistoryJpaRepository customerPointHistoryJpaRepository;
 
-
-    private boolean isNotDeleted(Date deletedAt) {
-        return deletedAt == null;
-    }
-
-    private BigDecimal convertPositiveOrNegative(PointType pointType, BigDecimal pointAmount) {
-        if (pointType == null) {
-            return BigDecimal.ZERO;
-        }
-        return pointType.equals(PointType.USE) ? pointAmount.negate() : pointAmount;
-    }
-
     @Override
     public Optional<Customer> findAvailableCustomer(Long customerId) {
-        return customerJpaRepository.findByDreamedAtIsNullAndWithdrawAtIsNullAndDeletedAtIsNullAndIdEquals(customerId)
+        return customerJpaRepository.findById(customerId)
+                .filter(entity -> entity.isNotDreamed()
+                                && entity.isNotWithdrawn()
+                                && entity.isNotDeleted())
                 .map(CustomerEntity::toDomain);
     }
 
@@ -48,5 +36,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     @Override
     public CustomerPointHistory saveCustomerPointHistory(CustomerPointHistory customerPointHistory) {
         return customerPointHistoryJpaRepository.save(CustomerPointHistoryEntity.from(customerPointHistory)).toDomain();
+    }
+
+    @Override
+    public Optional<Customer> findAvailableCustomerWithPessimisticLock(Long customerId) {
+        return Optional.empty();
     }
 }

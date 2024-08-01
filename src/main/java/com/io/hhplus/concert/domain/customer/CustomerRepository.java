@@ -9,4 +9,5 @@ public interface CustomerRepository {
     Optional<Customer> findAvailableCustomer(Long customerId);
     Customer saveCustomer(Customer customer);
     CustomerPointHistory saveCustomerPointHistory(CustomerPointHistory customerPointHistory);
+    Optional<Customer> findAvailableCustomerWithPessimisticLock(Long customerId);
 }

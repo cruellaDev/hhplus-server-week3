@@ -48,6 +48,19 @@ public class CustomerEntity implements Auditable {
     @Column(name = "DELETED_AT", nullable = true)
     private Date deletedAt;
 
+
+    public boolean isNotDreamed() {
+        return this.dreamedAt == null;
+    }
+
+    public boolean isNotWithdrawn() {
+        return this.withdrawnAt == null;
+    }
+
+    public boolean isNotDeleted() {
+        return this.deletedAt == null;
+    }
+
     public static CustomerEntity from(Customer customer) {
         return CustomerEntity.builder()
                 .id(customer.customerId())
@@ -71,4 +84,5 @@ public class CustomerEntity implements Auditable {
                 .deletedAt(this.deletedAt)
                 .build();
     }
+
 }

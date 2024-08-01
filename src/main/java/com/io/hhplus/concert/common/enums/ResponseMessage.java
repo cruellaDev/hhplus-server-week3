@@ -13,6 +13,7 @@ public enum ResponseMessage {
     CONCERT_SCHEDULE_INVALID("공연 일정 데이터가 유효하지 않습니다."),
     CONCERT_SEAT_INVALID("공연 좌석 데이터가 유효하지 않습니다."),
     PAYMENT_AMOUNT_INVALID("결제 금액이 유효하지 않습니다."),
+    QUEUE_STATUS_INVALID("대기열 상태가 유효하지 않습니다."),
     ALREADY_RESERVED("예약 데이터가 이미 존재합니다."),
     NOT_AVAILABLE("사용할 수 없는 데이터입니다."),
     CONCERT_NOT_AVAILABLE("이용할 수 없는 콘서트 정보입니다."),

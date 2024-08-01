@@ -10,4 +10,5 @@ public class GlobalConstants {
     // max
     public static final Long MAX_NUMBER_OF_ACTIVE_QUEUE = 50L;
     public static final Long MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS = 300L;
+    public static final Long INTERVAL_OF_REFRESH_TOKEN_IN_SECONDS = 60L;
 }

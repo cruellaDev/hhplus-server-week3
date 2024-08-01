@@ -36,7 +36,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command){
-        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
+        Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
                 .filter(o
                         -> o.isNotDreamed()
                         && o.isNotWithdrawn()
@@ -55,9 +55,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo useCustomerPoint(CustomerCommand.UseCustomerPointCommand command) {
-        // TODO PESSIMISTIC_WRITE VS PESSIMISTIC_READ(갱신소실 문제 있음!!) 알기
-        // 비관적 락도 row 조회 가능하다! 단 select for update는 row 조회 불가
-        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
+        Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
                 .filter(o
                         -> o.isNotDreamed()
                         && o.isNotWithdrawn()

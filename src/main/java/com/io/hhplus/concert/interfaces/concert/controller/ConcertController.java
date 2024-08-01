@@ -4,6 +4,8 @@ import com.io.hhplus.concert.application.concert.ConcertFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
 import com.io.hhplus.concert.interfaces.concert.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,8 +21,10 @@ public class ConcertController {
      * @return 예약 가능 콘서트 목록
      */
     @GetMapping("/")
-    public CommonResponse<ConcertDto.Response> concerts() {
-        return CommonResponse.success(ConcertDto.Response.from(concertFacade.getAvailableConcerts()));
+    public ResponseEntity<CommonResponse<ConcertDto.Response>> concerts() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertDto.Response.from(concertFacade.getAvailableConcerts())));
     }
 
     /**
@@ -29,8 +33,10 @@ public class ConcertController {
      * @return 예약 가능 날짜 공연 목록
      */
     @GetMapping("/{concertId}/schedules")
-    public CommonResponse<ConcertScheduleDto.Response> schedules(@PathVariable("concertId") Long concertId) {
-        return CommonResponse.success(ConcertScheduleDto.Response.from(concertFacade.getAvailableSchedules(concertId)));
+    public ResponseEntity<CommonResponse<ConcertScheduleDto.Response>> schedules(@PathVariable("concertId") Long concertId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertScheduleDto.Response.from(concertFacade.getAvailableSchedules(concertId))));
     }
 
     /**
@@ -40,9 +46,11 @@ public class ConcertController {
      * @return 예약가능 좌석 목록
      */
     @GetMapping("/{concertId}/schedules/{concertScheduleId}/seats")
-    public CommonResponse<ConcertSeatDto.Response> seats(@PathVariable("concertId") Long concertId,
+    public ResponseEntity<CommonResponse<ConcertSeatDto.Response>> seats(@PathVariable("concertId") Long concertId,
                                                          @PathVariable("concertScheduleId") Long concertScheduleId) {
-        return CommonResponse.success(ConcertSeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertSeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId))));
     }
 
     /**
@@ -51,7 +59,9 @@ public class ConcertController {
      * @return 응답 정보
      */
     @PostMapping("/reserve/seats")
-    public CommonResponse<ReservationDto.ReserveSeatsResponse> reserveSeats(ReservationDto.ReserveSeatsRequest request) {
-        return CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertFacade.reserveSeats(request.toCommand())));
+    public ResponseEntity<CommonResponse<ReservationDto.ReserveSeatsResponse>> reserveSeats(ReservationDto.ReserveSeatsRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertFacade.reserveSeats(request.toCommand()))));
     }
 }

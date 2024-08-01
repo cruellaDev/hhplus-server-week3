@@ -44,10 +44,10 @@ public class CustomerPointDto {
 
         public static CustomerPointDto.ChargeCustomerPointResponse from(CustomerPointInfo chargeCustomerPointInfo) {
             return CustomerPointDto.ChargeCustomerPointResponse.builder()
-                    .customerId(chargeCustomerPointInfo.getCustomer().customerId())
-                    .pointBalance(chargeCustomerPointInfo.getCustomer().pointBalance())
-                    .chargeAmount(chargeCustomerPointInfo.getCustomerPointHistory().pointAmount())
-                    .chargedAt(chargeCustomerPointInfo.getCustomerPointHistory().createdAt())
+                    .customerId(chargeCustomerPointInfo.customer().customerId())
+                    .pointBalance(chargeCustomerPointInfo.customer().pointBalance())
+                    .chargeAmount(chargeCustomerPointInfo.customerPointHistory().pointAmount())
+                    .chargedAt(chargeCustomerPointInfo.customerPointHistory().createdAt())
                     .build();
         }
     }
@@ -73,10 +73,10 @@ public class CustomerPointDto {
 
         public static CustomerPointDto.UseCustomerPointResponse from(CustomerPointInfo useCustomerPointInfo) {
             return CustomerPointDto.UseCustomerPointResponse.builder()
-                    .customerId(useCustomerPointInfo.getCustomer().customerId())
-                    .pointBalance(useCustomerPointInfo.getCustomer().pointBalance())
-                    .useAmount(useCustomerPointInfo.getCustomerPointHistory().pointAmount())
-                    .usedAt(useCustomerPointInfo.getCustomerPointHistory().createdAt())
+                    .customerId(useCustomerPointInfo.customer().customerId())
+                    .pointBalance(useCustomerPointInfo.customer().pointBalance())
+                    .useAmount(useCustomerPointInfo.customerPointHistory().pointAmount())
+                    .usedAt(useCustomerPointInfo.customerPointHistory().createdAt())
                     .build();
         }
     }
