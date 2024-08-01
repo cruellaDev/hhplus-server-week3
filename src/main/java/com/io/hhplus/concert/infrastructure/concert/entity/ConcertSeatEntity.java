@@ -22,27 +22,26 @@ import java.util.Date;
 public class ConcertSeatEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false, columnDefinition = "구역_ID")
+    @Column(name = "ID", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "CONCERT_SCHEDULE_ID", nullable = false, updatable = false, columnDefinition = "공연_ID")
+    @Column(name = "CONCERT_SCHEDULE_ID", nullable = false, updatable = false)
     private Long concertScheduleId;
 
-    @Column(name = "CONCERT_ID", nullable = false, updatable = false, columnDefinition = "콘서트_ID")
+    @Column(name = "CONCERT_ID", nullable = false, updatable = false)
     private Long concertId;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "SEAT_PRICE", nullable = false, precision = 18, scale = 3, columnDefinition = "좌석_가격")
+    @Column(name = "SEAT_PRICE", nullable = false, precision = 18, scale = 3)
     private BigDecimal seatPrice;
 
-    @Column(name = "SEAT_CAPACITY", nullable = false, columnDefinition = "좌석_인원")
+    @Column(name = "SEAT_CAPACITY", nullable = false)
     private Long seatCapacity;
 
     @Builder.Default
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "DELETED_AT", nullable = true, columnDefinition = "삭제_일시")
+    @Column(name = "DELETED_AT", nullable = true)
     private Date deletedAt;
 
     public static ConcertSeatEntity from(ConcertSeat concertSeat) {

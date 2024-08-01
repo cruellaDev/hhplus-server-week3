@@ -1,7 +1,6 @@
-package com.io.hhplus.concert.interfaces.customer.controller;
+package com.io.hhplus.concert.interfaces.queue.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.io.hhplus.concert.application.customer.CustomerFacade;
+import com.io.hhplus.concert.application.queue.QueueTokenFacade;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -10,34 +9,33 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(CustomerController.class)
+@WebMvcTest(QueueTokenController.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Disabled
-class CustomerControllerTest {
+class WaitingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private CustomerFacade customerFacade;
+    private QueueTokenFacade queueTokenFacade;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    /**
+     * 대기열 진입
+     */
 //    @Test
-//    void getCustomerPoint() throws Exception {
+//    void enter() throws Exception {
 //        //given
-//        CustomerInfo response = CustomerInfo.builder().build();
-//        given(customerFacade.getCustomerPoint(anyLong())).willReturn(response);
+//        WaitingResultInfo response = WaitingResultInfo.builder().build();
+//        given(waitingFacade.publishWaitingToken(anyLong())).willReturn(response);
 //
 //        //when - then
-//        mockMvc.perform(get("/customer/point")
+//        mockMvc.perform(post("/waiting/enter")
 //                        .header("Authorization", "Bearer " + 1)
 //                        .header("customerId", 1)
 //                )
@@ -49,21 +47,15 @@ class CustomerControllerTest {
 //    }
 //
 //    @Test
-//    void chargeCustomerPoint() throws Exception {
+//    void check() throws Exception {
 //        //given
-//        CustomerInfoWithCustomerPointHistory response = CustomerInfoWithCustomerPointHistory.builder().build();
-//        given(customerFacade.chargeCustomerPoint(anyLong(), any())).willReturn(response);
+//        WaitingResultInfo response = WaitingResultInfo.builder().build();
+//        given(waitingFacade.getWaitingToken(anyLong())).willReturn(response);
 //
 //        //when - then
-//        CustomerPointRequest request = CustomerPointRequest.builder()
-//                .customerId(1L)
-//                .pointAmount(BigDecimal.valueOf(10000))
-//                .build();
-//        mockMvc.perform(post("/customer/point/charge")
+//        mockMvc.perform(get("/waiting/check")
 //                        .header("Authorization", "Bearer " + 1)
 //                        .header("customerId", 1)
-//                        .content(objectMapper.writeValueAsString(request))
-//                        .contentType(MediaType.APPLICATION_JSON)
 //                )
 //                .andDo(print())
 //                .andExpect(status().isOk())

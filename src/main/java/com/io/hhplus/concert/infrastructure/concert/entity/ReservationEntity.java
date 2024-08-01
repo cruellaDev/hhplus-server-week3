@@ -41,7 +41,8 @@ public class ReservationEntity implements Auditable {
         return ReservationEntity.builder()
                 .id(reservation.reservationId())
                 .customerId(reservation.customerId())
-                .bookerName(reservation.bookerName())                .deletedAt(reservation.deletedAt())
+                .bookerName(reservation.bookerName())
+                .deletedAt(reservation.deletedAt())
                 .build();
     }
 

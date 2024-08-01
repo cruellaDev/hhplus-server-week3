@@ -32,7 +32,7 @@ public class CustomerPointHistoryEntity implements Auditable {
     @Column(name = "POINT_AMOUNT", nullable = false, precision = 18, scale = 3)
     private BigDecimal pointAmount;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "POINT_TYPE", nullable = false, length = 50)
     private PointType pointType;
 

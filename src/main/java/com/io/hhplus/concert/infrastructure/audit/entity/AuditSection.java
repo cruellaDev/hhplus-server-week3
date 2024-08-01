@@ -18,10 +18,10 @@ import java.util.Date;
 @Embeddable
 public class AuditSection {
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "CREATED_AT", nullable = false, updatable = false, columnDefinition = "생성_일시")
+    @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private Date createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "MODIFIED_AT", nullable = false, columnDefinition = "수정_일시")
+    @Column(name = "MODIFIED_AT", nullable = false)
     private Date modifiedAt;
 }

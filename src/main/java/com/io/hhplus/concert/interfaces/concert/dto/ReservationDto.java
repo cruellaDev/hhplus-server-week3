@@ -35,8 +35,8 @@ public class ReservationDto {
 
         public static ReservationDto.ReserveSeatsResponse from(ReservationInfo reservationInfo) {
             return ReserveSeatsResponse.builder()
-                    .reservation(reservationInfo.getReservation())
-                    .tickets(reservationInfo.getTickets())
+                    .reservation(reservationInfo.reservation())
+                    .tickets(reservationInfo.tickets())
                     .build();
         }
     }
