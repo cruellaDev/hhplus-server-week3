@@ -1,10 +1,10 @@
-package com.io.hhplus.concert.interfaces.queue.controller;
+package com.io.hhplus.concert.interfaces.token.controller;
 
 import com.io.hhplus.concert.application.queue.QueueTokenFacade;
 import com.io.hhplus.concert.common.GlobalConstants;
 import com.io.hhplus.concert.common.dto.CommonResponse;
 import com.io.hhplus.concert.domain.queue.dto.BankCounterQueueTokenInfo;
-import com.io.hhplus.concert.interfaces.queue.dto.QueueTokenDto;
+import com.io.hhplus.concert.interfaces.token.dto.QueueTokenDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("queues")
-public class QueueTokenController {
+public class TokenController {
 
     private final QueueTokenFacade queueTokenFacade;
 
@@ -30,7 +30,7 @@ public class QueueTokenController {
 
         // 발급된 토큰 헤더에 리턴
         HttpHeaders headers = new HttpHeaders();
-        headers.add(GlobalConstants.HEADER_AUTHORIZATION, GlobalConstants.PREFIX_BEARER + bankCounterQueueTokenInfo.queueToken().toString());
+        headers.add(HttpHeaders.AUTHORIZATION, GlobalConstants.PREFIX_BEARER + bankCounterQueueTokenInfo.queueToken().toString());
 
         return ResponseEntity
                 .status(HttpStatus.OK)

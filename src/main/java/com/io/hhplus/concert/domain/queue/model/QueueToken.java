@@ -4,6 +4,7 @@ import com.io.hhplus.concert.common.GlobalConstants;
 import com.io.hhplus.concert.common.enums.QueueStatus;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
+import com.io.hhplus.concert.common.utils.DateUtils;
 import com.io.hhplus.concert.domain.queue.TokenCommand;
 import lombok.Builder;
 
@@ -25,7 +26,8 @@ public record QueueToken(
     }
 
     public boolean isActive() {
-        return this.queueStatus.isActive();
+        return this.queueStatus.isActive()
+                && DateUtils.calculateDuration(DateUtils.getSysDate(), this.modifiedAt) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS;
     }
 
     public boolean isNotDeleted() {

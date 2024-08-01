@@ -39,7 +39,7 @@ public class TokenService {
         if (optionalQueueToken.isPresent()) {
             queueToken = optionalQueueToken.get();
         } else {
-            long activeQueueTokenCount = queueTokenRepository.countActiveQueueToken();
+            Long activeQueueTokenCount = queueTokenRepository.countActiveQueueToken();
             queueToken = queueTokenRepository.saveQueueToken(QueueToken.create().updateStatusBasedOnCount(activeQueueTokenCount).enter(command));
         }
 

@@ -6,6 +6,8 @@ import com.io.hhplus.concert.domain.queue.dto.BankCounterQueueTokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class QueueTokenFacade {
@@ -33,5 +35,14 @@ public class QueueTokenFacade {
      */
     public void expireToken() {
         tokenService.expireToken();
+    }
+
+    /**
+     * 대기열 토큰 검증
+     * @param token 대기열 토큰
+     * @return
+     */
+    public void validateToken(UUID token) {
+        tokenService.validateIndividualToken(token);
     }
 }

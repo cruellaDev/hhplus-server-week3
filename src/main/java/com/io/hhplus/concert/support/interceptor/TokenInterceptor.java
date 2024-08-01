@@ -1,9 +1,9 @@
 package com.io.hhplus.concert.support.interceptor;
 
+import com.io.hhplus.concert.application.queue.QueueTokenFacade;
+import com.io.hhplus.concert.common.GlobalConstants;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
-import com.io.hhplus.concert.domain.customer.CustomerValidator;
-import com.io.hhplus.concert.domain.queue.WaitingValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -13,13 +13,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 @Profile("!test")
 public class TokenInterceptor implements HandlerInterceptor {
 
-    private final CustomerValidator customerValidator;
-    private final WaitingValidator waitingValidator;
+    private QueueTokenFacade queueTokenFacade;
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
@@ -27,16 +28,12 @@ public class TokenInterceptor implements HandlerInterceptor {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authorization == null || authorization.isBlank()) {
-            throw new CustomException(ResponseMessage.TOKEN_NOT_FOUNT, "토큰이 존재하지 않습니다.");
+            throw new CustomException(ResponseMessage.TOKEN_NOT_FOUNT);
         }
 
-        String token = authorization.replaceAll("Bearer ", "");
+        UUID token = UUID.fromString(authorization.replaceAll(GlobalConstants.PREFIX_BEARER, ""));
 
-        // 고객 검증
-//        customerValidator.validateCustomer(token);
-
-        // 대기열 토큰 검증
-//        waitingValidator.validateToken(token);
+        queueTokenFacade.validateToken(token);
 
         return true;
     }
