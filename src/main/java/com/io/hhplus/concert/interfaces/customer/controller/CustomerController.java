@@ -1,38 +1,42 @@
 package com.io.hhplus.concert.interfaces.customer.controller;
 
-import com.io.hhplus.concert.application.customer.dto.CustomerInfoWithCustomerPointHistory;
-import com.io.hhplus.concert.interfaces.customer.dto.request.CustomerPointRequest;
-import com.io.hhplus.concert.application.customer.dto.CustomerInfo;
-import com.io.hhplus.concert.application.customer.facade.CustomerFacade;
+import com.io.hhplus.concert.application.customer.CustomerFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
+import com.io.hhplus.concert.interfaces.customer.dto.CustomerPointDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("customer")
+@RequestMapping("customers")
 public class CustomerController {
 
     private final CustomerFacade customerFacade;
 
     /**
-     * 포인트 잔액 조회
+     * 고객 포인트 잔액 조회
      * @param customerId 고객_ID
      * @return 응답 정보
      */
-    @GetMapping("/point")
-    public CommonResponse<CustomerInfo> getCustomerPoint(@RequestHeader("customerId") Long customerId) {
-        return CommonResponse.success(customerFacade.getCustomerPoint(customerId));
+    @GetMapping("/{customerId}/point")
+    public ResponseEntity<CommonResponse<CustomerPointDto.CustomerPointBalanceResponse>> getCustomerPoint(@PathVariable("customerId") Long customerId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(customerFacade.getCustomerPointBalance(customerId)));
     }
 
     /**
-     * 포인트 충전
+     * 고객 포인트 충전
      * @param requestBody 요청 정보
      * @return 응답 정보
      */
     @PostMapping("/point/charge")
-    public CommonResponse<CustomerInfoWithCustomerPointHistory> chargeCustomerPoint(@RequestBody @Valid CustomerPointRequest requestBody) {
-        return CommonResponse.success(customerFacade.chargeCustomerPoint(requestBody.getCustomerId(), requestBody.getPointAmount()));
+    public ResponseEntity<CommonResponse<CustomerPointDto.ChargeCustomerPointResponse>> chargeCustomerPoint(@RequestBody @Valid CustomerPointDto.ChargeCustomerPointRequest requestBody) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body((CommonResponse.success(customerFacade.chargeCustomerPoint(requestBody.toCommand()))));
     }
 }

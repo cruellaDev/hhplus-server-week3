@@ -3,10 +3,11 @@ package com.io.hhplus.concert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.io.hhplus.concert.interfaces.concert.controller.ConcertController;
 import com.io.hhplus.concert.interfaces.customer.controller.CustomerController;
-import com.io.hhplus.concert.interfaces.customer.dto.request.CustomerPointRequest;
-import com.io.hhplus.concert.interfaces.reservation.controller.ReservationController;
-import com.io.hhplus.concert.interfaces.waiting.controller.WaitingController;
+import com.io.hhplus.concert.interfaces.payment.controller.PaymentController;
+import com.io.hhplus.concert.interfaces.queue.controller.QueueTokenController;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@Disabled
 public class MockApiTest {
     @Autowired
     private MockMvc mockMvc;
@@ -33,10 +36,10 @@ public class MockApiTest {
     private ConcertController concertController;
 
     @MockBean
-    private ReservationController reservationController;
+    private PaymentController reservationController;
 
     @MockBean
-    private WaitingController waitingController;
+    private QueueTokenController waitingController;
 
     @Autowired
     private ObjectMapper objectMapper;

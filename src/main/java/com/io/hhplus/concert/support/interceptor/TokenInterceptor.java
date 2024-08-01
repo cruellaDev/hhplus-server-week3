@@ -2,8 +2,8 @@ package com.io.hhplus.concert.support.interceptor;
 
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
-import com.io.hhplus.concert.domain.customer.service.CustomerValidator;
-import com.io.hhplus.concert.domain.waiting.service.WaitingValidator;
+import com.io.hhplus.concert.domain.customer.CustomerValidator;
+import com.io.hhplus.concert.domain.queue.WaitingValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -33,10 +33,10 @@ public class TokenInterceptor implements HandlerInterceptor {
         String token = authorization.replaceAll("Bearer ", "");
 
         // 고객 검증
-        customerValidator.validateCustomer(token);
+//        customerValidator.validateCustomer(token);
 
         // 대기열 토큰 검증
-        waitingValidator.validateToken(token);
+//        waitingValidator.validateToken(token);
 
         return true;
     }

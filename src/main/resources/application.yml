@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   application:
@@ -12,5 +12,5 @@ spring:
 
 logging:
   level:
-    org.springframework: debug
+    org.springframework: error
     org.hibernate.SQL: DEBUG
