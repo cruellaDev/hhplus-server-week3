@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.application.concert.dto;
 
-import com.io.hhplus.concert.domain.concert.model.Performance;
+import com.io.hhplus.concert.domain.concert.model.ConcertSchedule;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -14,7 +14,7 @@ public record PerformanceServiceResponse(
         Integer capacityLimit,
         Date performedAt
 ) {
-    public static PerformanceServiceResponse from(Performance performance) {
+    public static PerformanceServiceResponse from(ConcertSchedule performance) {
         return PerformanceServiceResponse.builder()
                 .performanceId(performance.performanceId())
                 .concertId(performance.concertId())

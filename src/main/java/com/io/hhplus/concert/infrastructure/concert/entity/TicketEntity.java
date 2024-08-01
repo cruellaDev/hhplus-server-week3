@@ -33,11 +33,11 @@ public class TicketEntity implements Auditable {
     @Column(name = "CONCERT_ID", nullable = false, updatable = false)
     private Long concertId;
 
-    @Column(name = "PERFORMANCE_ID", nullable = false, updatable = false)
-    private Long performanceId;
+    @Column(name = "CONCERT_SCHEDULE_ID", nullable = false, updatable = false)
+    private Long concertScheduleId;
 
-    @Column(name = "AREA_ID", nullable = false, updatable = false)
-    private Long areaId;
+    @Column(name = "CONCERT_SEAT_ID", nullable = false, updatable = false)
+    private Long concertSeatId;
 
     @Column(name = "CONCERT_NAME", nullable = false, updatable = false, length = 300)
     private String concertName;
@@ -48,20 +48,8 @@ public class TicketEntity implements Auditable {
     @Column(name = "PERFORMED_AT", nullable = false, updatable = false)
     private Date performedAt;
 
-    @Column(name = "AREA_NAME", nullable = false, length = 100)
-    private String areaName;
-
     @Column(name = "SEAT_NUMBER", nullable = false, length = 300)
     private String seatNumber;
-
-    @Column(name = "IS_RECEIVE_ONLINE", nullable = true, precision = 1)
-    private Integer isReceiveOnline;
-
-    @Column(name = "IS_RECEIVE_ON_SITE", nullable = true, precision = 1)
-    private Integer isReceiveOnSite;
-
-    @Column(name = "IS_RECEIVE_BY_POST", nullable = true, precision = 1)
-    private Integer isReceiveByPost;
 
     @Column(name = "TICKET_PRICE", nullable = false, updatable = false, precision = 18, scale = 3)
     private BigDecimal ticketPrice;
@@ -93,16 +81,12 @@ public class TicketEntity implements Auditable {
                 .id(ticket.ticketId())
                 .reservationId(ticket.reservationId())
                 .concertId(ticket.concertId())
-                .performanceId(ticket.performanceId())
-                .areaId(ticket.areaId())
+                .concertScheduleId(ticket.concertScheduleId())
+                .concertSeatId(ticket.concertSeatId())
                 .concertName(ticket.concertName())
                 .artistName(ticket.artistName())
                 .performedAt(ticket.performedAt())
-                .areaName(ticket.areaName())
                 .seatNumber(ticket.seatNumber())
-                .isReceiveOnline(ticket.isReceiveOnline() ? 1 : 0)
-                .isReceiveOnSite(ticket.isReceiveOnSite() ? 1 : 0)
-                .isReceiveByPost(ticket.isReceiveByPost() ? 1 : 0)
                 .ticketPrice(ticket.ticketPrice())
                 .reservedAt(ticket.reservedAt())
                 .publishedAt(ticket.publishedAt())
@@ -117,16 +101,12 @@ public class TicketEntity implements Auditable {
                 .ticketId(this.id)
                 .reservationId(this.reservationId)
                 .concertId(this.concertId)
-                .performanceId(this.performanceId)
-                .areaId(this.areaId)
+                .concertScheduleId(this.concertScheduleId)
+                .concertSeatId(this.concertSeatId)
                 .concertName(this.concertName)
                 .artistName(this.artistName)
                 .performedAt(this.performedAt)
-                .areaName(this.areaName)
                 .seatNumber(this.seatNumber)
-                .isReceiveOnline(this.isReceiveOnline == 1)
-                .isReceiveOnSite(this.isReceiveOnSite == 1)
-                .isReceiveByPost(this.isReceiveByPost == 1)
                 .ticketPrice(this.ticketPrice)
                 .receivedAt(this.receivedAt)
                 .publishedAt(this.publishedAt)

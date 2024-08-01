@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.application.concert.dto;
 
-import com.io.hhplus.concert.domain.concert.model.Area;
+import com.io.hhplus.concert.domain.concert.model.ConcertSeat;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -14,13 +14,13 @@ public record AreaServiceResponse(
         BigDecimal seatPrice,
         Long seatCapacity
 ) {
-    public static AreaServiceResponse from(Area area) {
+    public static AreaServiceResponse from(ConcertSeat seat) {
         return AreaServiceResponse.builder()
-                .areaId(area.areaId())
-                .performanceId(area.performanceId())
-                .concertId(area.concertId())
-                .areaName(area.areaName())
-                .seatPrice(area.seatPrice())
+                .areaId(seat.areaId())
+                .performanceId(seat.performanceId())
+                .concertId(seat.concertId())
+                .areaName(seat.areaName())
+                .seatPrice(seat.seatPrice())
                 .build();
     }
 }

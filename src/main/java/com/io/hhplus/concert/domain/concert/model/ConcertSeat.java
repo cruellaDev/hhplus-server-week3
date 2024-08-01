@@ -8,25 +8,28 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Builder
-public record Area(
-        Long areaId,
-        Long performanceId,
+public record ConcertSeat(
+        Long concertSeatId,
+        Long concertScheduleId,
         Long concertId,
-        String areaName,
         BigDecimal seatPrice,
         Long seatCapacity,
         Date createdAt,
         Date modifiedAt,
         Date deletedAt
 ) {
+    public boolean hasEnoughSeats() {
+        return this.seatCapacity != null && this.seatCapacity.compareTo(0L) > 0;
+    }
+
     public boolean isNotDeleted() {
         return deletedAt == null;
     }
 
-    public void validate() {
-        if (isNotDeleted()) {
+    public void checkValid() {
+        if (hasEnoughSeats() && isNotDeleted()) {
             return;
         }
-        throw new CustomException(ResponseMessage.AREA_INVALID);
+        throw new CustomException(ResponseMessage.CONCERT_SEAT_INVALID);
     }
 }

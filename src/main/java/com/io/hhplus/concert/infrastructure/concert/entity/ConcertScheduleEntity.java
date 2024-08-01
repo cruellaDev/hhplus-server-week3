@@ -1,13 +1,12 @@
 package com.io.hhplus.concert.infrastructure.concert.entity;
 
-import com.io.hhplus.concert.domain.concert.model.Performance;
+import com.io.hhplus.concert.domain.concert.model.ConcertSchedule;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
 import com.io.hhplus.concert.infrastructure.audit.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -18,8 +17,8 @@ import java.util.Date;
 @Builder
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PERFORMANCE")
-public class PerformanceEntity implements Auditable {
+@Table(name = "CONCERT_SCHEDULE")
+public class ConcertScheduleEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false, columnDefinition = "공연_ID")
@@ -38,23 +37,27 @@ public class PerformanceEntity implements Auditable {
     @Column(name = "DELETED_AT", nullable = true, columnDefinition = "삭제_일시")
     private Date deletedAt;
 
-    public static PerformanceEntity from(Performance performance) {
-        return PerformanceEntity.builder()
-                .id(performance.performanceId())
-                .concertId(performance.concertId())
-                .performedAt(performance.performedAt())
-                .deletedAt(performance.deletedAt())
+    public static ConcertScheduleEntity from(ConcertSchedule concertSchedule) {
+        return ConcertScheduleEntity.builder()
+                .id(concertSchedule.concertScheduleId())
+                .concertId(concertSchedule.concertId())
+                .performedAt(concertSchedule.performedAt())
+                .deletedAt(concertSchedule.deletedAt())
                 .build();
     }
 
-    public Performance toDomain() {
-        return Performance.builder()
-                .performanceId(this.id)
+    public ConcertSchedule toDomain() {
+        return ConcertSchedule.builder()
+                .concertScheduleId(this.id)
                 .concertId(this.concertId)
                 .performedAt(this.performedAt)
                 .createdAt(this.auditSection.getCreatedAt())
                 .modifiedAt(this.auditSection.getModifiedAt())
                 .deletedAt(this.deletedAt)
                 .build();
+    }
+
+    public boolean isEqualConcertId(Long concertId) {
+        return concertId != null && this.concertId.compareTo(concertId) == 0;
     }
 }

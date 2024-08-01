@@ -2,10 +2,10 @@ package com.io.hhplus.concert.infrastructure.concert.repository.impl;
 
 import com.io.hhplus.concert.domain.concert.model.*;
 import com.io.hhplus.concert.infrastructure.concert.entity.*;
-import com.io.hhplus.concert.domain.concert.repository.ConcertRepository;
-import com.io.hhplus.concert.infrastructure.concert.repository.jpa.AreaJpaRepository;
+import com.io.hhplus.concert.domain.concert.ConcertRepository;
+import com.io.hhplus.concert.infrastructure.concert.repository.jpa.ConcertSeatJpaRepository;
 import com.io.hhplus.concert.infrastructure.concert.repository.jpa.ConcertJpaRepository;
-import com.io.hhplus.concert.infrastructure.concert.repository.jpa.PerformanceJpaRepository;
+import com.io.hhplus.concert.infrastructure.concert.repository.jpa.ConcertScheduleJpaRepository;
 import com.io.hhplus.concert.infrastructure.concert.repository.jpa.ReservationJpaRepository;
 import com.io.hhplus.concert.infrastructure.concert.repository.jpa.TicketJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 public class ConcertRepositoryImpl implements ConcertRepository {
 
     private final ConcertJpaRepository concertJpaRepository;
-    private final PerformanceJpaRepository performanceJpaRepository;
-    private final AreaJpaRepository areaJpaRepository;
+    private final ConcertScheduleJpaRepository concertScheduleJpaRepository;
+    private final ConcertSeatJpaRepository concertSeatJpaRepository;
     private final ReservationJpaRepository reservationJpaRepository;
     private final TicketJpaRepository ticketJpaRepository;
 
@@ -34,38 +34,28 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public List<Performance> findPerformances(Long concertId) {
-        return performanceJpaRepository.findAllByDeletedAtIsNullAndConcertIdEquals(concertId)
+    public List<ConcertSchedule> findConcertSchedules(Long concertId) {
+        return concertScheduleJpaRepository.findAllByDeletedAtIsNullAndConcertIdEquals(concertId)
                 .stream()
-                .map(PerformanceEntity::toDomain)
+                .map(ConcertScheduleEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Area> findAreas(Long concertId, Long performanceId) {
-        return areaJpaRepository.findAllByConcertIdAndPerformanceIdAndDeletedAtIsNull(concertId, performanceId)
-                .stream()
-                .filter(entity -> entity.isEqualConcertId(concertId)
-                        && entity.isEqualPerformanceId(performanceId)
-                        && entity.isNotDeleted())
-                .map(AreaEntity::toDomain)
-                .collect(Collectors.toList());
+    public Optional<ConcertSeat> findConcertSeat(Long concertId, Long concertScheduleId) {
+        Optional<ConcertScheduleEntity> concertSchedule = concertScheduleJpaRepository.findByIdAndConcertIdAndDeletedAtIsNull(concertScheduleId, concertId);
+        if (concertSchedule.isPresent()) {
+            return concertSeatJpaRepository.findByConcertIdAndConcertScheduleIdAndDeletedAtIsNull(concertId, concertScheduleId)
+                    .map(ConcertSeatEntity::toDomain);
+        }
+        return Optional.empty();
     }
 
     @Override
-    public Optional<Area> findArea(Long concertId, Long performanceId, Long areaId) {
-        return areaJpaRepository.findById(areaId)
-                .filter(entity -> entity.isEqualConcertId(concertId)
-                        && entity.isEqualPerformanceId(performanceId)
-                        && entity.isNotDeleted())
-                .map(AreaEntity::toDomain);
-    }
-
-    @Override
-    public Boolean existsAvailableSeat(Long concertId, Long performanceId, Long areaId, String seatNumber) {
-        return ticketJpaRepository.findNotOccupiedSeatFromTicket(concertId, performanceId, areaId, seatNumber)
+    public Optional<Ticket> findNotOccupiedSeatFromTicket(Long concertId, Long concertScheduleId, String seatNumber) {
+        return ticketJpaRepository.findNotOccupiedSeatFromTicket(concertId, concertScheduleId, seatNumber)
                 .filter(TicketEntity::isReservable)
-                .isPresent();
+                .map(TicketEntity::toDomain);
     }
 
     @Override
@@ -85,20 +75,16 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public Optional<Performance> findPerformance(Long performanceId) {
-        return performanceJpaRepository.findById(performanceId)
-                .map(PerformanceEntity::toDomain);
+    public Optional<ConcertSchedule> findConcertSchedule(Long concertId, Long concertScheduleId) {
+        return concertScheduleJpaRepository.findById(concertScheduleId)
+                .filter(entity -> entity.isEqualConcertId(concertId))
+                .map(ConcertScheduleEntity::toDomain);
     }
 
     @Override
-    public Optional<Area> findArea(Long areaId) {
-        return areaJpaRepository.findById(areaId)
-                .map(AreaEntity::toDomain);
-    }
-
-    @Override
-    public Optional<Reservation> findReservation(Long reservationId) {
+    public Optional<Reservation> findReservation(Long reservationId, Long customerId) {
         return reservationJpaRepository.findById(reservationId)
+                .filter(entity -> entity.isEqualCustomerId(customerId) && entity.isNotDeleted())
                 .map(ReservationEntity::toDomain);
     }
 
@@ -108,5 +94,10 @@ public class ConcertRepositoryImpl implements ConcertRepository {
                 .stream()
                 .map(TicketEntity::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Reservation> findReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+        return reservationJpaRepository.findReservationAlreadyExists(customerId, concertId, concertScheduleId, seatNumbers);
     }
 }

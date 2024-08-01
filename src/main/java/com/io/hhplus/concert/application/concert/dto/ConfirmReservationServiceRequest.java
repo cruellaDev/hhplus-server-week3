@@ -11,20 +11,10 @@ public class ConfirmReservationServiceRequest {
     private Long customerId;
     private Long reservationId;
     private String reserverName;
-    private ReceiveMethod receiveMethod;
-    private String receiverName;
-    private String receivePostCode;
-    private String receiveBaseAddress;
-    private String receiveDetailAddress;
 
     public Reservation.ReceiveInfo toReceiveInfoDomain() {
         return Reservation.ReceiveInfo.builder()
                 .reserverName(this.reserverName)
-                .receiveMethod(this.receiveMethod)
-                .receiverName(this.receiverName)
-                .receiverPostcode(this.receivePostCode)
-                .receiverBaseAddress(this.receiveBaseAddress)
-                .receiverDetailAddress(this.receiveDetailAddress)
                 .build();
     }
 }

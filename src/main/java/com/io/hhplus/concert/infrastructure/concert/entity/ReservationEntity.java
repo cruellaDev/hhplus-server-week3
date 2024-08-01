@@ -29,23 +29,8 @@ public class ReservationEntity implements Auditable {
     @Column(name = "CUSTOMER_ID", nullable = false, updatable = false)
     private Long customerId;
 
-    @Column(name = "RESERVER_NAME", nullable = true, updatable = false, length = 100)
-    private String reserverName;
-
-    @Column(name = "RECEIVE_METHOD", nullable = true, length = 50)
-    private ReceiveMethod receiveMethod;
-
-    @Column(name = "RECEIVER_NAME", nullable = true, length = 100)
-    private String receiverName;
-
-    @Column(name = "RECEIVE_POSTCODE", nullable = true, length = 20)
-    private String receivePostcode;
-
-    @Column(name = "RECEIVE_BASE_ADDRESS", nullable = true, length = 100)
-    private String receiveBaseAddress;
-
-    @Column(name = "RECEIVE_DETAIL_ADDRESS", nullable = true, length = 300)
-    private String receiveDetailAddress;
+    @Column(name = "BOOKER_NAME", nullable = true, updatable = false, length = 100)
+    private String bookerName;
 
     @Builder.Default
     @Embedded
@@ -58,13 +43,7 @@ public class ReservationEntity implements Auditable {
         return ReservationEntity.builder()
                 .id(reservation.reservationId())
                 .customerId(reservation.customerId())
-                .reserverName(reservation.reserverName())
-                .receiveMethod(reservation.receiveMethod())
-                .receiverName(reservation.receiverName())
-                .receivePostcode(reservation.receiverPostcode())
-                .receiveBaseAddress(reservation.receiverBaseAddress())
-                .receiveDetailAddress(reservation.receiverDetailAddress())
-                .deletedAt(reservation.deletedAt())
+                .bookerName(reservation.bookerName())                .deletedAt(reservation.deletedAt())
                 .build();
     }
 
@@ -72,15 +51,18 @@ public class ReservationEntity implements Auditable {
         return Reservation.builder()
                 .reservationId(this.id)
                 .customerId(this.customerId)
-                .reserverName(this.reserverName)
-                .receiveMethod(this.receiveMethod)
-                .receiverName(this.receiverName)
-                .receiverPostcode(this.receivePostcode)
-                .receiverBaseAddress(this.receiveBaseAddress)
-                .receiverDetailAddress(this.receiveDetailAddress)
+                .bookerName(this.bookerName)
                 .createdAt(this.auditSection.getCreatedAt())
                 .modifiedAt(this.auditSection.getModifiedAt())
                 .deletedAt(this.deletedAt)
                 .build();
+    }
+
+    public boolean isEqualCustomerId(Long customerId) {
+        return this.customerId != null && this.customerId.compareTo(customerId) == 0;
+    }
+
+    public boolean isNotDeleted() {
+        return this.deletedAt == null;
     }
 }

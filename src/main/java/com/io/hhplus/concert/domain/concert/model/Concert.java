@@ -36,7 +36,7 @@ public record Concert(
         return this.deletedAt == null;
     }
 
-    public void validate() {
+    public void checkValid() {
         if (isAbleToBook() && isAvailableConcertStatus() && isNotDeleted()) {
             return;
         }

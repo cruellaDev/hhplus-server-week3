@@ -1,7 +1,9 @@
 package com.io.hhplus.concert.application.concert.facade;
 
 import com.io.hhplus.concert.application.concert.dto.*;
-import com.io.hhplus.concert.domain.concert.service.ConcertService;
+import com.io.hhplus.concert.domain.concert.ConcertCommand;
+import com.io.hhplus.concert.domain.concert.ConcertService;
+import com.io.hhplus.concert.domain.concert.dto.ReservationInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,34 +32,21 @@ public class ConcertFacade {
      * @param concertId 콘서트_ID
      * @return 응답 정보
      */
-    public List<PerformanceServiceResponse> getAvailablePerformances(Long concertId) {
-        return concertService.getAvailablePerformances(concertId)
+    public List<PerformanceServiceResponse> getAvailableSchedules(Long concertId) {
+        return concertService.getAvailableSchedules(concertId)
                 .stream()
                 .map(PerformanceServiceResponse::from)
                 .toList();
     }
 
     /**
-     * 예약 가능 콘서트 공연 구역 목록 조회
-     * @param concertId 콘서트_ID
-     * @param performanceId 공연_ID
-     * @return 응답 정보
-     */
-    public List<AreaServiceResponse> getAvailableAreas(Long concertId, Long performanceId) {
-        return concertService.getAvailableAreas(concertId, performanceId)
-                .stream()
-                .map(AreaServiceResponse::from)
-                .toList();
-    }
-
-    /**
      * 예약 가능 콘서트 공연 좌석 목록 조회
      * @param concertId 콘서트_ID
-     * @param performanceId 공연_ID
+     * @param concertScheduleId 공연_ID
      * @return 응답 정보
      */
-    public List<SeatServiceResponse> getAvailableSeats(Long concertId, Long performanceId, Long areaId) {
-        return concertService.getAvailableSeats(concertId, performanceId, areaId)
+    public List<SeatServiceResponse> getAvailableSeats(Long concertId, Long concertScheduleId) {
+        return concertService.getAvailableSeats(concertId, concertScheduleId)
                 .stream()
                 .map(SeatServiceResponse::from)
                 .toList();
@@ -65,11 +54,11 @@ public class ConcertFacade {
 
     /**
      * 좌석 배정 및 예약 요청
-     * @param serviceRequest 요청 정보
+     * @param command 좌석 예약 command
      * @return 응답 정보
      */
     @Transactional
-    public List<HoldSeatServiceResponse> holdSeats(HoldSeatServiceRequest serviceRequest) {
-        return concertService.holdSeats(serviceRequest);
+    public ReservationInfo reserveSeats(ConcertCommand.ReserveSeatsCommand command) {
+        return concertService.reserveSeats(command);
     }
 }

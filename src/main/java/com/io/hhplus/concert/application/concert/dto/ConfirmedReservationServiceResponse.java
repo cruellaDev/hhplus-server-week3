@@ -42,9 +42,9 @@ public record ConfirmedReservationServiceResponse(
                     .reserverName(reservation.reserverName())
                     .receiveMethod(reservation.receiveMethod())
                     .receiverName(reservation.receiverName())
-                    .receivePostCode(reservation.receiverPostcode())
-                    .receiveBaseAddress(reservation.receiverBaseAddress())
-                    .receiveDetailAddress(reservation.receiverDetailAddress())
+                    .receivePostCode(reservation.receivePostcode())
+                    .receiveBaseAddress(reservation.receiveBaseAddress())
+                    .receiveDetailAddress(reservation.receiveDetailAddress())
                     .build();
         }
     }

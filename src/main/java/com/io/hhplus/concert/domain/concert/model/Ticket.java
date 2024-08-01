@@ -14,16 +14,12 @@ public record Ticket(
         Long ticketId,
         Long reservationId,
         Long concertId,
-        Long performanceId,
-        Long areaId,
+        Long concertScheduleId,
+        Long concertSeatId,
         String concertName,
         String artistName,
         Date performedAt,
-        String areaName,
         String seatNumber,
-        Boolean isReceiveOnline,
-        Boolean isReceiveOnSite,
-        Boolean isReceiveByPost,
         BigDecimal ticketPrice,
         Date reservedAt,
         Date publishedAt,
@@ -34,21 +30,21 @@ public record Ticket(
         Date modifiedAt,
         Date deletedAt
 ) {
-    public static Ticket create(Reservation reservation, Concert concert, Performance performance, Area area, String seatNumber) {
+    public static Ticket reserve(Reservation reservation, Concert concert, ConcertSchedule concertSchedule, ConcertSeat concertSeat, String seatNumber) {
+        concert.checkValid();
+        concertSchedule.checkValid();
+        concertSeat.checkValid();
+
         return Ticket.builder()
                 .reservationId(reservation.reservationId())
                 .concertId(concert.concertId())
-                .performanceId(performance.performanceId())
-                .areaId(area.areaId())
+                .concertScheduleId(concertSchedule.concertScheduleId())
+                .concertSeatId(concertSeat.concertSeatId())
                 .concertName(concert.concertName())
                 .artistName(concert.artistName())
-                .performedAt(performance.performedAt())
-                .areaName(area.areaName())
+                .performedAt(concertSchedule.performedAt())
                 .seatNumber(seatNumber)
-                .isReceiveOnline(concert.isReceiveOnline())
-                .isReceiveOnSite(concert.isReceiveOnSite())
-                .isReceiveByPost(concert.isReceiveByPost())
-                .ticketPrice(area.seatPrice())
+                .ticketPrice(concertSeat.seatPrice())
                 .build();
     }
 
@@ -66,20 +62,16 @@ public record Ticket(
         return Ticket.builder()
                 .reservationId(this.reservationId)
                 .concertId(this.concertId)
-                .performanceId(this.performanceId)
-                .areaId(this.areaId)
+                .concertScheduleId(this.concertScheduleId)
+                .concertSeatId(this.concertSeatId)
                 .concertName(this.concertName)
                 .artistName(this.artistName)
                 .performedAt(this.performedAt)
-                .areaName(this.areaName)
                 .seatNumber(this.seatNumber)
-                .isReceiveOnline(this.isReceiveOnline)
-                .isReceiveOnSite(this.isReceiveOnSite)
-                .isReceiveByPost(this.isReceiveByPost)
                 .ticketPrice(this.ticketPrice)
                 .reservedAt(currentDate)
-                .publishedAt(reservation.isReceivedOnline() ? currentDate : this.publishedAt)
-                .receivedAt(reservation.isReceivedOnline() ? currentDate : this.receivedAt)
+                .publishedAt(this.publishedAt)
+                .receivedAt(this.receivedAt)
                 .build();
     }
 }

@@ -9,11 +9,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Builder
-public record Performance(
-        Long performanceId,
+public record ConcertSchedule(
+        Long concertScheduleId,
         Long concertId,
-        BigDecimal performancePrice,
-        Integer capacityLimit,
         Date performedAt,
         Date createdAt,
         Date modifiedAt,
@@ -27,10 +25,10 @@ public record Performance(
         return this.deletedAt == null;
     }
 
-    public void validate() {
+    public void checkValid() {
         if (isToBePerformed() && isNotDeleted()) {
             return;
         }
-        throw new CustomException(ResponseMessage.PERFORMANCE_INVALID);
+        throw new CustomException(ResponseMessage.CONCERT_SCHEDULE_INVALID);
     }
 }

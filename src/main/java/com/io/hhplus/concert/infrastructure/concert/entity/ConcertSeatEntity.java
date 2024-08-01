@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.infrastructure.concert.entity;
 
-import com.io.hhplus.concert.domain.concert.model.Area;
+import com.io.hhplus.concert.domain.concert.model.ConcertSeat;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
 import com.io.hhplus.concert.infrastructure.audit.entity.Auditable;
@@ -18,21 +18,18 @@ import java.util.Date;
 @Builder
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "AREA")
-public class AreaEntity implements Auditable {
+@Table(name = "CONCERT_SEAT")
+public class ConcertSeatEntity implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false, updatable = false, columnDefinition = "구역_ID")
     private Long id;
 
-    @Column(name = "PERFORMANCE_ID", nullable = false, updatable = false, columnDefinition = "공연_ID")
-    private Long performanceId;
+    @Column(name = "CONCERT_SCHEDULE_ID", nullable = false, updatable = false, columnDefinition = "공연_ID")
+    private Long concertScheduleId;
 
     @Column(name = "CONCERT_ID", nullable = false, updatable = false, columnDefinition = "콘서트_ID")
     private Long concertId;
-
-    @Column(name = "AREA_NAME", nullable = false, length = 100, columnDefinition = "구역_명")
-    private String areaName;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "SEAT_PRICE", nullable = false, precision = 18, scale = 3, columnDefinition = "좌석_가격")
@@ -48,24 +45,22 @@ public class AreaEntity implements Auditable {
     @Column(name = "DELETED_AT", nullable = true, columnDefinition = "삭제_일시")
     private Date deletedAt;
 
-    public static AreaEntity from(Area area) {
-        return AreaEntity.builder()
-                .id(area.areaId())
-                .performanceId(area.performanceId())
-                .concertId(area.concertId())
-                .areaName(area.areaName())
-                .seatPrice(area.seatPrice())
-                .seatCapacity(area.seatCapacity())
-                .deletedAt(area.deletedAt())
+    public static ConcertSeatEntity from(ConcertSeat concertSeat) {
+        return ConcertSeatEntity.builder()
+                .id(concertSeat.concertSeatId())
+                .concertScheduleId(concertSeat.concertScheduleId())
+                .concertId(concertSeat.concertId())
+                .seatPrice(concertSeat.seatPrice())
+                .seatCapacity(concertSeat.seatCapacity())
+                .deletedAt(concertSeat .deletedAt())
                 .build();
     }
 
-    public Area toDomain() {
-        return Area.builder()
-                .areaId(this.id)
-                .performanceId(this.performanceId)
+    public ConcertSeat toDomain() {
+        return ConcertSeat.builder()
+                .concertSeatId(this.id)
+                .concertScheduleId(this.concertScheduleId)
                 .concertId(this.concertId)
-                .areaName(this.areaName)
                 .seatPrice(this.seatPrice)
                 .seatCapacity(this.seatCapacity)
                 .createdAt(this.auditSection.getCreatedAt())
@@ -76,10 +71,6 @@ public class AreaEntity implements Auditable {
 
     public boolean isEqualConcertId(Long concertId) {
         return this.concertId.compareTo(concertId) == 0;
-    }
-
-    public boolean isEqualPerformanceId(Long performanceId) {
-        return this.performanceId.compareTo(performanceId) == 0;
     }
 
     public boolean isNotDeleted() {

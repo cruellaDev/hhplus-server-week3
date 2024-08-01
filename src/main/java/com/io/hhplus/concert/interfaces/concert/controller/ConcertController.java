@@ -28,35 +28,21 @@ public class ConcertController {
      * @param concertId 콘서트_ID
      * @return 예약 가능 날짜 공연 목록
      */
-    @GetMapping("/{concertId}/performances")
+    @GetMapping("/{concertId}/schedules")
     public CommonResponse<PerformanceDto.Response> performances(@PathVariable("concertId") Long concertId) {
-        return CommonResponse.success(PerformanceDto.Response.from(concertFacade.getAvailablePerformances(concertId)));
-    }
-
-    /**
-     * 예약 가능 구역 조회
-     * @param concertId 콘서트_ID
-     * @param performanceId 공연_ID
-     * @return 예약 가능 구역 목록
-     */
-    @GetMapping("/{concertId}/performances/{performanceId}/areas")
-    public CommonResponse<Object> areas(@PathVariable("concertId") Long concertId,
-                                        @PathVariable("performanceId") Long performanceId) {
-        return CommonResponse.success(AreaDto.Response.from(concertFacade.getAvailableAreas(concertId, performanceId)));
+        return CommonResponse.success(PerformanceDto.Response.from(concertFacade.getAvailableSchedules(concertId)));
     }
 
     /**
      * 예약가능 좌석 목록 조회
      * @param concertId 콘서트_ID
-     * @param performanceId 공연_ID
-     * @param areaId 구역_ID
+     * @param concertScheduleId 공연_일정_ID
      * @return 예약가능 좌석 목록
      */
-    @GetMapping("/{concertId}/performances/{performanceId}/areas/{areaId}")
+    @GetMapping("/{concertId}/schedules/{concertScheduleId}/seats/{concertSeatId}")
     public CommonResponse<SeatDto.Response> seats(@PathVariable("concertId") Long concertId,
-                                                  @PathVariable("performanceId") Long performanceId,
-                                                  @PathVariable("areaId") Long areaId) {
-        return CommonResponse.success(SeatDto.Response.from(concertFacade.getAvailableSeats(concertId, performanceId, areaId)));
+                                                  @PathVariable("concertScheduleId") Long concertScheduleId) {
+        return CommonResponse.success(SeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId)));
     }
 
     /**
@@ -64,8 +50,8 @@ public class ConcertController {
      * @param request 요청 정보
      * @return 응답 정보
      */
-    @PostMapping("/hold/seats")
-    public CommonResponse<ReservationDto.HoldSeatsResponse> holdSeats(ReservationDto.HoldSeatsRequest request) {
-        return CommonResponse.success(ReservationDto.HoldSeatsResponse.from(concertFacade.holdSeats(request.toServiceRequest())));
+    @PostMapping("/reserve/seats")
+    public CommonResponse<ReservationDto.ReserveSeatsResponse> reserveSeats(ReservationDto.ReserveSeatsRequest request) {
+        return CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertFacade.reserveSeats(request.toCommand())));
     }
 }
