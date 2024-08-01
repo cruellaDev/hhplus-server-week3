@@ -12,5 +12,5 @@ spring:
 
 logging:
   level:
-    org.springframework: debug
+    org.springframework: error
     org.hibernate.SQL: DEBUG
