@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -45,8 +43,8 @@ public class CustomerService {
                         && o.isNotDeleted())
                 .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
-                customerRepository.saveCustomer(customer.chargePoint(command.getAmount())),
-                customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePointOf(customer, command.getAmount()))
+                customerRepository.saveCustomer(customer.chargePoint(command)),
+                customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePoint(command))
         );
     }
 
@@ -66,7 +64,7 @@ public class CustomerService {
                         && o.isNotDeleted())
                 .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
-                customerRepository.saveCustomer(customer.usePoint(command.getAmount())),
-                customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePointOf(customer, command.getAmount())));
+                customerRepository.saveCustomer(customer.usePoint(command)),
+                customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePoint(command)));
     }
 }

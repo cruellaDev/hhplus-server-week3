@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.interfaces.concert.controller;
 
-import com.io.hhplus.concert.application.concert.facade.ConcertFacade;
+import com.io.hhplus.concert.application.concert.ConcertFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
 import com.io.hhplus.concert.interfaces.concert.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class ConcertController {
      * @return 예약 가능 날짜 공연 목록
      */
     @GetMapping("/{concertId}/schedules")
-    public CommonResponse<PerformanceDto.Response> performances(@PathVariable("concertId") Long concertId) {
-        return CommonResponse.success(PerformanceDto.Response.from(concertFacade.getAvailableSchedules(concertId)));
+    public CommonResponse<ConcertScheduleDto.Response> schedules(@PathVariable("concertId") Long concertId) {
+        return CommonResponse.success(ConcertScheduleDto.Response.from(concertFacade.getAvailableSchedules(concertId)));
     }
 
     /**
@@ -39,10 +39,10 @@ public class ConcertController {
      * @param concertScheduleId 공연_일정_ID
      * @return 예약가능 좌석 목록
      */
-    @GetMapping("/{concertId}/schedules/{concertScheduleId}/seats/{concertSeatId}")
-    public CommonResponse<SeatDto.Response> seats(@PathVariable("concertId") Long concertId,
-                                                  @PathVariable("concertScheduleId") Long concertScheduleId) {
-        return CommonResponse.success(SeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId)));
+    @GetMapping("/{concertId}/schedules/{concertScheduleId}/seats")
+    public CommonResponse<ConcertSeatDto.Response> seats(@PathVariable("concertId") Long concertId,
+                                                         @PathVariable("concertScheduleId") Long concertScheduleId) {
+        return CommonResponse.success(ConcertSeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId)));
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.io.hhplus.concert.infrastructure.concert.entity;
 
-import com.io.hhplus.concert.common.enums.ReceiveMethod;
-import com.io.hhplus.concert.common.enums.ReservationStatus;
 import com.io.hhplus.concert.domain.concert.model.Reservation;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;

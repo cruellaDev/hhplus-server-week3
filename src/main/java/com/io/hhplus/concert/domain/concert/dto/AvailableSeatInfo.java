@@ -1,6 +1,5 @@
 package com.io.hhplus.concert.domain.concert.dto;
 
-import com.io.hhplus.concert.common.enums.SeatStatus;
 import com.io.hhplus.concert.domain.concert.model.ConcertSeat;
 import lombok.Builder;
 

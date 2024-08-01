@@ -1,6 +1,5 @@
 package com.io.hhplus.concert.domain.concert;
 
-import com.io.hhplus.concert.application.concert.dto.ConfirmedReservationServiceResponse;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.domain.concert.dto.AvailableSeatInfo;
@@ -73,8 +72,10 @@ public class ConcertService {
      */
     @Transactional
     public ReservationInfo reserveSeats(ConcertCommand.ReserveSeatsCommand command) {
-        // 생성된 예약과 티켓이 있는지 확인
-        Reservation reservation = concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).orElseGet(Reservation::create);
+        // 생성된 예약과 티켓이 있는지 확인 후 결제 생성 진행
+        Reservation reservation = concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers())
+                .orElseGet(Reservation::create)
+                .reserve(command);
 
         // 콘서트 정보 조회
         Concert concert = concertRepository.findConcert(command.getConcertId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
@@ -87,11 +88,8 @@ public class ConcertService {
                 .anyMatch(seatNumber -> concertRepository.findNotOccupiedSeatFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isEmpty());
         if (!isAvailable) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
-        // 예약 저장
-        Reservation reservedReservation = concertRepository.saveReservation(reservation.reserve(command.getCustomerId(), command.getBookerName()));
-        // 티켓 저장
         return ReservationInfo.of(
-                reservedReservation,
+                concertRepository.saveReservation(reservation),
                 command.getSeatNumbers()
                         .stream()
                         .map(seatNumber -> concertRepository.saveTicket(Ticket.reserve(reservation, concert, concertSchedule, concertSeat, seatNumber)))
@@ -102,7 +100,7 @@ public class ConcertService {
      * 예약 완료
      */
     @Transactional
-    public ConfirmedReservationServiceResponse confirmReservation(ConcertCommand.ConfirmReservationCommand command) {
+    public ReservationInfo confirmReservation(ConcertCommand.ConfirmReservationCommand command) {
         // 예약 조회
         Reservation reservation = concertRepository.findReservation(command.getReservationId(), command.getCustomerId())
                 .filter(Reservation::isNotDeleted)
@@ -113,7 +111,7 @@ public class ConcertService {
                 .map(ticket -> ticket.confirmReservation(reservation))
                 .toList();
 
-        return ConfirmedReservationServiceResponse.of(
+        return ReservationInfo.of(
                 reservation,
                 tickets.stream().map(concertRepository::saveTicket).collect(Collectors.toList())
         );

@@ -60,7 +60,7 @@ public record Ticket(
         }
         Date currentDate = DateUtils.getSysDate();
         return Ticket.builder()
-                .reservationId(this.reservationId)
+                .reservationId(reservation.reservationId())
                 .concertId(this.concertId)
                 .concertScheduleId(this.concertScheduleId)
                 .concertSeatId(this.concertSeatId)

@@ -1,11 +1,10 @@
 package com.io.hhplus.concert.domain.concert.model;
 
 import com.io.hhplus.concert.common.GlobalConstants;
-import com.io.hhplus.concert.common.enums.ReceiveMethod;
-import com.io.hhplus.concert.common.enums.ReservationStatus;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.common.utils.DateUtils;
+import com.io.hhplus.concert.domain.concert.ConcertCommand;
 import lombok.Builder;
 
 import java.util.Date;
@@ -23,7 +22,7 @@ public record Reservation(
         return Reservation.builder().build();
     }
 
-    public Reservation reserve(Long customerId, String bookerName) {
+    public Reservation reserve(ConcertCommand.ReserveSeatsCommand command) {
         if (this.reservationId != null && this.reservationId.compareTo(0L) > 0) {
             throw new CustomException(ResponseMessage.ALREADY_RESERVED);
         }
@@ -32,8 +31,8 @@ public record Reservation(
         }
 
         return Reservation.builder()
-                .customerId(customerId)
-                .bookerName(bookerName)
+                .customerId(command.getCustomerId())
+                .bookerName(command.getBookerName())
                 .build();
     }
 

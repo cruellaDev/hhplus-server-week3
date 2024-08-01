@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.interfaces.concert.dto;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
-import com.io.hhplus.concert.application.concert.dto.ConcertServiceResponse;
+import com.io.hhplus.concert.domain.concert.model.Concert;
 import lombok.Builder;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public class ConcertDto {
     public static class Response {
         private List<ConcertResponse> concerts;
 
-        public static ConcertDto.Response from(List<ConcertServiceResponse> concerts) {
+        public static ConcertDto.Response from(List<Concert> concerts) {
             List<ConcertDto.ConcertResponse> concertResponses = concerts
                     .stream()
                     .map(concert
