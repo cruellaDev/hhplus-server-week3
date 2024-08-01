@@ -28,11 +28,11 @@ class WaitingIntegrationTest {
         }
     }
 
-    @AfterEach
-    void tearDown() {
-        waitingRepository.deleteAllWaitingQueue();
-        waitingRepository.deleteAllWaitingEnterHistory();
-    }
+//    @AfterEach
+//    void tearDown() {
+//        waitingRepository.deleteAllWaitingQueue();
+//        waitingRepository.deleteAllWaitingEnterHistory();
+//    }
 
     /**
      * 대기열 토큰 발급 (대기열 진입) - 유효하고 대기열에 없는 고객

@@ -1,7 +1,6 @@
 package com.io.hhplus.concert.domain.queue.service;
 
 import com.io.hhplus.concert.domain.queue.QueueTokenRepository;
-import com.io.hhplus.concert.domain.queue.WaitingValidator;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,9 +17,6 @@ class WaitingValidatorTest {
 
     @Mock
     private QueueTokenRepository waitingRepository;
-
-    @InjectMocks
-    private WaitingValidator waitingValidator;
 
     @BeforeEach
     void setUp() {

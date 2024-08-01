@@ -1,9 +1,6 @@
 package com.io.hhplus.concert.common;
 
 public class GlobalConstants {
-    // header
-    public static final String HEADER_AUTHORIZATION = "Authorization";
-
     // prefix
     public static final String PREFIX_BEARER = "Bearer ";
 

@@ -15,11 +15,11 @@ import static org.mockito.ArgumentMatchers.any;
 @Disabled
 class ReservationServiceTest {
 
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @InjectMocks
-    private ReservationService reservationService;
+//    @Mock
+//    private ReservationRepository reservationRepository;
+//
+//    @InjectMocks
+//    private ReservationService reservationService;
 
     @BeforeEach
     void setUp() {

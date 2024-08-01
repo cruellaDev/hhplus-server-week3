@@ -32,15 +32,15 @@ class ReservationIntegrationTest {
         }
     }
 
-    @AfterEach
-    void tearDown() {
-        waitingRepository.deleteAllWaitingQueue();
-        waitingRepository.deleteAllWaitingEnterHistory();
-
-        for (long i = 4; i < 50; i+=5) {
-//            seatRepository.save(SeatModel.create(i, 1L, 1L, String.valueOf(i), SeatStatus.AVAILABLE));
-        }
-    }
+//    @AfterEach
+//    void tearDown() {
+//        waitingRepository.deleteAllWaitingQueue();
+//        waitingRepository.deleteAllWaitingEnterHistory();
+//
+//        for (long i = 4; i < 50; i+=5) {
+////            seatRepository.save(SeatModel.create(i, 1L, 1L, String.valueOf(i), SeatStatus.AVAILABLE));
+//        }
+//    }
 
     /**
      * 유효하지 않은 고객의 예약 요청
