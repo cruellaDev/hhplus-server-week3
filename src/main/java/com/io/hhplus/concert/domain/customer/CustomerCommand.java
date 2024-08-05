@@ -10,6 +10,17 @@ import java.math.BigDecimal;
 public class CustomerCommand {
 
     /**
+     * 고객 등록 Command
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class RegisterCustomerCommand {
+        private String customerName;
+    }
+
+    /**
      * 고객 포인트 충전 Command
      */
     @Data

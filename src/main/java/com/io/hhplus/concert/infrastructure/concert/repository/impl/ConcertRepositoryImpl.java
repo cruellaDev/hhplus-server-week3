@@ -26,11 +26,21 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     private final TicketJpaRepository ticketJpaRepository;
 
     @Override
+    public Concert saveConcert(Concert concert) {
+        return concertJpaRepository.save(ConcertEntity.from(concert)).toDomain();
+    }
+
+    @Override
     public List<Concert> findConcerts() {
         return concertJpaRepository.findAllByDeletedAtIsNull()
                 .stream()
                 .map(ConcertEntity::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ConcertSchedule saveConcertSchedule(ConcertSchedule concertSchedule) {
+        return concertScheduleJpaRepository.save(ConcertScheduleEntity.from(concertSchedule)).toDomain();
     }
 
     @Override
@@ -42,13 +52,14 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
+    public ConcertSeat saveConcertSeat(ConcertSeat concertSeat) {
+        return concertSeatJpaRepository.save(ConcertSeatEntity.from(concertSeat)).toDomain();
+    }
+
+    @Override
     public Optional<ConcertSeat> findConcertSeat(Long concertId, Long concertScheduleId) {
-        Optional<ConcertScheduleEntity> concertSchedule = concertScheduleJpaRepository.findByIdAndConcertIdAndDeletedAtIsNull(concertScheduleId, concertId);
-        if (concertSchedule.isPresent()) {
-            return concertSeatJpaRepository.findByConcertIdAndConcertScheduleIdAndDeletedAtIsNull(concertId, concertScheduleId)
-                    .map(ConcertSeatEntity::toDomain);
-        }
-        return Optional.empty();
+        return concertSeatJpaRepository.findByConcertIdAndConcertScheduleIdAndDeletedAtIsNull(concertId, concertScheduleId)
+                .map(ConcertSeatEntity::toDomain);
     }
 
     @Override

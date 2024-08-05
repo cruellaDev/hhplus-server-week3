@@ -34,6 +34,20 @@ public record Customer(
         return this.deletedAt == null;
     }
 
+    public static Customer create() {
+        return Customer.builder().build();
+    }
+
+    public Customer register(CustomerCommand.RegisterCustomerCommand command) {
+        if (command.getCustomerName() == null || command.getCustomerName().isBlank()) {
+            throw new CustomException(ResponseMessage.INVALID, "고객 명이 존재하지 않습니다.");
+        }
+        return Customer.builder()
+                .customerName(command.getCustomerName())
+                .pointBalance(BigDecimal.ZERO)
+                .build();
+    }
+
     public Customer chargePoint(CustomerCommand.ChargeCustomerPointCommand command) {
         if (command.getAmount() == null || command.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new CustomException(ResponseMessage.INVALID, "포인트 충전 금액은 0보다 커야 합니다.");

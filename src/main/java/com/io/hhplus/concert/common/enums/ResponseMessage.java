@@ -26,6 +26,7 @@ public enum ResponseMessage {
     CUSTOMER_NOT_FOUND("존재하지 않는 사용자 정보입니다."),
     WAITING_NOT_FOUND("존재하지 않는 대기열 정보입니다."),
     RESERVATION_NOT_FOUND("존재하지 않는 예약 정보입니다."),
+    TICKET_NOT_FOUND("존재하지 않는 예매 티켓 정보입니다."),
     SEAT_TAKEN("이미 선점된 좌석입니다"),
     TOKEN_NOT_FOUNT("존재하지 않는 토큰입니다."),
     OUT_OF_TIME("시간이 초과되었습니다."),

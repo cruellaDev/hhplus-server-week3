@@ -94,7 +94,7 @@ public class DateUtils {
             return TimeUnit.MILLISECONDS.toSeconds(fromDate.getTime() - toDate.getTime());
         } catch (Exception e) {
             log.debug("[utils-DateUtils-calculateDuration]: fromDate: {}, toDate: {}", fromDate, toDate);
-            return -9999;
+            return 0;
         }
     }
 

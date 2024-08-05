@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConcertRepository {
+    Concert saveConcert(Concert concert);
     List<Concert> findConcerts();
+    ConcertSchedule saveConcertSchedule(ConcertSchedule concertSchedule);
     List<ConcertSchedule> findConcertSchedules(Long concertId);
+    ConcertSeat saveConcertSeat(ConcertSeat concertSeat);
     Optional<ConcertSeat> findConcertSeat(Long concertId, Long concertScheduleId);
     Optional<Ticket> findNotOccupiedSeatFromTicket(Long concertId, Long concertScheduleId, String seatNumber);
     Reservation saveReservation(Reservation reservation);

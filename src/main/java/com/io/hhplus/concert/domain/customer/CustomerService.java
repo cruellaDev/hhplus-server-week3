@@ -16,6 +16,15 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     /**
+     * 고객 등록
+     * @param command 고객 등록 command
+     * @return 고객 등록 command
+     */
+    public Customer regiterCustomer(CustomerCommand.RegisterCustomerCommand command) {
+        return customerRepository.saveCustomer(Customer.create().register(command));
+    }
+
+    /**
      * 고객 포인트 잔액 조회
      * @param customerId 고객 ID
      * @return 포인트잔액
@@ -35,8 +44,27 @@ public class CustomerService {
      * @return 고객 포인트 충전 정보
      */
     @Transactional
-    public CustomerPointInfo chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command){
+    public CustomerPointInfo chargeCustomerPointWithPessimisticLock(CustomerCommand.ChargeCustomerPointCommand command){
         Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
+                .filter(o
+                        -> o.isNotDreamed()
+                        && o.isNotWithdrawn()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        return CustomerPointInfo.of(
+                customerRepository.saveCustomer(customer.chargePoint(command)),
+                customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePoint(command))
+        );
+    }
+
+    /**
+     * 고객 포인트 충전
+     * @param command 고객 포인트 충전 command
+     * @return 고객 포인트 충전 정보
+     */
+    @Transactional
+    public CustomerPointInfo chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command){
+        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
                 .filter(o
                         -> o.isNotDreamed()
                         && o.isNotWithdrawn()
@@ -55,6 +83,24 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo useCustomerPoint(CustomerCommand.UseCustomerPointCommand command) {
+        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
+                .filter(o
+                        -> o.isNotDreamed()
+                        && o.isNotWithdrawn()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        return CustomerPointInfo.of(
+                customerRepository.saveCustomer(customer.usePoint(command)),
+                customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePoint(command)));
+    }
+
+    /**
+     * 고객 포인트 사용
+     * @param command 고객 포인트 충전 command
+     * @return 고객 포인트 사용 정보
+     */
+    @Transactional
+    public CustomerPointInfo useCustomerPointWithPessimisticLock(CustomerCommand.UseCustomerPointCommand command) {
         Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
                 .filter(o
                         -> o.isNotDreamed()

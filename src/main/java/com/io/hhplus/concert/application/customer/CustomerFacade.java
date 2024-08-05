@@ -29,4 +29,13 @@ public class CustomerFacade {
     public CustomerPointDto.ChargeCustomerPointResponse chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command) {
         return CustomerPointDto.ChargeCustomerPointResponse.from(customerService.chargeCustomerPoint(command));
     }
+
+    /**
+     * 고객 포인트 충전 (비관적 락 사용)
+     * @param command 고객 포인트 충전 command
+     * @return 응답 정보
+     */
+    public CustomerPointDto.ChargeCustomerPointResponse chargeCustomerPointWithPessimisticLick(CustomerCommand.ChargeCustomerPointCommand command) {
+        return CustomerPointDto.ChargeCustomerPointResponse.from(customerService.chargeCustomerPointWithPessimisticLock(command));
+    }
 }
