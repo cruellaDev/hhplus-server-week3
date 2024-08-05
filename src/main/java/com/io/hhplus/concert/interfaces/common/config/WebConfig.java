@@ -15,10 +15,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)
-                .addPathPatterns(
-                        "/concerts/**",
-                        "/payment/**"
-                )
+                .addPathPatterns("/v1/api/**")                 // 인터셉터 적용 경로
+                .excludePathPatterns("/v1/api/queues/**")      // 제외 경로 (토큰)
+                .excludePathPatterns("/v1/api/customers/**");  // 제외 경로 (고객)
         ;
     }
 
