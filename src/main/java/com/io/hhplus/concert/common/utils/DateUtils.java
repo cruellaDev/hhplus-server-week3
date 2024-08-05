@@ -109,7 +109,55 @@ public class DateUtils {
         return source;
     }
 
+    /**
+     * 날짜에 초를 뺀다.
+     * @param source 뺄 날짜
+     * @param target 초(s)
+     * @return 날짜
+     */
     public static Date subtractSeconds(Date source, long target) {
         return addSeconds(source, target * -1);
+    }
+
+    /**
+     * 날짜에 분을 더한다.
+     * @param source 더할 날짜
+     * @param target 분(i)
+     * @return 날짜
+     */
+    public static Date addMinutes(Date source, long target) {
+        source.setTime(source.getTime() + (target * 60 * 1000));
+        return source;
+    }
+
+    /**
+     * 날짜에 분을 뺀다.
+     * @param source 뺄 날짜
+     * @param target 분(i)
+     * @return 날짜
+     */
+    public static Date subtractMinutes(Date source, long target) {
+        return addMinutes(source, target * -1);
+    }
+
+    /**
+     * 날짜에 일을 더한다.
+     * @param source 더할 날짜
+     * @param target 일(dd)
+     * @return 날짜
+     */
+    public static Date addDays(Date source, long target) {
+        source.setTime(source.getTime() + (target * 24 * 60 * 60 * 1000));
+        return source;
+    }
+
+    /**
+     * 날짜에 일을 뺀다.
+     * @param source 뺄 날짜
+     * @param target 일(dd)
+     * @return 날짜
+     */
+    public static Date subtractDays(Date source, long target) {
+        return addDays(source, target * -1);
     }
 }
