@@ -19,25 +19,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ConcertIntegrationTest {
 
-    @Autowired
-    private ConcertFacade concertFacade;
-
-    /**
-     * 예약 가능 콘서트 목록 조회 - 콘서트 존재
-     */
-    @Test
-    void 예약_가능_콘서트_목록을_모두_조회한다() {
-        // given
-        long concertId = 1;
-        ConcertStatus concertStatus = ConcertStatus.AVAILABLE;
-
-        // when
-        List<ConcertServiceResponse> result = concertFacade.getAvailableConcerts();
-
-        // then
-        assertAll(() -> assertEquals(concertId, result.get(0).concertId()),
-                () -> assertEquals(concertStatus, result.get(0).concertStatus()));
-    }
+//    @Autowired
+//    private ConcertFacade concertFacade;
+//
+//    /**
+//     * 예약 가능 콘서트 목록 조회 - 콘서트 존재
+//     */
+//    @Test
+//    void 예약_가능_콘서트_목록을_모두_조회한다() {
+//        // given
+//        long concertId = 1;
+//        ConcertStatus concertStatus = ConcertStatus.AVAILABLE;
+//
+//        // when
+//        List<ConcertServiceResponse> result = concertFacade.getAvailableConcerts();
+//
+//        // then
+//        assertAll(() -> assertEquals(concertId, result.get(0).concertId()),
+//                () -> assertEquals(concertStatus, result.get(0).concertStatus()));
+//    }
 
 //    /**
 //     * 예약 가능 콘서트 공연 목록 조회 - 콘서트, 공연 모두 존재

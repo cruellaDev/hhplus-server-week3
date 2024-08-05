@@ -91,7 +91,7 @@ public class DateUtils {
      */
     public static long calculateDuration(Date fromDate, Date toDate) {
         try {
-            return TimeUnit.MILLISECONDS.toSeconds(fromDate.getTime() - toDate.getTime());
+            return TimeUnit.MILLISECONDS.toSeconds(toDate.getTime() - fromDate.getTime());
         } catch (Exception e) {
             log.debug("[utils-DateUtils-calculateDuration]: fromDate: {}, toDate: {}", fromDate, toDate);
             return 0;

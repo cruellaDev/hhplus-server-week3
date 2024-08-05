@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.interfaces.queue.dto;
+package com.io.hhplus.concert.interfaces.token.dto;
 
 import com.io.hhplus.concert.common.enums.QueueStatus;
 import com.io.hhplus.concert.domain.queue.TokenCommand;

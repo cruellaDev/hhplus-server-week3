@@ -6,6 +6,7 @@ import com.io.hhplus.concert.common.dto.CommonResponse;
 import com.io.hhplus.concert.interfaces.payment.dto.PaymentDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class PaymentController {
      * @return 응답 정보
      */
     @PostMapping("/pay")
-    public ResponseEntity<CommonResponse<PaymentDto.CheckoutPaymentResponse>> checkoutPayment(@RequestHeader(value = GlobalConstants.HEADER_AUTHORIZATION) String authorizationHeader,
+    public ResponseEntity<CommonResponse<PaymentDto.CheckoutPaymentResponse>> checkoutPayment(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                                                                               @RequestBody @Valid PaymentDto.CheckoutPaymentRequest requestBody) {
         UUID token = UUID.fromString(authorizationHeader.replace(GlobalConstants.PREFIX_BEARER, ""));
         return ResponseEntity

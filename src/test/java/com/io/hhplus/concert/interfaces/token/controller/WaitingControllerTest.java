@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.interfaces.queue.controller;
+package com.io.hhplus.concert.interfaces.token.controller;
 
 import com.io.hhplus.concert.application.queue.QueueTokenFacade;
 import org.junit.jupiter.api.Disabled;
@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(QueueTokenController.class)
+@WebMvcTest(TokenController.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Disabled
 class WaitingControllerTest {

@@ -927,4 +927,5 @@ class ConcertServiceTest {
                 .extracting("messageDetail")
                 .isEqualTo("예약이 가능한 상태가 아닙니다.");
     }
+
 }
