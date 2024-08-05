@@ -48,14 +48,14 @@ public record Ticket(
                 .build();
     }
 
-    public boolean isReservable() {
-        return (this.reservedAt == null || this.cancelAcceptedAt == null)
-                && DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
+    public boolean isAbleToConfirmReservation() {
+        return this.reservedAt == null
+                && DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) > GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
                 && this.deletedAt == null;
     }
 
     public Ticket confirmReservation(Reservation reservation) {
-        if (!isReservable()) {
+        if (!isAbleToConfirmReservation()) {
             throw new CustomException(ResponseMessage.INVALID, "예약이 가능한 상태가 아닙니다.");
         }
         Date currentDate = DateUtils.getSysDate();

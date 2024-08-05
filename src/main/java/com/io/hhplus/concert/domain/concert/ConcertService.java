@@ -23,6 +23,15 @@ public class ConcertService {
     private final ConcertRepository concertRepository;
 
     /**
+     * 콘서트 등록
+     * @param command 콘서트 등록 command
+     * @return 저장된 콘서트 정보
+     */
+    public Concert registerConcert(ConcertCommand.RegisterConcertCommand command) {
+        return concertRepository.saveConcert(Concert.create().register(command));
+    }
+
+    /**
      * 콘서트 목록 조회
      * @return 콘서트 목록
      */
@@ -34,9 +43,18 @@ public class ConcertService {
     }
 
     /**
-     * 현재일시 기준 특정 콘서트의 예약 가능 공연 목록 조회
+     * 콘서트 일정 등록
+     * @param command 콘서트 일정 등록 command
+     * @return 저정된 콘서트 일정 정보
+     */
+    public ConcertSchedule registerConcertSchedule(ConcertCommand.RegisterConcertScheduleCommand command) {
+        return concertRepository.saveConcertSchedule(ConcertSchedule.create().register(command));
+    }
+
+    /**
+     * 현재일시 기준 특정 콘서트의 예약 가능 일정 목록 조회
      * @param concertId 콘서트 ID
-     * @return 현재일시 기준 특정 콘서트의 예약가능 공연 목록 조회
+     * @return 현재일시 기준 특정 콘서트의 예약가능 일정 목록 조회
      */
     public List<ConcertSchedule> getAvailableSchedules(Long concertId) {
         log.info("[service-concert-getAvailableSchedules] - concertId : {}", concertId);
@@ -46,6 +64,15 @@ public class ConcertService {
                         -> concertSchedule.isToBePerformed()
                         && concertSchedule.isNotDeleted())
                 .toList();
+    }
+
+    /**
+     * 콘서트 좌석 등록
+     * @param command 콘서트 좌석 등록 command
+     * @return 저장된 콘서트 좌석 정보
+     */
+    public ConcertSeat registerConcertSeat(ConcertCommand.RegisterConcertSeatCommand command) {
+        return concertRepository.saveConcertSeat(ConcertSeat.create().register(command));
     }
 
     /**
@@ -78,15 +105,26 @@ public class ConcertService {
                 .reserve(command);
 
         // 콘서트 정보 조회
-        Concert concert = concertRepository.findConcert(command.getConcertId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
-        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(command.getConcertId(), command.getConcertScheduleId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SCHEDULE_NOT_FOUND));
-        ConcertSeat concertSeat = concertRepository.findConcertSeat(command.getConcertId(), command.getConcertScheduleId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SEAT_NOT_FOUND));
+        Concert concert = concertRepository.findConcert(command.getConcertId())
+                .filter(o
+                        -> o.isAvailableConcertStatus()
+                        && o.isAbleToBook()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
+        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(command.getConcertId(), command.getConcertScheduleId())
+                .filter(o
+                        -> o.isToBePerformed()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SCHEDULE_NOT_FOUND));
+        ConcertSeat concertSeat = concertRepository.findConcertSeat(command.getConcertId(), command.getConcertScheduleId())
+                .filter(ConcertSeat::isNotDeleted)
+                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SEAT_NOT_FOUND));
 
         // 좌석 확인
-        boolean isAvailable = command.getSeatNumbers()
+        boolean isSeatTaken = command.getSeatNumbers()
                 .stream()
-                .anyMatch(seatNumber -> concertRepository.findNotOccupiedSeatFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isEmpty());
-        if (!isAvailable) throw new CustomException(ResponseMessage.SEAT_TAKEN);
+                .anyMatch(seatNumber -> concertRepository.findNotOccupiedSeatFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isPresent());
+        if (isSeatTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
         return ReservationInfo.of(
                 concertRepository.saveReservation(reservation),
@@ -103,13 +141,16 @@ public class ConcertService {
     public ReservationInfo confirmReservation(ConcertCommand.ConfirmReservationCommand command) {
         // 예약 조회
         Reservation reservation = concertRepository.findReservation(command.getReservationId(), command.getCustomerId())
-                .filter(Reservation::isNotDeleted)
-                .orElseThrow(() -> new CustomException(ResponseMessage.NOT_FOUND));
+                .filter(o
+                        -> o.isAbleToPay()
+                        && o.isNotDeleted())
+                .orElseThrow(() -> new CustomException(ResponseMessage.RESERVATION_NOT_FOUND));
         // 티켓
         List<Ticket> tickets = concertRepository.findTickets(command.getReservationId())
                 .stream()
                 .map(ticket -> ticket.confirmReservation(reservation))
                 .toList();
+        if (tickets.isEmpty()) throw new CustomException(ResponseMessage.TICKET_NOT_FOUND);
 
         return ReservationInfo.of(
                 reservation,

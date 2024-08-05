@@ -26,9 +26,6 @@ public record Reservation(
         if (this.reservationId != null && this.reservationId.compareTo(0L) > 0) {
             throw new CustomException(ResponseMessage.ALREADY_RESERVED);
         }
-        if (isNotDeleted() && DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS) {
-            throw new CustomException(ResponseMessage.RESERVATION_TIMED_OUT);
-        }
 
         return Reservation.builder()
                 .customerId(command.getCustomerId())
@@ -38,5 +35,9 @@ public record Reservation(
 
     public boolean isNotDeleted() {
         return this.deletedAt == null;
+    }
+
+    public boolean isAbleToPay() {
+        return DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS;
     }
 }
