@@ -196,4 +196,152 @@ public class ConcertConcurrencyTest {
         // 예외 발생 개수 체크 (단 하나만 성공했는지 검증)
         assertEquals(numberOfExceptions, numberOfThreads - 1, "예외 발생 개수 불일치");
     }
+
+    /**
+     * 비동기
+     */
+    @Test
+    void 여러_명의_다른_유저가_동시에_하나의_좌석을_예약_요청했을_시_처음를_제외하고_전부_실패한다() {
+
+        // given
+        long concertId = 10;
+        long concertScheduleId = 100;
+        long concertSeatId = 100;
+        String seatNumber = "3";
+
+        // 좌석 예약 요청 command 객체 생성
+        List<ConcertCommand.ReserveSeatsCommand> commands = List.of(
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(1L)
+                        .bookerName("고객1")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(2L)
+                        .bookerName("고객2")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(3L)
+                        .bookerName("고객3")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(4L)
+                        .bookerName("고객4")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(5L)
+                        .bookerName("고객5")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(6L)
+                        .bookerName("고객6")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(7L)
+                        .bookerName("고객7")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(8L)
+                        .bookerName("고객8")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(9L)
+                        .bookerName("고객9")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build(),
+                ConcertCommand.ReserveSeatsCommand.builder()
+                        .customerId(10L)
+                        .bookerName("고객10")
+                        .concertId(concertId)
+                        .concertScheduleId(concertScheduleId)
+                        .concertSeatId(concertSeatId)
+                        .seatNumbers(List.of(seatNumber))
+                        .build()
+        );
+
+        // when
+        // 10개의 스레드를 통해 동시에 좌석 예약 시도
+        int numberOfThreads = 10;
+
+        // 시작 시간 기록
+        Instant testStart = Instant.now();
+        logger.debug("테스트 시작 : {}", testStart);
+
+        // 각 스레드에서 요청 시도
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        List<CompletableFuture<Exception>> futures = new ArrayList<>();
+        for (int i = 0; i < numberOfThreads; i++) {
+            int finalI = i;
+            futures.add(CompletableFuture.supplyAsync(() -> {
+                String currentThreadNm = Thread.currentThread().getName();
+                Instant start = Instant.now();
+                logger.info("{} - 개별 스레드 시작 : {}", currentThreadNm, start);
+                try {
+                    concertFacade.reserveSeats(commands.get(finalI));
+                    return null;
+                } catch (Exception e) {
+                    logger.error("{} - 개별 스레드 예외 : {}", currentThreadNm, e.getMessage());
+                    return e;
+                } finally {
+                    Instant end = Instant.now();
+                    logger.info("{} - 개별 스레드 종료 : {}", currentThreadNm, end);
+                    logger.info("{} - 개별 스레드 경과 : {}", currentThreadNm, Duration.between(start, end).toMillis());
+                }
+            }, executorService));
+        }
+
+        // 모든 작업이 완료되기를 기다림
+        List<Exception> exceptions = futures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .toList();
+
+        // 종료 시간 기록
+        Instant testEnd = Instant.now();
+        logger.info("테스트 종료 : {}", testEnd);
+        logger.info("테스트 총 경과 시간 : {} ms", Duration.between(testStart, testEnd).toMillis());
+
+        // then
+        // 예약 성공 결과 확인 (단 하나의 예약만 성공했는지 확인)
+        List<Reservation> reservations = concertRepository.findReservationsAlreadyExists(concertId, concertScheduleId, List.of(seatNumber));
+        assertThat(reservations).hasSize(1);
+
+        // 예외 발생 스레드 개수 체크 (단 하나의 스레드만 성공했는지 검증)
+        int numberOfExceptions = exceptions.size();
+        assertEquals(numberOfExceptions, numberOfThreads - 1, "예외 발생 스레드 개수 불일치");
+    }
 }

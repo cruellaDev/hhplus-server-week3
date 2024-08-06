@@ -104,7 +104,7 @@ public class ConcertService {
         boolean isAlreadyReserved = concertRepository.findCustomerReservationAlreadyExistsWithPessimisticLock(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isPresent();
         if (isAlreadyReserved) throw new CustomException(ResponseMessage.ALREADY_RESERVED);
         // 다른 유저 접근 확인
-        boolean isAlreadyTaken = !concertRepository.findReservationsAlreadyExistsWithPessimisticLock(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
+        boolean isAlreadyTaken = !concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
         if (isAlreadyTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
 
