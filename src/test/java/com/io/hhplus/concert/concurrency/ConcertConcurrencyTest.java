@@ -156,7 +156,7 @@ public class ConcertConcurrencyTest {
                 .build();
 
         // when
-        // 10개의 스레드를 통해 동시에 좌석 예약 시도
+        // 10번 순차적으로 좌석 예약 시도
         int numberOfThreads = 10;
 
         // 예외 발생 개수
@@ -166,22 +166,20 @@ public class ConcertConcurrencyTest {
         Instant testStart = Instant.now();
         logger.debug("테스트 시작 : {}", testStart);
 
-        // 각 스레드에서 요청 시도
-        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        List<CompletableFuture<Exception>> futures = new ArrayList<>();
+        // 순차적으로 요청 시도
         for (int i = 0; i < numberOfThreads; i++) {
             String currentThreadNm = Thread.currentThread().getName();
             Instant start = Instant.now();
-            logger.info("{} - 개별 스레드 시작 : {}", currentThreadNm, start);
+            logger.info("{} - 시작 : {}", currentThreadNm, start);
             try {
                 concertFacade.reserveSeats(command);
             } catch (Exception e) {
                 numberOfExceptions++;
-                logger.error("{} - 개별 스레드 예외 : {}", currentThreadNm, e.getMessage());
+                logger.error("{} - 예외 : {}", currentThreadNm, e.getMessage());
             } finally {
                 Instant end = Instant.now();
-                logger.info("{} - 개별 스레드 종료 : {}", currentThreadNm, end);
-                logger.info("{} - 개별 스레드 경과 : {}", currentThreadNm, Duration.between(start, end).toMillis());
+                logger.info("{} - 종료 : {}", currentThreadNm, end);
+                logger.info("{} - 경과 : {}", currentThreadNm, Duration.between(start, end).toMillis());
             }
         }
 
