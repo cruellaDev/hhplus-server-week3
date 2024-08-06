@@ -11,8 +11,8 @@ spring:
   datasource:
     url: "jdbc:mysql://localhost:13306/hhplusdev"
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: root
+    username: user
+    password: user_password
 
   jpa:
     database: mysql

@@ -1,9 +1,27 @@
 version: '3.8'
+
 services:
   redis:
     image: redis:latest
-    container_name: redis_test_2
+    container_name: redis_test_3
     volumes:
       - ./data:/data
     ports:
       - "6379:6379"
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: hhplusdev  # 기존 DB 이름 반영
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "13306:3306"  # 호스트 포트를 13306으로 변경
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
