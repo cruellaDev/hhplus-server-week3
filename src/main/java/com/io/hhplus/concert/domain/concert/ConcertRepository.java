@@ -13,7 +13,7 @@ public interface ConcertRepository {
     List<ConcertSchedule> findConcertSchedules(Long concertId);
     ConcertSeat saveConcertSeat(ConcertSeat concertSeat);
     Optional<ConcertSeat> findConcertSeat(Long concertId, Long concertScheduleId);
-    List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber, Date requestedDate);
+    List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber);
     Reservation saveReservation(Reservation reservation);
     Ticket saveTicket(Ticket ticket);
     Optional<Concert> findConcert(Long concertId);
