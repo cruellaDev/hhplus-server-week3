@@ -100,7 +100,7 @@ class ConcertIntegrationTest {
     @Test
     void 예약_가능_콘서트_일정_목록_조회_콘서트와_일정_데이터가_모두_존재할_경우_데이터를_조회하여_모두_반환한다() {
         // given
-        long concertId = 1;
+        long concertId = 2;
 
         // when
         List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);

@@ -64,8 +64,8 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber, Date requestedDate) {
-        return ticketJpaRepository.findOccupiedSeatsFromTicket(concertId, concertScheduleId, seatNumber, requestedDate)
+    public List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber) {
+        return ticketJpaRepository.findOccupiedSeatsFromTicket(concertId, concertScheduleId, seatNumber)
                 .stream()
                 .filter(entity -> entity.isNotDeleted() && (entity.isSeatReserved() || entity.isSeatOccupied()))
                 .map(TicketEntity::toDomain)

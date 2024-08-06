@@ -91,7 +91,7 @@ public class ConcertService {
         long lEnd = seat.seatCapacity();
         Date requestedDate = DateUtils.subtractSeconds(DateUtils.getSysDate(), GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS);
         return LongStream.rangeClosed(lStart, lEnd)
-                .filter(seatSequence -> concertRepository.findOccupiedSeatsFromTicket(seat.concertId(), seat.concertScheduleId(), String.valueOf(seatSequence), requestedDate).isEmpty())
+                .filter(seatSequence -> concertRepository.findOccupiedSeatsFromTicket(seat.concertId(), seat.concertScheduleId(), String.valueOf(seatSequence)).isEmpty())
                 .mapToObj(seatSequence -> AvailableSeatInfo.of(seat, seatSequence))
                 .toList();
     }
@@ -130,7 +130,7 @@ public class ConcertService {
         Date requestedDate = DateUtils.subtractSeconds(DateUtils.getSysDate(), GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS);
         boolean isSeatTaken = command.getSeatNumbers()
                 .stream()
-                .anyMatch(seatNumber -> !(concertRepository.findOccupiedSeatsFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber, requestedDate).isEmpty()));
+                .anyMatch(seatNumber -> !(concertRepository.findOccupiedSeatsFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isEmpty()));
         if (isSeatTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
         return ReservationInfo.of(

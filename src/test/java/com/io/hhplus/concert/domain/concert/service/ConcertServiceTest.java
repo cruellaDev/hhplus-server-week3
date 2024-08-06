@@ -256,7 +256,7 @@ class ConcertServiceTest {
                 .seatCapacity(0L)
                 .build();
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
 
         // when
         List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
@@ -280,9 +280,9 @@ class ConcertServiceTest {
                 .build();
 
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
 
         // when
         List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
@@ -324,9 +324,9 @@ class ConcertServiceTest {
                 .build();
 
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat1));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat2));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat3));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of(seat1));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of(seat2));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of(seat3));
 
         // when
         List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
@@ -502,7 +502,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -564,7 +564,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -626,7 +626,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -680,7 +680,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of(seat));
 
         // when - then
         ConcertCommand.ReserveSeatsCommand command = ConcertCommand.ReserveSeatsCommand.builder()
@@ -741,7 +741,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString())).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
