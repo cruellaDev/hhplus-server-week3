@@ -20,6 +20,8 @@ public interface ConcertRepository {
     Optional<ConcertSchedule> findConcertSchedule(Long concertId, Long concertScheduleId);
     Optional<Reservation> findReservation(Long reservationId, Long customerId);
     List<Ticket> findTickets(Long reservationId);
-    Optional<Reservation> findReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
+    Optional<Reservation> findCustomerReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
+    Optional<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
     List<Reservation> findReservationsAlreadyExists(Long concertId, Long concertScheduleId, List<String> seatNumbers);
+    List<Reservation> findReservationsAlreadyExistsWithPessimisticLock(Long concertId, Long concertScheduleId, List<String> seatNumbers);
 }

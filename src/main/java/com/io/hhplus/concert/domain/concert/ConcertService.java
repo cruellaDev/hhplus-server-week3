@@ -100,15 +100,13 @@ public class ConcertService {
     @Transactional
     public ReservationInfo reserveSeats(ConcertCommand.ReserveSeatsCommand command) {
         // 생성된 예약과 티켓이 있는지 확인 후 결제 생성 진행
+        // 다른 유저 접근 확인
+        boolean isAlreadyTaken = !concertRepository.findReservationsAlreadyExistsWithPessimisticLock(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
+        if (isAlreadyTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
         // 동일 유저 접근
-        log.debug("alreadyReserved : {}", concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).orElse(null));
-        boolean isAlreadyReserved = concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isPresent();
+        boolean isAlreadyReserved = concertRepository.findCustomerReservationAlreadyExistsWithPessimisticLock(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isPresent();
         if (isAlreadyReserved) throw new CustomException(ResponseMessage.ALREADY_RESERVED);
 
-        // 다른 유저 접근 확인
-        log.debug("alreadyTaken : {}", concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()));
-        boolean isAlreadyTaken = !concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
-        if (isAlreadyTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
         // 콘서트 정보 조회
         Concert concert = concertRepository.findConcert(command.getConcertId())
