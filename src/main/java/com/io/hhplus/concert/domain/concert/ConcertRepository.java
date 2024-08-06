@@ -2,6 +2,7 @@ package com.io.hhplus.concert.domain.concert;
 
 import com.io.hhplus.concert.domain.concert.model.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ public interface ConcertRepository {
     List<ConcertSchedule> findConcertSchedules(Long concertId);
     ConcertSeat saveConcertSeat(ConcertSeat concertSeat);
     Optional<ConcertSeat> findConcertSeat(Long concertId, Long concertScheduleId);
-    Optional<Ticket> findNotOccupiedSeatFromTicket(Long concertId, Long concertScheduleId, String seatNumber);
+    List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber, Date requestedDate);
     Reservation saveReservation(Reservation reservation);
     Ticket saveTicket(Ticket ticket);
     Optional<Concert> findConcert(Long concertId);

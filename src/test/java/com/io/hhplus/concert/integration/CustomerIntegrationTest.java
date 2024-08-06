@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.application.customer.facade;
+package com.io.hhplus.concert.integration;
 
 import com.io.hhplus.concert.application.customer.CustomerFacade;
 import org.junit.jupiter.api.DisplayNameGeneration;

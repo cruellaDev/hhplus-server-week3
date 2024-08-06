@@ -50,7 +50,7 @@ public record Ticket(
 
     public boolean isAbleToConfirmReservation() {
         return this.reservedAt == null
-                && DateUtils.calculateDuration(this.createdAt, DateUtils.getSysDate()) > GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
+                && DateUtils.calculateDuration(DateUtils.getSysDate(), this.createdAt) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
                 && this.deletedAt == null;
     }
 

@@ -7,6 +7,6 @@ public enum ConcertStatus {
     CLOSED;
 
     public boolean isAvailable() {
-        return AVAILABLE.equals(this);
+        return this.compareTo(AVAILABLE) == 0;
     }
 }

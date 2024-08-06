@@ -119,9 +119,26 @@ public class TicketEntity implements Auditable {
                 .build();
     }
 
+    public boolean isNotDeleted() {
+        return this.deletedAt == null;
+    }
+
+    public boolean isSeatReserved() {
+        return this.reservedAt != null && this.cancelApprovedAt == null;
+    }
+
+    public boolean isSeatOccupied() {
+        long spentTimeForReservation = DateUtils.calculateDuration(DateUtils.getSysDate(), this.auditSection.getCreatedAt());
+        return this.reservedAt == null && spentTimeForReservation < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS;
+    }
+
     public boolean isReservable() {
-        return (this.reservedAt == null || this.cancelApprovedAt != null)
-                && DateUtils.calculateDuration(this.auditSection.getCreatedAt(), DateUtils.getSysDate()) < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS
-                && this.deletedAt == null;
+        if (this.deletedAt != null) return false;
+        if (this.reservedAt != null && this.cancelAcceptedAt != null) return false;
+        if (this.id != null && this.reservedAt == null) {
+            long spentTimeForReservation = DateUtils.calculateDuration(DateUtils.getSysDate(), this.auditSection.getCreatedAt());
+            return spentTimeForReservation < GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS;
+        }
+        return true;
     }
 }

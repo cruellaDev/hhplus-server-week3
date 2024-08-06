@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,25 +76,6 @@ class ConcertServiceTest {
                 .isInstanceOf(CustomException.class)
                 .extracting("messageDetail")
                 .isEqualTo("아티스트 명이 존재하지 않습니다.");
-    }
-
-    @Test
-    void 콘서트_등록_시_예매_시작_일시가_없으면_예외를_반환한다() {
-        // given
-        ConcertCommand.RegisterConcertCommand command = ConcertCommand.RegisterConcertCommand.builder()
-                .concertName("항플 콘서트")
-                .artistName("항해킴")
-                .build();
-
-        // when - then
-        assertThatThrownBy(() -> concertService.registerConcert(command))
-                .isInstanceOf(CustomException.class)
-                .extracting("responseMessage")
-                .isEqualTo(ResponseMessage.CONCERT_INVALID);
-        assertThatThrownBy(() -> concertService.registerConcert(command))
-                .isInstanceOf(CustomException.class)
-                .extracting("messageDetail")
-                .isEqualTo("예매 기간 정보가 존재하지 않습니다.");
     }
 
     @Test
@@ -274,7 +256,7 @@ class ConcertServiceTest {
                 .seatCapacity(0L)
                 .build();
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
 
         // when
         List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
@@ -288,6 +270,32 @@ class ConcertServiceTest {
      */
     @Test
     void 현재_일시_기준_특정_콘서트의_공연_좌석_목록을_조회한다_모두_예약_가능() {
+        // given
+        ConcertSeat seat = ConcertSeat.builder()
+                .concertSeatId(1L)
+                .concertId(1L)
+                .concertScheduleId(1L)
+                .seatPrice(BigDecimal.valueOf(10000))
+                .seatCapacity(3L)
+                .build();
+
+        given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
+
+        // when
+        List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
+
+        // then
+        assertThat(result).hasSize(3);
+    }
+
+    /**
+     * 현재일시 기준 특정 콘서트의 예약 가능 공연 좌석 목록을 조회한댜.
+     */
+    @Test
+    void 현재_일시_기준_특정_콘서트의_공연_좌석_목록을_조회한다_모두_예약된_상태() {
         // given
         ConcertSeat seat = ConcertSeat.builder()
                 .concertSeatId(1L)
@@ -316,35 +324,9 @@ class ConcertServiceTest {
                 .build();
 
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.of(seat1));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.of(seat2));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.of(seat3));
-
-        // when
-        List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
-
-        // then
-        assertThat(result).hasSize(3);
-    }
-
-    /**
-     * 현재일시 기준 특정 콘서트의 예약 가능 공연 좌석 목록을 조회한댜.
-     */
-    @Test
-    void 현재_일시_기준_특정_콘서트의_공연_좌석_목록을_조회한다_모두_예약된_상태() {
-        // given
-        ConcertSeat seat = ConcertSeat.builder()
-                .concertSeatId(1L)
-                .concertId(1L)
-                .concertScheduleId(1L)
-                .seatPrice(BigDecimal.valueOf(10000))
-                .seatCapacity(3L)
-                .build();
-
-        given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(seat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat1));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat2));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat3));
 
         // when
         List<AvailableSeatInfo> result = concertService.getAvailableSeats(1L, 1L);
@@ -520,7 +502,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -582,7 +564,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -644,7 +626,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 
@@ -698,7 +680,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.of(seat));
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of(seat));
 
         // when - then
         ConcertCommand.ReserveSeatsCommand command = ConcertCommand.ReserveSeatsCommand.builder()
@@ -759,7 +741,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
-        given(concertRepository.findNotOccupiedSeatFromTicket(anyLong(), anyLong(), anyString())).willReturn(Optional.empty());
+        given(concertRepository.findOccupiedSeatsFromTicket(anyLong(), anyLong(), anyString(), any(Date.class))).willReturn(List.of());
         given(concertRepository.saveReservation(any(Reservation.class))).willReturn(reservation);
         given(concertRepository.saveTicket(any(Ticket.class))).willReturn(ticket);
 

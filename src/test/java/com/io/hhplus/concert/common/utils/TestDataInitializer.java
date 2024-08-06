@@ -35,7 +35,7 @@ public class TestDataInitializer {
     public void initializeTestData() {
         // Customer Dummy 데이터 생성
         dummyCustomers = new ArrayList<>();
-        for (int i = 1; i <= 30; i++) {
+        for (int i = 1; i <= 10; i++) {
             dummyCustomers.add(
                     customerRepository.saveCustomer(Customer.builder()
                             .customerName("고객" + i)
@@ -55,7 +55,7 @@ public class TestDataInitializer {
                             .concertName("항해플러스 코치님 팬미팅" + i)
                             .artistName("코치" + i)
                             .concertStatus(i % 2 == 0 ? ConcertStatus.AVAILABLE : ConcertStatus.NOT_AVAILABLE)
-                            .bookBeginAt(DateUtils.addMinutes(DateUtils.getSysDate(), i))
+                            .bookBeginAt(DateUtils.subtractDays(DateUtils.getSysDate(), i))
                             .bookEndAt(DateUtils.addDays(DateUtils.getSysDate(), i))
                             .build()
             );
@@ -63,14 +63,15 @@ public class TestDataInitializer {
                 ConcertSchedule concertSchedule = concertRepository.saveConcertSchedule(
                         ConcertSchedule.builder()
                                 .concertId(concert.concertId())
-                                .performedAt(i % 2 == 0 ? DateUtils.getSysDate() : DateUtils.subtractMinutes(DateUtils.getSysDate(), -1))
+                                .performedAt(i % 2 == 0 ? DateUtils.addDays(DateUtils.getSysDate(), 7) : DateUtils.subtractDays(DateUtils.getSysDate(), 1))
                                 .build()
                 );
                 ConcertSeat concertSeat = concertRepository.saveConcertSeat(
                         ConcertSeat.builder()
                                 .concertId(concert.concertId())
                                 .concertScheduleId(concertSchedule.concertScheduleId())
-                                .seatCapacity(((long) (Math.random() * 100)) * 1000)
+                                .seatCapacity(5L)
+//                                .seatCapacity(((long) (Math.random() * 100)) * 1000)
                                 .seatPrice(BigDecimal.valueOf(((int) (Math.random() * 100)) * 100))
                                 .build()
                 );

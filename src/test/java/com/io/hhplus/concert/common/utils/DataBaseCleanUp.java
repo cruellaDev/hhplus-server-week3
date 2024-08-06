@@ -22,7 +22,7 @@ public class DataBaseCleanUp {
         List<String> tableNames = getTableNames();
         entityManager.flush();
 
-        // mySQL foreign Key check 설정 변경
+        // mySQL foreign Key check 설정 해제
         entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
 
         tableNames.forEach(tableName -> {

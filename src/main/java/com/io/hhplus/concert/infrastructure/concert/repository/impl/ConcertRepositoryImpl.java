@@ -11,6 +11,7 @@ import com.io.hhplus.concert.infrastructure.concert.repository.jpa.TicketJpaRepo
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,10 +64,12 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public Optional<Ticket> findNotOccupiedSeatFromTicket(Long concertId, Long concertScheduleId, String seatNumber) {
-        return ticketJpaRepository.findNotOccupiedSeatFromTicket(concertId, concertScheduleId, seatNumber)
-                .filter(TicketEntity::isReservable)
-                .map(TicketEntity::toDomain);
+    public List<Ticket> findOccupiedSeatsFromTicket(Long concertId, Long concertScheduleId, String seatNumber, Date requestedDate) {
+        return ticketJpaRepository.findOccupiedSeatsFromTicket(concertId, concertScheduleId, seatNumber, requestedDate)
+                .stream()
+                .filter(entity -> entity.isNotDeleted() && (entity.isSeatReserved() || entity.isSeatOccupied()))
+                .map(TicketEntity::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
