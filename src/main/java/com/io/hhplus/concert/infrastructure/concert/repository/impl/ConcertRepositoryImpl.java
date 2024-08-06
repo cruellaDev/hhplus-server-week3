@@ -112,6 +112,14 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public Optional<Reservation> findReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
-        return reservationJpaRepository.findReservationAlreadyExists(customerId, concertId, concertScheduleId, seatNumbers);
+        return reservationJpaRepository.findReservationAlreadyExists(customerId, concertId, concertScheduleId, seatNumbers)
+                .map(ReservationEntity::toDomain);
+    }
+
+    @Override
+    public List<Reservation> findReservationsAlreadyExists(Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+        return reservationJpaRepository.findReservationsAlreadyExists(concertId, concertScheduleId, seatNumbers)
+                .stream().map(ReservationEntity::toDomain)
+                .collect(Collectors.toList());
     }
 }

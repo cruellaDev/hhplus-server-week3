@@ -1,6 +1,7 @@
 package com.io.hhplus.concert.common.utils;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
+import com.io.hhplus.concert.concurrency.ConcertConcurrencyTest;
 import com.io.hhplus.concert.domain.concert.ConcertRepository;
 import com.io.hhplus.concert.domain.concert.model.Concert;
 import com.io.hhplus.concert.domain.concert.model.ConcertSchedule;
@@ -8,6 +9,8 @@ import com.io.hhplus.concert.domain.concert.model.ConcertSeat;
 import com.io.hhplus.concert.domain.customer.CustomerRepository;
 import com.io.hhplus.concert.domain.customer.model.Customer;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -26,6 +29,8 @@ public class TestDataInitializer {
         this.customerRepository = customerRepository;
         this.concertRepository = concertRepository;
     }
+
+    Logger logger = LoggerFactory.getLogger(ConcertConcurrencyTest.class);
 
     private List<Customer> dummyCustomers;
     private List<Concert> dummyConcerts;
@@ -77,6 +82,9 @@ public class TestDataInitializer {
                 );
                 dummyConcertSchedules.add(concertSchedule);
                 dummyConcertSeats.add(concertSeat);
+
+                logger.info("concertId : {}, concertStatus: {}, concertScheduleId : {}, concertPerformedAt: {}, concertSeatId: {}, concertSeatPrice: {}, concertSeatCapacity: {}",
+                        concert.concertId(), concert.concertStatus(), concertSchedule.concertScheduleId(), concertSchedule.performedAt(), concertSeat.concertSeatId(), concertSeat.seatPrice(), concertSeat.seatCapacity());
             }
         }
     }

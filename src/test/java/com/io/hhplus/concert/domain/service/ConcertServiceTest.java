@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.concert.service;
+package com.io.hhplus.concert.domain.service;
 
 import com.io.hhplus.concert.common.enums.ConcertStatus;
 import com.io.hhplus.concert.common.enums.ResponseMessage;
@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

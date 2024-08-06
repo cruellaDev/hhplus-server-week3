@@ -89,7 +89,6 @@ public class ConcertService {
         log.info("[service-concert-get-getAvailableSeats] - concertId : {}, concertScheduleId : {}", concertId, concertScheduleId);
         long lStart = 1;
         long lEnd = seat.seatCapacity();
-        Date requestedDate = DateUtils.subtractSeconds(DateUtils.getSysDate(), GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS);
         return LongStream.rangeClosed(lStart, lEnd)
                 .filter(seatSequence -> concertRepository.findOccupiedSeatsFromTicket(seat.concertId(), seat.concertScheduleId(), String.valueOf(seatSequence)).isEmpty())
                 .mapToObj(seatSequence -> AvailableSeatInfo.of(seat, seatSequence))
@@ -104,11 +103,13 @@ public class ConcertService {
     @Transactional
     public ReservationInfo reserveSeats(ConcertCommand.ReserveSeatsCommand command) {
         // 생성된 예약과 티켓이 있는지 확인 후 결제 생성 진행
-        Reservation reservation = concertRepository.saveReservation(
-                concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers())
-                .orElseGet(Reservation::create)
-                .reserve(command)
-        );
+        // 동일 유저 접근
+        boolean isReserved = concertRepository.findReservationAlreadyExists(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isPresent();
+        if (isReserved) throw new CustomException(ResponseMessage.ALREADY_RESERVED);
+
+        // 다른 유저 접근
+        boolean isReservationExists = !concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
+        if (isReservationExists) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
         // 콘서트 정보 조회
         Concert concert = concertRepository.findConcert(command.getConcertId())
@@ -127,18 +128,18 @@ public class ConcertService {
                 .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SEAT_NOT_FOUND));
 
         // 좌석 확인
-        Date requestedDate = DateUtils.subtractSeconds(DateUtils.getSysDate(), GlobalConstants.MAX_DURATION_OF_ACTIVE_QUEUE_IN_SECONDS);
         boolean isSeatTaken = command.getSeatNumbers()
                 .stream()
                 .anyMatch(seatNumber -> !(concertRepository.findOccupiedSeatsFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isEmpty()));
         if (isSeatTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
-        return ReservationInfo.of(
-                reservation,
-                command.getSeatNumbers()
-                        .stream()
-                        .map(seatNumber -> concertRepository.saveTicket(Ticket.reserve(reservation, concert, concertSchedule, concertSeat, seatNumber)))
-                        .toList());
+        Reservation reservation = concertRepository.saveReservation(Reservation.create().reserve(command));
+        List<Ticket> tickets = command.getSeatNumbers()
+                .stream()
+                .map(seatNumber -> concertRepository.saveTicket(Ticket.reserve(reservation, concert, concertSchedule, concertSeat, seatNumber)))
+                .toList();
+
+        return ReservationInfo.of(reservation, tickets);
     }
 
     /**

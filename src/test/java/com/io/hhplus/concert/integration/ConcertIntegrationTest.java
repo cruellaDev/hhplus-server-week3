@@ -11,6 +11,8 @@ import com.io.hhplus.concert.domain.concert.dto.AvailableSeatInfo;
 import com.io.hhplus.concert.domain.concert.model.*;
 import com.io.hhplus.concert.application.concert.ConcertFacade;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -39,6 +41,8 @@ class ConcertIntegrationTest {
 
     @Autowired
     private ConcertRepository concertRepository;
+
+    Logger logger = LoggerFactory.getLogger(ConcertIntegrationTest.class);
 
     @BeforeEach
     void setUp() {
