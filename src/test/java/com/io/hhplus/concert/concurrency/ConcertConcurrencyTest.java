@@ -60,7 +60,7 @@ public class ConcertConcurrencyTest {
      * 비동기
      */
     @Test
-    void 동일_유저가_동시에_하나의_좌석을_예약_요청했을_시_하나를_제외하고_전부_실패한다()  {
+    void 동일_유저가_동시에_하나의_좌석을_여러_번_예약_요청했을_시_처음를_제외하고_전부_실패한다()  {
 
         // given
         long customerId = 5;
