@@ -11,6 +11,12 @@ public record ReservationInfo(
     Reservation reservation,
     List<Ticket> tickets
 ) {
+    public static ReservationInfo from(Reservation reservation) {
+        return ReservationInfo.builder()
+                .reservation(reservation)
+                .tickets(reservation.tickets())
+                .build();
+    }
     public static ReservationInfo of(Reservation reservation, List<Ticket> tickets) {
         return ReservationInfo.builder()
                 .reservation(reservation)

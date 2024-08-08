@@ -17,14 +17,50 @@ public class ConcertController {
     private final ConcertFacade concertFacade;
 
     /**
+     * 콘서트 등록
+     * @param request 콘서트 등록 요청 정보
+     * @return 콘서트 등록 응답 정보
+     */
+    @PostMapping("/register/concert")
+    public ResponseEntity<CommonResponse<ConcertDto.SingleResponse>> register(ConcertDto.RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertDto.SingleResponse.from(concertFacade.registerConcert(request.toCommand()))));
+    }
+
+    /**
+     * 콘서트 일정 등록
+     * @param request 콘서트 일정 등록 요청 정보
+     * @return 콘서트 일정 등록 응답 정보
+     */
+    @PostMapping("/register/schedule")
+    public ResponseEntity<CommonResponse<ConcertScheduleDto.SingleResponse>> register(@RequestBody ConcertScheduleDto.RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertScheduleDto.SingleResponse.from(concertFacade.registerConcertSchedule(request.toCommand()))));
+    }
+
+    /**
+     * 콘서트 좌석 등록
+     * @param request 콘서트 좌석 등록 요청 정보
+     * @return 콘서트 좌석 등록 응답 정보
+     */
+    @PostMapping("/register/seat")
+    public ResponseEntity<CommonResponse<ConcertSeatDto.SingleResponse>> register(@RequestBody ConcertSeatDto.RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponse.success(ConcertSeatDto.SingleResponse.from(concertFacade.registerConcertSeat(request.toCommand()))));
+    }
+
+    /**
      * 예약가능 콘서트 조회
      * @return 예약 가능 콘서트 목록
      */
     @GetMapping("/")
-    public ResponseEntity<CommonResponse<ConcertDto.Response>> concerts() {
+    public ResponseEntity<CommonResponse<ConcertDto.ListResponse>> concerts() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertDto.Response.from(concertFacade.getAvailableConcerts())));
+                .body(CommonResponse.success(ConcertDto.ListResponse.from(concertFacade.getAvailableConcerts())));
     }
 
     /**
@@ -33,10 +69,10 @@ public class ConcertController {
      * @return 예약 가능 날짜 공연 목록
      */
     @GetMapping("/{concertId}/schedules")
-    public ResponseEntity<CommonResponse<ConcertScheduleDto.Response>> schedules(@PathVariable("concertId") Long concertId) {
+    public ResponseEntity<CommonResponse<ConcertScheduleDto.ListResponse>> schedules(@PathVariable("concertId") Long concertId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertScheduleDto.Response.from(concertFacade.getAvailableSchedules(concertId))));
+                .body(CommonResponse.success(ConcertScheduleDto.ListResponse.from(concertFacade.getAvailableSchedules(concertId))));
     }
 
     /**
@@ -46,11 +82,11 @@ public class ConcertController {
      * @return 예약가능 좌석 목록
      */
     @GetMapping("/{concertId}/schedules/{concertScheduleId}/seats")
-    public ResponseEntity<CommonResponse<ConcertSeatDto.Response>> seats(@PathVariable("concertId") Long concertId,
+    public ResponseEntity<CommonResponse<ConcertSeatDto.ListResponse>> seats(@PathVariable("concertId") Long concertId,
                                                          @PathVariable("concertScheduleId") Long concertScheduleId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertSeatDto.Response.from(concertFacade.getAvailableSeats(concertId, concertScheduleId))));
+                .body(CommonResponse.success(ConcertSeatDto.ListResponse.from(concertFacade.getAvailableSeats(concertId, concertScheduleId))));
     }
 
     /**

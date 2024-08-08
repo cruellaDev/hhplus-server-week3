@@ -5,13 +5,17 @@ import com.io.hhplus.concert.application.payment.dto.CheckoutPaymentResultAndCon
 import com.io.hhplus.concert.domain.concert.model.Reservation;
 import com.io.hhplus.concert.domain.concert.model.Ticket;
 import com.io.hhplus.concert.domain.payment.model.Payment;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class PaymentDto {
 
+    @Data
     public static class CheckoutPaymentRequest {
         private Long customerId;
         private Long reservationId;
@@ -27,6 +31,9 @@ public class PaymentDto {
     }
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CheckoutPaymentResponse {
         private Payment payment;
         private Reservation reservation;

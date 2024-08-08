@@ -3,10 +3,14 @@ package com.io.hhplus.concert.interfaces.token.dto;
 import com.io.hhplus.concert.common.enums.QueueStatus;
 import com.io.hhplus.concert.domain.queue.TokenCommand;
 import com.io.hhplus.concert.domain.queue.dto.BankCounterQueueTokenInfo;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class QueueTokenDto {
 
+    @Data
     public static class BankCounterIssueTokenRequest {
         private Long customerId;
 
@@ -18,6 +22,9 @@ public class QueueTokenDto {
     }
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BankCounterIssueTokenResponse {
         private Long customerId;
         private QueueStatus queueStatus;
