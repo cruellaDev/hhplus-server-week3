@@ -40,7 +40,7 @@ public class TokenService {
             queueToken = optionalQueueToken.get();
         } else {
             Long activeQueueTokenCount = queueTokenRepository.countActiveQueueToken();
-            queueToken = queueTokenRepository.saveQueueToken(QueueToken.create().updateStatusBasedOnCount(activeQueueTokenCount).enter(command));
+            queueToken = queueTokenRepository.saveQueueToken(QueueToken.enter(command).updateStatusBasedOnCount(activeQueueTokenCount));
         }
 
         // 대기인원 (앞으로 남은 사람)

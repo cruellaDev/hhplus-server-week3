@@ -35,11 +35,8 @@ public class ConcertService {
      * 콘서트 목록 조회
      * @return 콘서트 목록
      */
-    public List<Concert> getConcerts() {
-        return concertRepository.findConcerts()
-                .stream()
-                .filter(Concert::isNotDeleted)
-                .toList();
+    public List<Concert> getAvailableConcerts() {
+        return concertRepository.findConcerts();
     }
 
     /**
@@ -58,12 +55,7 @@ public class ConcertService {
      */
     public List<ConcertSchedule> getAvailableSchedules(Long concertId) {
         log.info("[service-concert-getAvailableSchedules] - concertId : {}", concertId);
-        return concertRepository.findConcertSchedules(concertId)
-                .stream()
-                .filter(concertSchedule
-                        -> concertSchedule.isToBePerformed()
-                        && concertSchedule.isNotDeleted())
-                .toList();
+        return concertRepository.findConcertSchedules(concertId);
     }
 
     /**
@@ -99,44 +91,26 @@ public class ConcertService {
      */
     @Transactional
     public ReservationInfo reserveSeats(ConcertCommand.ReserveSeatsCommand command) {
-        // 생성된 예약과 티켓이 있는지 확인 후 결제 생성 진행
-        // 동일 유저 접근
-        boolean isAlreadyReserved = concertRepository.findCustomerReservationAlreadyExistsWithPessimisticLock(command.getCustomerId(), command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isPresent();
-        if (isAlreadyReserved) throw new CustomException(ResponseMessage.ALREADY_RESERVED);
-        // 다른 유저 접근 확인
-        boolean isAlreadyTaken = !concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
-        if (isAlreadyTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
-
-
         // 콘서트 정보 조회
-        Concert concert = concertRepository.findConcert(command.getConcertId())
-                .filter(o
-                        -> o.isAvailableConcertStatus()
-                        && o.isAbleToBook()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
-        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(command.getConcertId(), command.getConcertScheduleId())
-                .filter(o
-                        -> o.isToBePerformed()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SCHEDULE_NOT_FOUND));
-        ConcertSeat concertSeat = concertRepository.findConcertSeat(command.getConcertId(), command.getConcertScheduleId())
-                .filter(ConcertSeat::isNotDeleted)
-                .orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SEAT_NOT_FOUND));
+        Concert concert = concertRepository.findConcert(command.getConcertId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_NOT_FOUND));
+        concert.checkValid();
+        // 콘서트 일정 정보 조회
+        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(command.getConcertId(), command.getConcertScheduleId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SCHEDULE_NOT_FOUND));
+        concertSchedule.checkValid();
+        // 콘서트 좌석 정보 조회
+        // TODO Lock
+        ConcertSeat concertSeat = concertRepository.findConcertSeat(command.getConcertId(), command.getConcertScheduleId()).orElseThrow(() -> new CustomException(ResponseMessage.CONCERT_SEAT_NOT_FOUND));
+        concertSeat.checkValid();
 
-        // 좌석 확인
-        boolean isSeatTaken = command.getSeatNumbers()
-                .stream()
-                .anyMatch(seatNumber -> !(concertRepository.findOccupiedSeatsFromTicket(command.getConcertId(), command.getConcertScheduleId(), seatNumber).isEmpty()));
+        // 좌석확인
+        boolean isSeatTaken = !concertRepository.findReservationsAlreadyExists(command.getConcertId(), command.getConcertScheduleId(), command.getSeatNumbers()).isEmpty();
         if (isSeatTaken) throw new CustomException(ResponseMessage.SEAT_TAKEN);
 
-        Reservation reservation = concertRepository.saveReservation(Reservation.create().reserve(command));
-        List<Ticket> tickets = command.getSeatNumbers()
-                .stream()
-                .map(seatNumber -> concertRepository.saveTicket(Ticket.reserve(reservation, concert, concertSchedule, concertSeat, seatNumber)))
-                .toList();
+        Reservation reservation = Reservation
+                .reserve(command.getCustomerId(), command.getBookerName())
+                .addTickets(concert, concertSchedule, concertSeat, command.getSeatNumbers());
 
-        return ReservationInfo.of(reservation, tickets);
+        return ReservationInfo.from(concertRepository.saveReservation(reservation));
     }
 
     /**
@@ -145,18 +119,16 @@ public class ConcertService {
     @Transactional
     public ReservationInfo confirmReservation(ConcertCommand.ConfirmReservationCommand command) {
         // 예약 조회
-        Reservation reservation = concertRepository.findReservation(command.getReservationId(), command.getCustomerId())
-                .filter(o
-                        -> o.isAbleToPay()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.RESERVATION_NOT_FOUND));
-        // 티켓
+        Reservation reservation = concertRepository.findReservation(command.getReservationId(), command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.RESERVATION_NOT_FOUND));
+        // 티켓 조회
+        // TODO refactoring - addTicket
         List<Ticket> tickets = concertRepository.findTickets(command.getReservationId())
                 .stream()
                 .map(ticket -> ticket.confirmReservation(reservation))
                 .toList();
         if (tickets.isEmpty()) throw new CustomException(ResponseMessage.TICKET_NOT_FOUND);
 
+        // TODO 예약 상태 추가
         return ReservationInfo.of(
                 reservation,
                 tickets.stream().map(concertRepository::saveTicket).collect(Collectors.toList())

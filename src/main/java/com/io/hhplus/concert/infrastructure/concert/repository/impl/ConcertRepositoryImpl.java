@@ -32,7 +32,7 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public List<Concert> findConcerts() {
-        return concertJpaRepository.findAllByDeletedAtIsNull()
+        return concertJpaRepository.findAvailableConcerts()
                 .stream()
                 .map(ConcertEntity::toDomain)
                 .collect(Collectors.toList());
@@ -73,7 +73,9 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public Reservation saveReservation(Reservation reservation) {
-        return reservationJpaRepository.save(ReservationEntity.from(reservation)).toDomain();
+        ReservationEntity savedReservation =reservationJpaRepository.save(ReservationEntity.from(reservation));
+        List<TicketEntity> savedTickets = reservation.tickets().stream().map(ticket -> ticketJpaRepository.save(TicketEntity.of(reservation, ticket))).toList();
+        return savedReservation.toDomain(savedTickets);
     }
 
     @Override
@@ -116,9 +118,9 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public Optional<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+    public List<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
         return reservationJpaRepository.findCustomerReservationAlreadyExistsWithPessimisticLock(customerId, concertId, concertScheduleId, seatNumbers)
-                .map(ReservationEntity::toDomain);
+                .stream().map(ReservationEntity::toDomain).collect(Collectors.toList());
     }
 
     @Override

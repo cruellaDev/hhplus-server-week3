@@ -4,12 +4,16 @@ import com.io.hhplus.concert.domain.concert.ConcertCommand;
 import com.io.hhplus.concert.domain.concert.dto.ReservationInfo;
 import com.io.hhplus.concert.domain.concert.model.Reservation;
 import com.io.hhplus.concert.domain.concert.model.Ticket;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 public class ReservationDto {
 
+    @Data
     public static class ReserveSeatsRequest {
         private Long customerId;
         private Long concertId;
@@ -29,6 +33,9 @@ public class ReservationDto {
     }
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReserveSeatsResponse {
         private Reservation reservation;
         private List<Ticket> tickets;

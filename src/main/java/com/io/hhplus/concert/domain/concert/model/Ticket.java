@@ -30,13 +30,12 @@ public record Ticket(
         Date modifiedAt,
         Date deletedAt
 ) {
-    public static Ticket reserve(Reservation reservation, Concert concert, ConcertSchedule concertSchedule, ConcertSeat concertSeat, String seatNumber) {
+    public static Ticket reserve(Concert concert, ConcertSchedule concertSchedule, ConcertSeat concertSeat, String seatNumber) {
         concert.checkValid();
         concertSchedule.checkValid();
         concertSeat.checkValid();
 
         return Ticket.builder()
-                .reservationId(reservation.reservationId())
                 .concertId(concert.concertId())
                 .concertScheduleId(concertSchedule.concertScheduleId())
                 .concertSeatId(concertSeat.concertSeatId())

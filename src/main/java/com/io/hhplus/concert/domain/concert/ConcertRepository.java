@@ -21,7 +21,7 @@ public interface ConcertRepository {
     Optional<Reservation> findReservation(Long reservationId, Long customerId);
     List<Ticket> findTickets(Long reservationId);
     Optional<Reservation> findCustomerReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
-    Optional<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
+    List<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers);
     List<Reservation> findReservationsAlreadyExists(Long concertId, Long concertScheduleId, List<String> seatNumbers);
     List<Reservation> findReservationsAlreadyExistsWithPessimisticLock(Long concertId, Long concertScheduleId, List<String> seatNumbers);
 }

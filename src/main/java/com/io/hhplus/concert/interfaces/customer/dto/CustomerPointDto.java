@@ -3,7 +3,10 @@ package com.io.hhplus.concert.interfaces.customer.dto;
 import com.io.hhplus.concert.domain.customer.CustomerCommand;
 import com.io.hhplus.concert.domain.customer.dto.CustomerPointInfo;
 import com.io.hhplus.concert.domain.customer.model.Customer;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +14,9 @@ import java.util.Date;
 public class CustomerPointDto {
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CustomerPointBalanceResponse {
         private Long customerId;
         private BigDecimal pointBalance;
@@ -23,6 +29,7 @@ public class CustomerPointDto {
         }
     }
 
+    @Data
     public static class ChargeCustomerPointRequest {
         private Long customerId;
         private BigDecimal amount;
@@ -36,6 +43,9 @@ public class CustomerPointDto {
     }
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ChargeCustomerPointResponse {
         private Long customerId;
         private BigDecimal pointBalance;
@@ -52,6 +62,7 @@ public class CustomerPointDto {
         }
     }
 
+    @Data
     public static class UseCustomerPointRequest {
         private Long customerId;
         private BigDecimal amount;
@@ -65,6 +76,9 @@ public class CustomerPointDto {
     }
 
     @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UseCustomerPointResponse {
         private Long customerId;
         private BigDecimal pointBalance;

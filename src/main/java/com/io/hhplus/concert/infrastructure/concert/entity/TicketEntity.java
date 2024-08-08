@@ -2,6 +2,7 @@ package com.io.hhplus.concert.infrastructure.concert.entity;
 
 import com.io.hhplus.concert.common.GlobalConstants;
 import com.io.hhplus.concert.common.utils.DateUtils;
+import com.io.hhplus.concert.domain.concert.model.Reservation;
 import com.io.hhplus.concert.domain.concert.model.Ticket;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditListener;
 import com.io.hhplus.concert.infrastructure.audit.entity.AuditSection;
@@ -80,6 +81,26 @@ public class TicketEntity implements Auditable {
         return TicketEntity.builder()
                 .id(ticket.ticketId())
                 .reservationId(ticket.reservationId())
+                .concertId(ticket.concertId())
+                .concertScheduleId(ticket.concertScheduleId())
+                .concertSeatId(ticket.concertSeatId())
+                .concertName(ticket.concertName())
+                .artistName(ticket.artistName())
+                .performedAt(ticket.performedAt())
+                .seatNumber(ticket.seatNumber())
+                .ticketPrice(ticket.ticketPrice())
+                .reservedAt(ticket.reservedAt())
+                .publishedAt(ticket.publishedAt())
+                .receivedAt(ticket.receivedAt())
+                .cancelAcceptedAt(ticket.cancelAcceptedAt())
+                .cancelApprovedAt(ticket.cancelApprovedAt())
+                .build();
+    }
+
+    public static TicketEntity of(Reservation reservation, Ticket ticket) {
+        return TicketEntity.builder()
+                .id(ticket.ticketId())
+                .reservationId(reservation.reservationId())
                 .concertId(ticket.concertId())
                 .concertScheduleId(ticket.concertScheduleId())
                 .concertSeatId(ticket.concertSeatId())

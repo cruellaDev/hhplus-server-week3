@@ -6,6 +6,7 @@ import com.io.hhplus.concert.domain.concert.dto.AvailableSeatInfo;
 import com.io.hhplus.concert.domain.concert.dto.ReservationInfo;
 import com.io.hhplus.concert.domain.concert.model.Concert;
 import com.io.hhplus.concert.domain.concert.model.ConcertSchedule;
+import com.io.hhplus.concert.domain.concert.model.ConcertSeat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +20,38 @@ public class ConcertFacade {
     private final ConcertService concertService;
 
     /**
+     * 콘서트 등록
+     * @param command 콘서트 등록 command
+     * @return 콘서트 저장 정보
+     */
+    public Concert registerConcert(ConcertCommand.RegisterConcertCommand command) {
+        return concertService.registerConcert(command);
+    }
+
+    /**
+     * 콘서트 일정 등록
+     * @param command 콘서트 일정 등록 command
+     * @return 콘서트 일정 저장 정보
+     */
+    public ConcertSchedule registerConcertSchedule(ConcertCommand.RegisterConcertScheduleCommand command) {
+        return concertService.registerConcertSchedule(command);
+    }
+
+    /**
+     * 콘서트 좌석 등록
+     * @param command 콘서트 좌석 등록 command
+     * @return 콘서트 좌석 저장 정보
+     */
+    public ConcertSeat registerConcertSeat(ConcertCommand.RegisterConcertSeatCommand command) {
+        return concertService.registerConcertSeat(command);
+    }
+
+    /**
      * 예약 가능한 콘서트 목록 조회
      * @return 콘서트 목록
      */
     public List<Concert> getAvailableConcerts() {
-        return concertService.getConcerts();
+        return concertService.getAvailableConcerts();
     }
 
     /**
