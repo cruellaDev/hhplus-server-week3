@@ -24,7 +24,7 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
                                                              @Param("concertScheduleId") Long concertScheduleId,
                                                              @Param("seatNumbers") List<String> seatNumbers);
 
-    @Query("SELECT R FROM ReservationEntity R WHERE R.deletedAt IS NULL AND (SELECT COUNT(T.id) FROM TicketEntity T WHERE T.concertId =:concertId AND T.concertScheduleId =:concertScheduleId AND T.seatNumber IN :seatNumbers AND T.cancelApprovedAt IS NULL AND T.deletedAt IS NULL) > 0")
+    @Query("SELECT R FROM ReservationEntity R WHERE R.deletedAt IS NULL AND (SELECT COUNT(T.id) FROM TicketEntity T WHERE T.reservationId = R.id AND T.concertId =:concertId AND T.concertScheduleId =:concertScheduleId AND T.seatNumber IN :seatNumbers AND T.cancelApprovedAt IS NULL AND T.deletedAt IS NULL) > 0")
     List<ReservationEntity> findReservationsAlreadyExists(@Param("concertId") Long concertId,
                                                           @Param("concertScheduleId") Long concertScheduleId,
                                                           @Param("seatNumbers") List<String> seatNumbers);

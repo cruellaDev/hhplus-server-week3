@@ -22,7 +22,7 @@ public class ConcertController {
      * @return 콘서트 등록 응답 정보
      */
     @PostMapping("/register/concert")
-    public ResponseEntity<CommonResponse<ConcertDto.SingleResponse>> register(ConcertDto.RegisterRequest request) {
+    public ResponseEntity<CommonResponse<ConcertDto.SingleResponse>> register(@RequestBody ConcertDto.RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponse.success(ConcertDto.SingleResponse.from(concertFacade.registerConcert(request.toCommand()))));
@@ -95,7 +95,7 @@ public class ConcertController {
      * @return 응답 정보
      */
     @PostMapping("/reserve/seats")
-    public ResponseEntity<CommonResponse<ReservationDto.ReserveSeatsResponse>> reserveSeats(ReservationDto.ReserveSeatsRequest request) {
+    public ResponseEntity<CommonResponse<ReservationDto.ReserveSeatsResponse>> reserveSeats(@RequestBody ReservationDto.ReserveSeatsRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertFacade.reserveSeats(request.toCommand()))));
