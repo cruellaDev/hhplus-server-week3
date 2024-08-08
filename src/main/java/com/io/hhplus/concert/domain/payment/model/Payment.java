@@ -28,7 +28,7 @@ public record Payment(
     }
 
     public Payment pay(PaymentCommand.CompletePaymentCommand command) {
-        if(!isValidPayAmount()) throw new CustomException(ResponseMessage.PAYMENT_AMOUNT_INVALID);
+        if(command.getPayAmount() == null || command.getPayAmount().compareTo(BigDecimal.ZERO) < 0) throw new CustomException(ResponseMessage.PAYMENT_AMOUNT_INVALID);
         return Payment.builder()
                 .reservationId(command.getReservationId())
                 .payAmount(command.getPayAmount())

@@ -40,6 +40,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public Optional<Customer> findAvailableCustomerWithPessimisticLock(Long customerId) {
-        return Optional.empty();
+        return customerJpaRepository.findByIdWithPessimisticLock(customerId).map(CustomerEntity::toDomain);
     }
 }

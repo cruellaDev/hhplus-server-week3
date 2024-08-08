@@ -73,8 +73,8 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public Reservation saveReservation(Reservation reservation) {
-        ReservationEntity savedReservation =reservationJpaRepository.save(ReservationEntity.from(reservation));
-        List<TicketEntity> savedTickets = reservation.tickets().stream().map(ticket -> ticketJpaRepository.save(TicketEntity.of(reservation, ticket))).toList();
+        ReservationEntity savedReservation = reservationJpaRepository.save(ReservationEntity.from(reservation));
+        List<TicketEntity> savedTickets = reservation.tickets().stream().map(ticket -> ticketJpaRepository.save(TicketEntity.of(savedReservation.toDomain(), ticket))).toList();
         return savedReservation.toDomain(savedTickets);
     }
 
