@@ -48,11 +48,10 @@ public record QueueToken(
                 .build();
     }
 
-    public QueueToken enter(TokenCommand.IssueTokenBankCounterCommand command) {
+    public static QueueToken enter(TokenCommand.IssueTokenBankCounterCommand command) {
         return QueueToken.builder()
                 .customerId(command.getCustomerId())
                 .queueToken(UUID.randomUUID())
-                .queueStatus(this.queueStatus)
                 .build();
     }
 
