@@ -4,6 +4,7 @@ import com.io.hhplus.concert.application.payment.CompositeCommand;
 import com.io.hhplus.concert.application.payment.dto.CheckoutPaymentResultAndConfirmedReservationInfo;
 import com.io.hhplus.concert.domain.concert.model.Reservation;
 import com.io.hhplus.concert.domain.concert.model.Ticket;
+import com.io.hhplus.concert.domain.payment.PaymentCommand;
 import com.io.hhplus.concert.domain.payment.model.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class PaymentDto {
 
@@ -23,6 +25,15 @@ public class PaymentDto {
 
         public CompositeCommand.CheckoutPaymentCommand toCommand() {
             return CompositeCommand.CheckoutPaymentCommand.builder()
+                    .customerId(this.customerId)
+                    .reservationId(this.reservationId)
+                    .payAmount(this.payAmount)
+                    .build();
+        }
+
+        public PaymentCommand.PayCommand toCommand(UUID token) {
+            return PaymentCommand.PayCommand.builder()
+                    .token(token)
                     .customerId(this.customerId)
                     .reservationId(this.reservationId)
                     .payAmount(this.payAmount)
@@ -44,6 +55,12 @@ public class PaymentDto {
                     .payment(checkoutPaymentResultAndConfirmedReservationInfo.getPayment())
                     .reservation(checkoutPaymentResultAndConfirmedReservationInfo.getReservation())
                     .tickets(checkoutPaymentResultAndConfirmedReservationInfo.getTickets())
+                    .build();
+        }
+
+        public static PaymentDto.CheckoutPaymentResponse from(Payment payment) {
+            return CheckoutPaymentResponse.builder()
+                    .payment(payment)
                     .build();
         }
     }

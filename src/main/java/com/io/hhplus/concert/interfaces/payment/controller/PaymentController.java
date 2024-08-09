@@ -1,8 +1,8 @@
 package com.io.hhplus.concert.interfaces.payment.controller;
 
-import com.io.hhplus.concert.application.payment.PaymentFacade;
 import com.io.hhplus.concert.common.GlobalConstants;
 import com.io.hhplus.concert.common.dto.CommonResponse;
+import com.io.hhplus.concert.domain.payment.PaymentService;
 import com.io.hhplus.concert.interfaces.payment.dto.PaymentDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequestMapping("payment")
 public class PaymentController {
 
-    private final PaymentFacade paymentFacade;
+    private final PaymentService paymentService;
 
     /**
      * 결제 요청
@@ -30,11 +30,10 @@ public class PaymentController {
     public ResponseEntity<CommonResponse<PaymentDto.CheckoutPaymentResponse>> checkoutPayment(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                                                                               @RequestBody @Valid PaymentDto.CheckoutPaymentRequest requestBody) {
         // TODO token 지우기 (인터셉터에서 확인함)
-        // TODO compositeCommand -> facade 없애면서 같이 다 없애기
         UUID token = UUID.fromString(authorizationHeader.replace(GlobalConstants.PREFIX_BEARER, ""));
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(PaymentDto.CheckoutPaymentResponse.from(paymentFacade.checkoutPayment(token, requestBody.toCommand()))));
+                .body(CommonResponse.success(PaymentDto.CheckoutPaymentResponse.from(paymentService.pay(requestBody.toCommand(token)))));
     }
 
 }
