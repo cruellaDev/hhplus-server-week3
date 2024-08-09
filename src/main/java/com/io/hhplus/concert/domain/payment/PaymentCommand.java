@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class PaymentCommand {
 
@@ -16,7 +17,8 @@ public class PaymentCommand {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class CompletePaymentCommand {
+    public static class PayCommand {
+        private UUID token;
         private Long customerId;
         private Long reservationId;
         private BigDecimal payAmount;
