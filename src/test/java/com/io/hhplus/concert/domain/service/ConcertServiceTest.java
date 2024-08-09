@@ -346,7 +346,7 @@ class ConcertServiceTest {
                 .bookerName("박항해")
                 .createdAt(DateUtils.createTemporalDateByIntParameters(2024, 8,5,11,56,30))
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.of(reservation));
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.of(reservation));
 
         // when - then
         ConcertCommand.ReserveSeatsCommand command = ConcertCommand.ReserveSeatsCommand.builder()
@@ -369,7 +369,7 @@ class ConcertServiceTest {
     @Test
     void 예약_요청_시_예약할_콘서트가_없을_경우_예외를_반환한다() {
         // given
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.empty());
 
         // when - then
@@ -401,7 +401,7 @@ class ConcertServiceTest {
                 .bookBeginAt(DateUtils.createTemporalDateByIntParameters(2024,7,1,0,0,0))
                 .bookEndAt(DateUtils.createTemporalDateByIntParameters(2024,12,31,23,59,59))
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
 
         // when - then
@@ -438,7 +438,7 @@ class ConcertServiceTest {
                 .concertScheduleId(1L)
                 .performedAt(DateUtils.createTemporalDateByIntParameters(2024,11,3,17,0,0))
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
 
@@ -497,7 +497,7 @@ class ConcertServiceTest {
                 .ticketPrice(BigDecimal.valueOf(10000))
                 .createdAt(DateUtils.getSysDate())
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
@@ -559,7 +559,7 @@ class ConcertServiceTest {
                 .ticketPrice(BigDecimal.valueOf(10000))
                 .createdAt(DateUtils.getSysDate())
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
@@ -621,7 +621,7 @@ class ConcertServiceTest {
                 .ticketPrice(BigDecimal.valueOf(10000))
                 .createdAt(DateUtils.getSysDate())
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
@@ -675,7 +675,7 @@ class ConcertServiceTest {
                 .seatNumber("1")
                 .ticketPrice(BigDecimal.valueOf(10000))
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));
@@ -736,7 +736,7 @@ class ConcertServiceTest {
                 .ticketPrice(BigDecimal.valueOf(10000))
                 .createdAt(DateUtils.getSysDate())
                 .build();
-        given(concertRepository.findReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
+        given(concertRepository.findCustomerReservationAlreadyExists(anyLong(), anyLong(), anyLong(), any())).willReturn(Optional.empty());
         given(concertRepository.findConcert(anyLong())).willReturn(Optional.of(concert));
         given(concertRepository.findConcertSchedule(anyLong(), anyLong())).willReturn(Optional.of(concertSchedule));
         given(concertRepository.findConcertSeat(anyLong(), anyLong())).willReturn(Optional.of(concertSeat));

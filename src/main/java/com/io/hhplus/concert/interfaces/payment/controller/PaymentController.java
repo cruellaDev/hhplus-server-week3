@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("reservation")
+@RequestMapping("payment")
 public class PaymentController {
 
     private final PaymentFacade paymentFacade;
@@ -29,6 +29,8 @@ public class PaymentController {
     @PostMapping("/pay")
     public ResponseEntity<CommonResponse<PaymentDto.CheckoutPaymentResponse>> checkoutPayment(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                                                                               @RequestBody @Valid PaymentDto.CheckoutPaymentRequest requestBody) {
+        // TODO token 지우기 (인터셉터에서 확인함)
+        // TODO compositeCommand -> facade 없애면서 같이 다 없애기
         UUID token = UUID.fromString(authorizationHeader.replace(GlobalConstants.PREFIX_BEARER, ""));
         return ResponseEntity
                 .status(HttpStatus.OK)
