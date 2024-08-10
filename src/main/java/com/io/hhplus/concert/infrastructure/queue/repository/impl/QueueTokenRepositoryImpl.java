@@ -23,7 +23,8 @@ public class QueueTokenRepositoryImpl implements QueueTokenRepository {
 
     @Override
     public Optional<QueueToken> findLatestQueueToken(Long customerId) {
-        return Optional.empty();
+        return queueTokenJpaRepository.findByCustomerIdAndDeletedAtIsNullOrderByIdDesc(customerId)
+                .map(QueueTokenEntity::toDomain);
     }
 
     @Override

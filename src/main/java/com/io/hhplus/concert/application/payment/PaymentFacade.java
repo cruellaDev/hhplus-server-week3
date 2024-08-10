@@ -29,11 +29,13 @@ public class PaymentFacade {
      */
     @Transactional
     public CheckoutPaymentResultAndConfirmedReservationInfo checkoutPayment(UUID token, CompositeCommand.CheckoutPaymentCommand command) {
-        tokenService.validateIndividualToken(token);
-        ReservationInfo confirmedReservationInfo = concertService.confirmReservation(command.toConfirmReservationCommand());
-        customerService.useCustomerPoint(command.toUseCustomerPointCommand());
+        // TODO facade 없애기 (토큰은 인터셉터에서만 확인하기)
+        //        tokenService.validateIndividualToken(token);
         Payment checkoutPaymentResult = paymentService.completePayment(command.toCompletePaymentCommand());
-        tokenService.expireIndividualToken(token);
+        // 모오두 이벤트로 가시게
+            customerService.useCustomerPointWithPessimisticLock(command.toUseCustomerPointCommand());
+            ReservationInfo confirmedReservationInfo = concertService.confirmReservation(command.toConfirmReservationCommand());
+//            tokenService.expireIndividualToken(token);
         return CheckoutPaymentResultAndConfirmedReservationInfo.of(checkoutPaymentResult, confirmedReservationInfo);
     }
 }

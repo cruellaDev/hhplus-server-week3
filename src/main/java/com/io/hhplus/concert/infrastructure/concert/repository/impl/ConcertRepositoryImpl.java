@@ -11,7 +11,6 @@ import com.io.hhplus.concert.infrastructure.concert.repository.jpa.TicketJpaRepo
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public List<Concert> findConcerts() {
-        return concertJpaRepository.findAllByDeletedAtIsNull()
+        return concertJpaRepository.findAvailableConcerts()
                 .stream()
                 .map(ConcertEntity::toDomain)
                 .collect(Collectors.toList());
@@ -74,7 +73,9 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public Reservation saveReservation(Reservation reservation) {
-        return reservationJpaRepository.save(ReservationEntity.from(reservation)).toDomain();
+        ReservationEntity savedReservation = reservationJpaRepository.save(ReservationEntity.from(reservation));
+        List<TicketEntity> savedTickets = reservation.tickets().stream().map(ticket -> ticketJpaRepository.save(TicketEntity.of(savedReservation.toDomain(), ticket))).toList();
+        return savedReservation.toDomain(savedTickets);
     }
 
     @Override
@@ -111,14 +112,27 @@ public class ConcertRepositoryImpl implements ConcertRepository {
     }
 
     @Override
-    public Optional<Reservation> findReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
-        return reservationJpaRepository.findReservationAlreadyExists(customerId, concertId, concertScheduleId, seatNumbers)
+    public Optional<Reservation> findCustomerReservationAlreadyExists(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+        return reservationJpaRepository.findCustomerReservationAlreadyExists(customerId, concertId, concertScheduleId, seatNumbers)
                 .map(ReservationEntity::toDomain);
+    }
+
+    @Override
+    public List<Reservation> findCustomerReservationAlreadyExistsWithPessimisticLock(Long customerId, Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+        return reservationJpaRepository.findCustomerReservationAlreadyExistsWithPessimisticLock(customerId, concertId, concertScheduleId, seatNumbers)
+                .stream().map(ReservationEntity::toDomain).collect(Collectors.toList());
     }
 
     @Override
     public List<Reservation> findReservationsAlreadyExists(Long concertId, Long concertScheduleId, List<String> seatNumbers) {
         return reservationJpaRepository.findReservationsAlreadyExists(concertId, concertScheduleId, seatNumbers)
+                .stream().map(ReservationEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Reservation> findReservationsAlreadyExistsWithPessimisticLock(Long concertId, Long concertScheduleId, List<String> seatNumbers) {
+        return reservationJpaRepository.findReservationsAlreadyExistsWithPessimisticLock(concertId, concertScheduleId, seatNumbers)
                 .stream().map(ReservationEntity::toDomain)
                 .collect(Collectors.toList());
     }

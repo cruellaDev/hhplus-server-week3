@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -51,6 +52,18 @@ public class ReservationEntity implements Auditable {
                 .reservationId(this.id)
                 .customerId(this.customerId)
                 .bookerName(this.bookerName)
+                .createdAt(this.auditSection.getCreatedAt())
+                .modifiedAt(this.auditSection.getModifiedAt())
+                .deletedAt(this.deletedAt)
+                .build();
+    }
+
+    public Reservation toDomain(List<TicketEntity> tickets) {
+        return Reservation.builder()
+                .reservationId(this.id)
+                .customerId(this.customerId)
+                .bookerName(this.bookerName)
+                .tickets(tickets.stream().map(TicketEntity::toDomain).toList())
                 .createdAt(this.auditSection.getCreatedAt())
                 .modifiedAt(this.auditSection.getModifiedAt())
                 .deletedAt(this.deletedAt)

@@ -101,12 +101,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo useCustomerPointWithPessimisticLock(CustomerCommand.UseCustomerPointCommand command) {
-        Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
-                .filter(o
-                        -> o.isNotDreamed()
-                        && o.isNotWithdrawn()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
                 customerRepository.saveCustomer(customer.usePoint(command)),
                 customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePoint(command)));

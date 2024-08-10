@@ -26,11 +26,14 @@ public record Concert(
     }
 
     public Concert register(ConcertCommand.RegisterConcertCommand command) {
-        if (command.getConcertName().isBlank()) {
+        if (command.getConcertName() == null || command.getConcertName().isBlank()) {
             throw new CustomException(ResponseMessage.CONCERT_INVALID, "콘서트 명이 존재하지 않습니다.");
         }
-        if (command.getArtistName().isBlank()) {
+        if (command.getArtistName() == null || command.getArtistName().isBlank()) {
             throw new CustomException(ResponseMessage.CONCERT_INVALID, "아티스트 명이 존재하지 않습니다.");
+        }
+        if (command.getBookBeginAt() == null || command.getBookEndAt() == null) {
+            throw new CustomException(ResponseMessage.CONCERT_INVALID, "예매 기간은 필수값입니다.");
         }
         if (command.getBookEndAt().before(DateUtils.getSysDate())) {
             throw new CustomException(ResponseMessage.CONCERT_INVALID, "예매 종료 일시는 현재 일시보다 이후여야 합니다.");
