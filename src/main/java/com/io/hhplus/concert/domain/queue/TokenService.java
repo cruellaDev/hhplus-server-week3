@@ -110,8 +110,7 @@ public class TokenService {
      * @param token 대기열 개별 토큰
      */
     public void validateIndividualToken(UUID token) {
-        QueueToken queueToken = queueTokenRepository.findQueueToken(token)
-                .orElseThrow(() -> new CustomException(ResponseMessage.TOKEN_NOT_FOUNT));
+        QueueToken queueToken = queueTokenRepository.findQueueToken(token).orElseThrow(() -> new CustomException(ResponseMessage.TOKEN_NOT_FOUNT));
         if (!queueToken.isActive()) throw new CustomException(ResponseMessage.QUEUE_STATUS_INVALID);
     }
 
@@ -121,8 +120,7 @@ public class TokenService {
      * @return 응답 정보
      */
     public BankCounterQueueTokenInfo expireIndividualToken(UUID token) {
-        QueueToken queueToken = queueTokenRepository.findQueueToken(token)
-                .orElseThrow(() -> new CustomException(ResponseMessage.TOKEN_NOT_FOUNT));
+        QueueToken queueToken = queueTokenRepository.findQueueToken(token).orElseThrow(() -> new CustomException(ResponseMessage.TOKEN_NOT_FOUNT));
         return BankCounterQueueTokenInfo.of(
                 queueTokenRepository.saveQueueToken(queueToken.expire()), 0L, 0L
         );

@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.payment;
+package com.io.hhplus.concert.domain.payment.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,16 +8,13 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class PaymentCommand {
+public class PaymentEvent {
 
-    /**
-     * 결제 완료 Command
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
-    public static class PayCommand {
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PaidSuccess {
         private UUID token;
         private Long customerId;
         private Long reservationId;

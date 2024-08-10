@@ -30,12 +30,7 @@ public class CustomerService {
      * @return 포인트잔액
      */
     public Customer getCustomerPointBalance(Long customerId) {
-        return customerRepository.findAvailableCustomer(customerId)
-                .filter(o
-                        -> o.isNotDreamed()
-                        && o.isNotWithdrawn()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        return customerRepository.findAvailableCustomer(customerId).orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
     }
 
     /**
@@ -45,12 +40,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo chargeCustomerPointWithPessimisticLock(CustomerCommand.ChargeCustomerPointCommand command){
-        Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId())
-                .filter(o
-                        -> o.isNotDreamed()
-                        && o.isNotWithdrawn()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findAvailableCustomerWithPessimisticLock(command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
                 customerRepository.saveCustomer(customer.chargePoint(command)),
                 customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePoint(command))
@@ -64,12 +54,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo chargeCustomerPoint(CustomerCommand.ChargeCustomerPointCommand command){
-        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
-                .filter(o
-                        -> o.isNotDreamed()
-                        && o.isNotWithdrawn()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
                 customerRepository.saveCustomer(customer.chargePoint(command)),
                 customerRepository.saveCustomerPointHistory(CustomerPointHistory.chargePoint(command))
@@ -83,12 +68,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerPointInfo useCustomerPoint(CustomerCommand.UseCustomerPointCommand command) {
-        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId())
-                .filter(o
-                        -> o.isNotDreamed()
-                        && o.isNotWithdrawn()
-                        && o.isNotDeleted())
-                .orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findAvailableCustomer(command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.CUSTOMER_NOT_FOUND));
         return CustomerPointInfo.of(
                 customerRepository.saveCustomer(customer.usePoint(command)),
                 customerRepository.saveCustomerPointHistory(CustomerPointHistory.usePoint(command)));
