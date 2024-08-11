@@ -29,7 +29,7 @@ public class PaymentEventListener {
 
 
             log.info("[Event][DataPlatform] 동기화를 진행합니다.");
-            dataPlatformClient.sync(PAID_SUCCESS, event);
+            dataPlatformClient.synchronize(PAID_SUCCESS, event);
             log.info("[Event][DataPlatform] 동기화가 완료되었습니다.");
         } catch (Exception e) {
             log.error("[Event][Error]", e);

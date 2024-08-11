@@ -21,13 +21,13 @@ public class PaymentService {
      */
     public Payment pay(PaymentCommand.PayCommand command) {
         Payment payment = paymentRepository.savePayment(Payment.create().pay(command));
-        paymentEventPublisher.success(
-                PaymentEvent.PaidSuccess.builder()
-                        .token(command.getToken())
-                        .customerId(command.getCustomerId())
-                        .reservationId(command.getReservationId())
-                        .payAmount(command.getPayAmount())
-                        .build());
+        PaymentEvent.PaidSuccess event = PaymentEvent.PaidSuccess.builder()
+                .token(command.getToken())
+                .customerId(command.getCustomerId())
+                .reservationId(command.getReservationId())
+                .payAmount(command.getPayAmount())
+                .build();
+        paymentEventPublisher.paidSuccess(event);
 
         return payment;
     }

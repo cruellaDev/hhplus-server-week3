@@ -12,7 +12,7 @@ public class PaymentEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void success(PaymentEvent.PaidSuccess event) {
+    public void paidSuccess(PaymentEvent.PaidSuccess event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

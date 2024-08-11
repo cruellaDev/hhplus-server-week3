@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class DataPlatformMockApiClientImpl implements DataPlatformClient {
 
     @Override
-    public boolean sync(String message, PaymentEvent.PaidSuccess event) {
+    public boolean synchronize(String message, PaymentEvent.PaidSuccess event) {
         try {
             Thread.sleep(6000L);
             log.info("데이터 플랫폼 동기화 성공: {}", message);
