@@ -1,6 +1,8 @@
 package com.io.hhplus.concert.domain.concert.model;
 
 import com.io.hhplus.concert.common.GlobalConstants;
+import com.io.hhplus.concert.common.enums.ResponseMessage;
+import com.io.hhplus.concert.common.exceptions.CustomException;
 import com.io.hhplus.concert.common.utils.DateUtils;
 import lombok.Builder;
 
@@ -26,13 +28,25 @@ public record Reservation(
                 .build();
     }
 
-    public Reservation addTickets(Concert concert, ConcertSchedule concertSchedule, ConcertSeat concertSeat, List<String> seatNumbers) {
+    public Reservation addNewTickets(Concert concert, ConcertSchedule concertSchedule, ConcertSeat concertSeat, List<String> seatNumbers) {
         List<Ticket> tickets = new ArrayList<>();
         seatNumbers.forEach(seatNumber -> tickets.add(Ticket.reserve(concert, concertSchedule, concertSeat, seatNumber)));
         return Reservation.builder()
                 .customerId(this.customerId)
                 .bookerName(this.bookerName)
                 .tickets(tickets)
+                .build();
+    }
+
+    public Reservation addConfirmedTickets(List<Ticket> tickets) {
+        if (tickets.isEmpty()) throw new CustomException(ResponseMessage.TICKET_NOT_FOUND);
+        List<Ticket> addedTickets = new ArrayList<>();
+        tickets.forEach(ticket -> addedTickets.add(ticket.confirmReservation(this)));
+        return Reservation.builder()
+                .reservationId(this.reservationId)
+                .customerId(this.customerId)
+                .bookerName(this.bookerName)
+                .tickets(addedTickets)
                 .build();
     }
 

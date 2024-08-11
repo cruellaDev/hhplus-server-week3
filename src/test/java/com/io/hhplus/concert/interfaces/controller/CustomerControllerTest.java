@@ -1,7 +1,8 @@
-package com.io.hhplus.concert.interfaces.customer.controller;
+package com.io.hhplus.concert.interfaces.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.io.hhplus.concert.application.customer.CustomerFacade;
+import com.io.hhplus.concert.domain.customer.CustomerService;
+import com.io.hhplus.concert.interfaces.customer.controller.CustomerController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -25,7 +26,7 @@ class CustomerControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CustomerFacade customerFacade;
+    private CustomerService customerService;
 
     @Autowired
     private ObjectMapper objectMapper;

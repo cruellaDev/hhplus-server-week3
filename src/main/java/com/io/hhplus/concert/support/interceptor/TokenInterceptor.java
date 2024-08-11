@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.support.interceptor;
 
-import com.io.hhplus.concert.application.queue.QueueTokenFacade;
 import com.io.hhplus.concert.common.GlobalConstants;
+import com.io.hhplus.concert.domain.queue.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TokenInterceptor implements HandlerInterceptor {
 
-    private QueueTokenFacade queueTokenFacade;
+    private TokenService tokenService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
@@ -39,7 +39,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다.");
         }
 
-        queueTokenFacade.validateToken(token);
+        tokenService.validateIndividualToken(token);
 
         return true;
     }

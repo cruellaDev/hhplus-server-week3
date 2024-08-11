@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.integration;
 
-import com.io.hhplus.concert.application.customer.CustomerFacade;
+import com.io.hhplus.concert.domain.customer.CustomerService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CustomerIntegrationTest {
 
     @Autowired
-    private CustomerFacade customerFacade;
+    private CustomerService customerService;
 
     /**
      * 고객 포인트 조회 - 잘못된 고객 ID

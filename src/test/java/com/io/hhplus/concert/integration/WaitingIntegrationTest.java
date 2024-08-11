@@ -1,7 +1,7 @@
-package com.io.hhplus.concert.application.queue.facade;
+package com.io.hhplus.concert.integration;
 
-import com.io.hhplus.concert.application.queue.QueueTokenFacade;
 import com.io.hhplus.concert.domain.queue.QueueTokenRepository;
+import com.io.hhplus.concert.domain.queue.TokenService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class WaitingIntegrationTest {
 
     @Autowired
-    private QueueTokenFacade queueTokenFacade;
+    private TokenService tokenService;
 
     @Autowired
     private QueueTokenRepository waitingRepository;

@@ -1,6 +1,6 @@
-package com.io.hhplus.concert.application.payment.facade;
+package com.io.hhplus.concert.integration;
 
-import com.io.hhplus.concert.application.payment.PaymentFacade;
+//import com.io.hhplus.concert.application.payment.PaymentFacade;
 import com.io.hhplus.concert.domain.queue.QueueTokenRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ReservationIntegrationTest {
+class PaymentIntegrationTest {
+
+//    @Autowired
+//    private PaymentFacade paymentFacade;
 
     @Autowired
-    private PaymentFacade paymentFacade;
-
-    @Autowired
-    private QueueTokenRepository waitingRepository;
+    private QueueTokenRepository queueTokenRepository;
 
     @BeforeEach
     void setUp() {

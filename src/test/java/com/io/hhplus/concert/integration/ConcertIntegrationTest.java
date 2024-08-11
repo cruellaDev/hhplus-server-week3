@@ -7,9 +7,9 @@ import com.io.hhplus.concert.common.utils.DataBaseCleanUp;
 import com.io.hhplus.concert.common.utils.TestDataInitializer;
 import com.io.hhplus.concert.domain.concert.ConcertCommand;
 import com.io.hhplus.concert.domain.concert.ConcertRepository;
+import com.io.hhplus.concert.domain.concert.ConcertService;
 import com.io.hhplus.concert.domain.concert.dto.AvailableSeatInfo;
 import com.io.hhplus.concert.domain.concert.model.*;
-import com.io.hhplus.concert.application.concert.ConcertFacade;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ class ConcertIntegrationTest {
     private DataBaseCleanUp dataBaseCleanUp;
 
     @Autowired
-    private ConcertFacade concertFacade;
+    private ConcertService concertService;
 
     @Autowired
     private ConcertRepository concertRepository;
@@ -46,38 +46,38 @@ class ConcertIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        testDataInitializer.initializeTestData();
+//        testDataInitializer.initializeTestData();
 
-        Concert concert = concertRepository.findConcert(2L).orElse(null);
-        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(2L, 13L).orElse(null);
-        ConcertSeat concertSeat = concertRepository.findConcertSeat(2L, 13L).orElse(null);
-
-
-        Reservation reservation = concertRepository.saveReservation(
-                Reservation.builder()
-                        .customerId(1L)
-                        .bookerName("고객1")
-                        .build()
-        );
-
-        Ticket ticket = concertRepository.saveTicket(
-                Ticket.builder()
-                        .reservationId(reservation.reservationId())
-                        .concertId(concert.concertId())
-                        .concertScheduleId(concertSchedule.concertScheduleId())
-                        .concertSeatId(concertSeat.concertSeatId())
-                        .concertName(concert.concertName())
-                        .artistName(concert.artistName())
-                        .performedAt(concertSchedule.performedAt())
-                        .ticketPrice(concertSeat.seatPrice())
-                        .seatNumber("30")
-                        .build()
-        );
+//        Concert concert = concertRepository.findConcert(2L).orElse(null);
+//        ConcertSchedule concertSchedule = concertRepository.findConcertSchedule(2L, 13L).orElse(null);
+//        ConcertSeat concertSeat = concertRepository.findConcertSeat(2L, 13L).orElse(null);
+//
+//
+//        Reservation reservation = concertRepository.saveReservation(
+//                Reservation.builder()
+//                        .customerId(1L)
+//                        .bookerName("고객1")
+//                        .build()
+//        );
+//
+//        Ticket ticket = concertRepository.saveTicket(
+//                Ticket.builder()
+//                        .reservationId(reservation.reservationId())
+//                        .concertId(concert.concertId())
+//                        .concertScheduleId(concertSchedule.concertScheduleId())
+//                        .concertSeatId(concertSeat.concertSeatId())
+//                        .concertName(concert.concertName())
+//                        .artistName(concert.artistName())
+//                        .performedAt(concertSchedule.performedAt())
+//                        .ticketPrice(concertSeat.seatPrice())
+//                        .seatNumber("30")
+//                        .build()
+//        );
     }
 
     @AfterEach
     void tearDown() {
-        dataBaseCleanUp.execute();
+//        dataBaseCleanUp.execute();
     }
 
     /**
@@ -90,7 +90,7 @@ class ConcertIntegrationTest {
         ConcertStatus concertStatus = ConcertStatus.AVAILABLE;
 
         // when
-        List<Concert> result = concertFacade.getAvailableConcerts();
+        List<Concert> result = concertService.getAvailableConcerts();
 
         // then
         assertAll(() -> assertFalse(result.isEmpty()),
@@ -107,7 +107,7 @@ class ConcertIntegrationTest {
         long concertId = 2;
 
         // when
-        List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);
+        List<ConcertSchedule> result = concertService.getAvailableSchedules(concertId);
 
         // then
         assertAll(() -> assertFalse(result.isEmpty()),
@@ -123,7 +123,7 @@ class ConcertIntegrationTest {
         Long concertId = null;
 
         // when
-        List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);
+        List<ConcertSchedule> result = concertService.getAvailableSchedules(concertId);
 
         // then
         assertAll(() -> assertTrue(result.isEmpty()));
@@ -138,7 +138,7 @@ class ConcertIntegrationTest {
         long concertId = -3;
 
         // when
-        List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);
+        List<ConcertSchedule> result = concertService.getAvailableSchedules(concertId);
 
         // then
         assertAll(() -> assertTrue(result.isEmpty()));
@@ -153,7 +153,7 @@ class ConcertIntegrationTest {
         long concertId = 0;
 
         // when
-        List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);
+        List<ConcertSchedule> result = concertService.getAvailableSchedules(concertId);
 
         // then
         assertAll(() -> assertTrue(result.isEmpty()));
@@ -168,7 +168,7 @@ class ConcertIntegrationTest {
         long concertId = 900001;
 
         // when
-        List<ConcertSchedule> result = concertFacade.getAvailableSchedules(concertId);
+        List<ConcertSchedule> result = concertService.getAvailableSchedules(concertId);
 
         // then
         assertAll(() -> assertTrue(result.isEmpty()));
@@ -184,7 +184,7 @@ class ConcertIntegrationTest {
         long concertScheduleId = 98;
 
         // when
-        List<AvailableSeatInfo> result = concertFacade.getAvailableSeats(concertId, concertScheduleId);
+        List<AvailableSeatInfo> result = concertService.getAvailableSeats(concertId, concertScheduleId);
 
         // then
         assertAll(() -> assertFalse(result.isEmpty()),
@@ -202,7 +202,7 @@ class ConcertIntegrationTest {
         long concertScheduleId = 2;
 
         // when - then
-        assertThatThrownBy(() -> concertFacade.getAvailableSeats(concertId, concertScheduleId))
+        assertThatThrownBy(() -> concertService.getAvailableSeats(concertId, concertScheduleId))
                 .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.CONCERT_SEAT_NOT_FOUND);
@@ -218,7 +218,7 @@ class ConcertIntegrationTest {
         long concertScheduleId = 2;
 
         // when - then
-        assertThatThrownBy(() -> concertFacade.getAvailableSeats(concertId, concertScheduleId))
+        assertThatThrownBy(() -> concertService.getAvailableSeats(concertId, concertScheduleId))
                 .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.CONCERT_SEAT_NOT_FOUND);
@@ -234,7 +234,7 @@ class ConcertIntegrationTest {
         Long concertScheduleId = null;
 
         // when - then
-        assertThatThrownBy(() -> concertFacade.getAvailableSeats(concertId, concertScheduleId))
+        assertThatThrownBy(() -> concertService.getAvailableSeats(concertId, concertScheduleId))
                 .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.CONCERT_SEAT_NOT_FOUND);
@@ -250,7 +250,7 @@ class ConcertIntegrationTest {
         long performanceId = 10001;
 
         // when - then
-        assertThatThrownBy(() -> concertFacade.getAvailableSeats(concertId, performanceId))
+        assertThatThrownBy(() -> concertService.getAvailableSeats(concertId, performanceId))
                 .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.CONCERT_SEAT_NOT_FOUND);
@@ -272,7 +272,7 @@ class ConcertIntegrationTest {
                 .bookerName("김익명")
                 .seatNumbers(List.of("30"))
                 .build();
-        assertThatThrownBy(() -> concertFacade.reserveSeats(command))
+        assertThatThrownBy(() -> concertService.reserveSeats(command))
                 .isInstanceOf(CustomException.class)
                 .extracting("responseMessage")
                 .isEqualTo(ResponseMessage.SEAT_TAKEN);

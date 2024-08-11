@@ -1,6 +1,6 @@
 package com.io.hhplus.concert.interfaces.token.scheduler;
 
-import com.io.hhplus.concert.application.queue.QueueTokenFacade;
+import com.io.hhplus.concert.domain.queue.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,14 +11,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TokenScheduler {
 
-    private final QueueTokenFacade queueTokenFacade;
+    private final TokenService tokenService;
 
     /**
      * 토큰 만료 처리 - 매 2분마다 실행
      */
     @Scheduled(fixedRate = 2, timeUnit = TimeUnit.MINUTES)
     public void expireToken() {
-        queueTokenFacade.expireToken();
+        tokenService.expireToken();
     }
 
     /**
@@ -26,6 +26,6 @@ public class TokenScheduler {
      */
     @Scheduled(fixedRate = 3, timeUnit = TimeUnit.MINUTES)
     public void activateToken() {
-        queueTokenFacade.activateToken();
+        tokenService.activateToken();
     }
 }

@@ -1,6 +1,7 @@
-package com.io.hhplus.concert.interfaces.token.controller;
+package com.io.hhplus.concert.interfaces.controller;
 
-import com.io.hhplus.concert.application.queue.QueueTokenFacade;
+import com.io.hhplus.concert.domain.queue.TokenService;
+import com.io.hhplus.concert.interfaces.token.controller.TokenController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -23,7 +24,7 @@ class WaitingControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private QueueTokenFacade queueTokenFacade;
+    private TokenService tokenService;
 
     /**
      * 대기열 진입

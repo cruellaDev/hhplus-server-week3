@@ -129,7 +129,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcerts()).willReturn(concerts);
 
         // when
-        List<Concert> result = concertService.getConcerts();
+        List<Concert> result = concertService.getAvailableConcerts();
 
         // then
         assertThat(result).hasSize(0);
@@ -147,7 +147,7 @@ class ConcertServiceTest {
         given(concertRepository.findConcerts()).willReturn(concerts);
 
         // when
-        List<Concert> result = concertService.getConcerts();
+        List<Concert> result = concertService.getAvailableConcerts();
 
         // then
         assertThat(result).hasSize(1);

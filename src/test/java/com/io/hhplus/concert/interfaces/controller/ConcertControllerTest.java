@@ -1,6 +1,7 @@
-package com.io.hhplus.concert.interfaces.concert.controller;
+package com.io.hhplus.concert.interfaces.controller;
 
-import com.io.hhplus.concert.application.concert.ConcertFacade;
+import com.io.hhplus.concert.domain.concert.ConcertService;
+import com.io.hhplus.concert.interfaces.concert.controller.ConcertController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -22,7 +23,7 @@ class ConcertControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ConcertFacade concertFacade;
+    private ConcertService concertService;
 
 //    @Test
 //    void concerts() throws Exception {

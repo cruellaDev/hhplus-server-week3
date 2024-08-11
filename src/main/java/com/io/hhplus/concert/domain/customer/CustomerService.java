@@ -20,7 +20,7 @@ public class CustomerService {
      * @param command 고객 등록 command
      * @return 고객 등록 command
      */
-    public Customer regiterCustomer(CustomerCommand.RegisterCustomerCommand command) {
+    public Customer registerCustomer(CustomerCommand.RegisterCustomerCommand command) {
         return customerRepository.saveCustomer(Customer.create().register(command));
     }
 

@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.queue.service;
+package com.io.hhplus.concert.domain.service;
 
 import com.io.hhplus.concert.domain.queue.QueueTokenRepository;
 import com.io.hhplus.concert.domain.queue.TokenService;

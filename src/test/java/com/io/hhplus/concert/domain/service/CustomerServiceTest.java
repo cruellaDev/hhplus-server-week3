@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.domain.customer.service;
+package com.io.hhplus.concert.domain.service;
 
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.CustomException;

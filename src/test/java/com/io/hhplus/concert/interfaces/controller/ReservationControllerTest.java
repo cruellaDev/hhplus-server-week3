@@ -1,7 +1,8 @@
-package com.io.hhplus.concert.interfaces.payment.controller;
+package com.io.hhplus.concert.interfaces.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.io.hhplus.concert.application.payment.PaymentFacade;
+//import com.io.hhplus.concert.application.payment.PaymentFacade;
+import com.io.hhplus.concert.interfaces.payment.controller.PaymentController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -23,8 +24,8 @@ class ReservationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private PaymentFacade paymentFacade;
+//    @MockBean
+//    private PaymentFacade paymentFacade;
 
     @Autowired
     private ObjectMapper objectMapper;

@@ -1,7 +1,7 @@
 package com.io.hhplus.concert.interfaces.concert.controller;
 
-import com.io.hhplus.concert.application.concert.ConcertFacade;
 import com.io.hhplus.concert.common.dto.CommonResponse;
+import com.io.hhplus.concert.domain.concert.ConcertService;
 import com.io.hhplus.concert.interfaces.concert.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("concerts")
 public class ConcertController {
 
-    private final ConcertFacade concertFacade;
+    private final ConcertService concertService;
 
     /**
      * 콘서트 등록
@@ -25,7 +25,7 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ConcertDto.SingleResponse>> register(@RequestBody ConcertDto.RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertDto.SingleResponse.from(concertFacade.registerConcert(request.toCommand()))));
+                .body(CommonResponse.success(ConcertDto.SingleResponse.from(concertService.registerConcert(request.toCommand()))));
     }
 
     /**
@@ -37,7 +37,7 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ConcertScheduleDto.SingleResponse>> register(@RequestBody ConcertScheduleDto.RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertScheduleDto.SingleResponse.from(concertFacade.registerConcertSchedule(request.toCommand()))));
+                .body(CommonResponse.success(ConcertScheduleDto.SingleResponse.from(concertService.registerConcertSchedule(request.toCommand()))));
     }
 
     /**
@@ -49,7 +49,7 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ConcertSeatDto.SingleResponse>> register(@RequestBody ConcertSeatDto.RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertSeatDto.SingleResponse.from(concertFacade.registerConcertSeat(request.toCommand()))));
+                .body(CommonResponse.success(ConcertSeatDto.SingleResponse.from(concertService.registerConcertSeat(request.toCommand()))));
     }
 
     /**
@@ -60,7 +60,7 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ConcertDto.ListResponse>> concerts() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertDto.ListResponse.from(concertFacade.getAvailableConcerts())));
+                .body(CommonResponse.success(ConcertDto.ListResponse.from(concertService.getAvailableConcerts())));
     }
 
     /**
@@ -72,7 +72,7 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ConcertScheduleDto.ListResponse>> schedules(@PathVariable("concertId") Long concertId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertScheduleDto.ListResponse.from(concertFacade.getAvailableSchedules(concertId))));
+                .body(CommonResponse.success(ConcertScheduleDto.ListResponse.from(concertService.getAvailableSchedules(concertId))));
     }
 
     /**
@@ -86,7 +86,7 @@ public class ConcertController {
                                                          @PathVariable("concertScheduleId") Long concertScheduleId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ConcertSeatDto.ListResponse.from(concertFacade.getAvailableSeats(concertId, concertScheduleId))));
+                .body(CommonResponse.success(ConcertSeatDto.ListResponse.from(concertService.getAvailableSeats(concertId, concertScheduleId))));
     }
 
     /**
@@ -98,6 +98,6 @@ public class ConcertController {
     public ResponseEntity<CommonResponse<ReservationDto.ReserveSeatsResponse>> reserveSeats(@RequestBody ReservationDto.ReserveSeatsRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertFacade.reserveSeats(request.toCommand()))));
+                .body(CommonResponse.success(ReservationDto.ReserveSeatsResponse.from(concertService.reserveSeats(request.toCommand()))));
     }
 }

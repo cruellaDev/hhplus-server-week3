@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 
@@ -108,7 +107,7 @@ public class ConcertService {
 
         Reservation reservation = Reservation
                 .reserve(command.getCustomerId(), command.getBookerName())
-                .addTickets(concert, concertSchedule, concertSeat, command.getSeatNumbers());
+                .addNewTickets(concert, concertSchedule, concertSeat, command.getSeatNumbers());
 
         return ReservationInfo.from(concertRepository.saveReservation(reservation));
     }
@@ -121,17 +120,11 @@ public class ConcertService {
         // 예약 조회
         Reservation reservation = concertRepository.findReservation(command.getReservationId(), command.getCustomerId()).orElseThrow(() -> new CustomException(ResponseMessage.RESERVATION_NOT_FOUND));
         // 티켓 조회
-        // TODO refactoring - addTicket
-        List<Ticket> tickets = concertRepository.findTickets(command.getReservationId())
-                .stream()
-                .map(ticket -> ticket.confirmReservation(reservation))
-                .toList();
-        if (tickets.isEmpty()) throw new CustomException(ResponseMessage.TICKET_NOT_FOUND);
+        List<Ticket> tickets = concertRepository.findTickets(command.getReservationId());
+
+        reservation.addConfirmedTickets(tickets);
 
         // TODO 예약 상태 추가
-        return ReservationInfo.of(
-                reservation,
-                tickets.stream().map(concertRepository::saveTicket).collect(Collectors.toList())
-        );
+        return ReservationInfo.from(concertRepository.saveReservation(reservation));
     }
 }
