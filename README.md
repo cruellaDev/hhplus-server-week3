@@ -119,7 +119,7 @@
 
 
 ### ERD
-![ERD](images/performedAt.png)
+![ERD](images/ConcertERD.png)
 
 ### API 명세 - Swagger UI
 ![SWAGGER](images/swagger_ui.png)
