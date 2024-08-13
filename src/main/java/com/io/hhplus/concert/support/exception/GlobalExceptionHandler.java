@@ -1,4 +1,4 @@
-package com.io.hhplus.concert.interfaces.common.exception;
+package com.io.hhplus.concert.support.exception;
 
 import com.io.hhplus.concert.common.enums.ResponseMessage;
 import com.io.hhplus.concert.common.exceptions.*;
