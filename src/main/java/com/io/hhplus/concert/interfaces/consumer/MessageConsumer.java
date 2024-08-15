@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,6 +23,7 @@ public class MessageConsumer {
 
     private final String TOPIC_PAID_SUCCESS = "PAID_SUCCESS";
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @KafkaListener(topics = TOPIC_PAID_SUCCESS)
     public void consume(String key, String message) throws JsonProcessingException {
         Outbox payload = objectMapper.readValue(message, Outbox.class);
