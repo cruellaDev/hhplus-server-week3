@@ -21,3 +21,13 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 50000
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+    consumer:
+      group-id: group_id
+      auto-offset-reset: earliest
+    admin:
+      auto-create: true

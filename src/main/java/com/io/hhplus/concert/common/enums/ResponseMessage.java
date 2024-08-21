@@ -35,7 +35,8 @@ public enum ResponseMessage {
     RESERVATION_OUT_OF_TIME("결제요청 시간이 초과되었습니다."),
     WAITING_TOKEN_EXPIRED("대기 토큰이 만료되었습니다."),
     OUT_OF_BUDGET("금액이 부족합니다."),
-    UNKNOWN("알 수 없는 에러")
+    UNKNOWN("알 수 없는 에러"),
+    ALREADY_PUBLISHED("이미 발행된 데이터가 존재합니다.")
     ;
 
     private final String messageDetail;

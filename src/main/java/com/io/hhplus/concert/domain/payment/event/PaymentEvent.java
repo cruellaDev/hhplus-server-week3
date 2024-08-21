@@ -1,5 +1,7 @@
 package com.io.hhplus.concert.domain.payment.event;
 
+import com.io.hhplus.concert.common.utils.DateUtils;
+import com.io.hhplus.concert.domain.outbox.model.Outbox;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +21,15 @@ public class PaymentEvent {
         private Long customerId;
         private Long reservationId;
         private BigDecimal payAmount;
+
+        public Outbox toEventRecordCommand() {
+            return Outbox.builder()
+                    .domainType("PAYMENT")
+                    .eventType("PAID_SUCCESS")
+                    .key(this.reservationId.toString())
+                    .payload(this.toString())
+                    .createdAt(DateUtils.getSysDate())
+                    .build();
+        }
     }
 }
