@@ -6,10 +6,10 @@ import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 export let options = {
     scenarios: {
         concert_scenario: {
-            vus: 100, // 가상 사용자
+            vus: 1, // 가상 사용자
             exec: 'concert_scenario',
             executor: 'per-vu-iterations', // 각각의 가상 사용자들이 정확한 반복 횟수만큼 실행
-            iterations: 1000,
+            iterations: 1,
         },
     },
     thresholds: {
@@ -25,7 +25,7 @@ let startTime = Date.now();
 let requestCount = 0;
 
 export function concert_scenario() {
-    const response = getSchedules();
+    const response = getConcerts();
     check(response, {
         'status is 200': (res) => res.status === 200,
     });
